@@ -27,7 +27,7 @@ public class RankingFragmentPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getCount() {
-        return 4;
+        return fragments.length;
     }
 
     @Override

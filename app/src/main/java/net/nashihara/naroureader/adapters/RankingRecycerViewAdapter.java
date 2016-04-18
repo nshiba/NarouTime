@@ -1,26 +1,34 @@
 package net.nashihara.naroureader.adapters;
 
 import android.content.Context;
+import android.databinding.DataBindingUtil;
 import android.support.annotation.Nullable;
 import android.support.v7.util.SortedList;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import net.nashihara.naroureader.R;
+import net.nashihara.naroureader.databinding.ListItemBinding;
 import net.nashihara.naroureader.entities.NovelItem;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
-public class RankingRecycerViewAdapter extends RecyclerView.Adapter<RankingRecycerViewAdapter.ViewHolder> implements View.OnClickListener {
+import narou4j.Novel;
+import narou4j.enums.NovelGenre;
+
+public class RankingRecycerViewAdapter extends RecyclerView.Adapter<RankingRecycerViewAdapter.BindingHolder> {
     private static final String TAG = RankingRecycerViewAdapter.class.getSimpleName();
 
     private LayoutInflater mInflater;
     private RecyclerView mRecycerView;
-    private OnItemClickListener mListener;
+    private RecyclerItemClickListener mListener;
     private SortedList<NovelItem> mSortedList;
 
     public RankingRecycerViewAdapter(Context context) {
@@ -41,24 +49,53 @@ public class RankingRecycerViewAdapter extends RecyclerView.Adapter<RankingRecyc
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public BindingHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         final View v = mInflater.inflate(R.layout.list_item, parent, false);
-        v.setOnClickListener(this);
-        return new ViewHolder(v);
+        return new BindingHolder(v);
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        Log.d(TAG, "onBindViewHolder: ");
+    public void onBindViewHolder(BindingHolder holder, int position) {
         if (mSortedList != null && mSortedList.size() > position && mSortedList.get(position) != null) {
             NovelItem novelItem = mSortedList.get(position);
-            holder.title.setText(novelItem.getNovelDetail().getTitle());
-            holder.rankingPoint.setText(String.valueOf(novelItem.getRankingPoint()));
-        }
-    }
+            Novel novel = novelItem.getNovelDetail();
 
-    public void setOnItemClickListener(OnItemClickListener listener) {
-        mListener = listener;
+            ListItemBinding binding = holder.getBinding();
+
+            binding.ranking.setText(String.valueOf(position +1));
+            binding.title.setText(novel.getTitle());
+            binding.rankingPoint.setText(int2String(novelItem.getRankingPoint()) + "pt");
+            binding.writer.setText(novel.getWriter());
+            binding.genre.setText(int2Genre(novel.getGenre()));
+            binding.story.setText(novel.getStory());
+            binding.allStory.setText(novel.getStory());
+            binding.allStory.setVisibility(View.GONE);
+            binding.keyword.setText("キーワード：" + novel.getKeyword());
+            binding.keyword.setVisibility(View.GONE);
+
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat format2 = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+            String dateString = "";
+            try {
+                Date date = format.parse(novel.getLastUploadDate());
+                dateString = format2.format(date);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            if (dateString.equals("")) {
+                binding.lastup.setText(novel.getLastUploadDate());
+            } else {
+                binding.lastup.setText(dateString);
+            }
+
+            if (novel.getIsNovelContinue() == 1) {
+                binding.isContinue.setText("連載中");
+            } else {
+                binding.isContinue.setText("完結済");
+            }
+            binding.page.setText("全" + String.valueOf(novel.getAllNumberOfNovel()) + "部分");
+            binding.length.setText(int2String(novel.getNumberOfChar()) + " 文字");
+        }
     }
 
     @Override
@@ -67,6 +104,20 @@ public class RankingRecycerViewAdapter extends RecyclerView.Adapter<RankingRecyc
             return 0;
         }
         return mSortedList.size();
+    }
+
+    private String int2String(int number) {
+        StringBuilder builder = new StringBuilder();
+        String pageString = String.valueOf(number);
+        builder.append(pageString);
+        int c = 0;
+        for (int i = pageString.length(); i > 0; i--) {
+            if (c % 3 == 0 && c != 0) {
+                builder.insert(i, ",");
+            }
+            c++;
+        }
+        return builder.toString();
     }
 
     public void addDataOf(List<NovelItem> dataList) {
@@ -89,29 +140,145 @@ public class RankingRecycerViewAdapter extends RecyclerView.Adapter<RankingRecyc
         return mSortedList;
     }
 
-    @Override
-    public void onClick(View v) {
-        if (mRecycerView == null || mListener == null) {
-            return;
+    private String int2Genre(NovelGenre target) {
+        switch (target) {
+            case LITERATURE: {
+                return "文学";
+            }
+            case LOVE: {
+                return "恋愛";
+            }
+            case HISTORY: {
+                return "歴史";
+            }
+            case DETECTIVE: {
+                return "推理";
+            }
+            case FANTASY: {
+                return "ファンタジー";
+            }
+            case SF: {
+                return "SF";
+            }
+            case HORROR: {
+                return "ホラー";
+            }
+            case COMEDY: {
+                return "コメディー";
+            }
+            case ADVENTURE: {
+                return "冒険";
+            }
+            case ACADEMY: {
+                return "学園";
+            }
+            case MILITARY_HISTORY: {
+                return "戦記";
+            }
+            case FAIRYTALE: {
+                return "童話";
+            }
+            case POEM: {
+                return "詩";
+            }
+            case ESSAY: {
+                return "エッセイ";
+            }
+            case REPLAY: {
+                return "リプレイ";
+            }
+            case OTHER: {
+                return "その他";
+            }
+            default: {
+                return "no such a genre";
+            }
+        }
+    }
+
+    public static class RecyclerItemClickListener implements RecyclerView.OnItemTouchListener {
+        private OnItemClickListener mListener;
+
+        public interface OnItemClickListener {
+            /**
+             * Fires when recycler view receives a single tap event on any item
+             *
+             * @param view     tapped view
+             * @param position item position in the list
+             */
+            public void onItemClick(View view, int position);
+
+            /**
+             * Fires when recycler view receives a long tap event on item
+             *
+             * @param view     long tapped view
+             * @param position item position in the list
+             */
+            public void onItemLongClick(View view, int position);
         }
 
-        int position = mRecycerView.getChildAdapterPosition(v);
-        NovelItem item = mSortedList.get(position);
-        mListener.onItemClick(this, position, item);
+        GestureDetector mGestureDetector;
+        ExtendedGestureListener mGestureListener;
+
+        public RecyclerItemClickListener(Context context, OnItemClickListener listener) {
+            mListener = listener;
+            mGestureListener = new ExtendedGestureListener();
+            mGestureDetector = new GestureDetector(context, mGestureListener);
+        }
+
+        @Override
+        public boolean onInterceptTouchEvent(RecyclerView view, MotionEvent e) {
+            View childView = view.findChildViewUnder(e.getX(), e.getY());
+            if (childView != null && mListener != null) {
+                mGestureListener.setHelpers(childView, view.getChildPosition(childView));
+                mGestureDetector.onTouchEvent(e);
+            }
+            return false;
+        }
+
+        @Override
+        public void onTouchEvent(RecyclerView view, MotionEvent motionEvent) {
+        }
+
+        @Override
+        public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+        }
+
+        /**
+         * Extended Gesture listener react for both item clicks and item long clicks
+         */
+        private class ExtendedGestureListener extends GestureDetector.SimpleOnGestureListener {
+            private View view;
+            private int position;
+
+            public void setHelpers(View view, int position) {
+                this.view = view;
+                this.position = position;
+            }
+
+            @Override
+            public boolean onSingleTapUp(MotionEvent e) {
+                mListener.onItemClick(view, position);
+                return true;
+            }
+
+            @Override
+            public void onLongPress(MotionEvent e) {
+                mListener.onItemLongClick(view, position);
+            }
+        }
     }
 
-    public static interface OnItemClickListener {
-        public void onItemClick(RankingRecycerViewAdapter adapter, int position, NovelItem item);
-    }
+    static class BindingHolder extends RecyclerView.ViewHolder {
+        private final ListItemBinding binding;
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView title;
-        TextView rankingPoint;
-
-        public ViewHolder(View itemView) {
+        public BindingHolder(View itemView) {
             super(itemView);
-            title = (TextView) itemView.findViewById(R.id.title);
-            rankingPoint = (TextView) itemView.findViewById(R.id.ranking_point);
+            binding = DataBindingUtil.bind(itemView);
+        }
+
+        public ListItemBinding getBinding(){
+            return this.binding;
         }
     }
 

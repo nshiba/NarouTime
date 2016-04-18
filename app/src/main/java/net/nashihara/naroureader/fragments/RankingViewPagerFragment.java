@@ -12,8 +12,6 @@ import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.adapters.RankingFragmentPagerAdapter;
 import net.nashihara.naroureader.databinding.FragmentRankingViewpagerBinding;
 
-import narou4j.enums.RankingType;
-
 public class RankingViewPagerFragment extends Fragment {
     private static final String TAG = RankingViewPagerFragment.class.getSimpleName();
 
@@ -49,10 +47,11 @@ public class RankingViewPagerFragment extends Fragment {
             String[] types = args.getStringArray(PARAM_TYPE);
             Fragment fragments[] = new Fragment[titles.length];
             for (int i = 0; i < fragments.length; i++) {
-                fragments[i] = RankingRecyclerViewFragment.newInstance(RankingType.valueOf(types[i]));
+                fragments[i] = RankingRecyclerViewFragment.newInstance(types[i]);
             }
             RankingFragmentPagerAdapter adapter = new RankingFragmentPagerAdapter(getFragmentManager(), fragments, titles);
             binding.pager.setAdapter(adapter);
+            binding.pager.setOffscreenPageLimit(4);
             binding.tabStrip.setupWithViewPager(binding.pager);
         }
 

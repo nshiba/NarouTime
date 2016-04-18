@@ -2,12 +2,10 @@ package net.nashihara.naroureader;
 
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
 import net.nashihara.naroureader.databinding.ActivityMainBinding;
 import net.nashihara.naroureader.fragments.RankingViewPagerFragment;
@@ -26,18 +24,10 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(binding.toolbar);
         manager = getSupportFragmentManager();
 
-        binding.fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
         String[] types = new String[]{
                 RankingType.DAILY.toString(), RankingType.WEEKLY.toString(),
-                RankingType.MONTHLY.toString(), RankingType.QUARTET.toString()};
-        String[] titles = new String[]{"日間", "週間", "月間", "四半期"};
+                RankingType.MONTHLY.toString(), RankingType.QUARTET.toString(), "all"};
+        String[] titles = new String[]{"日間", "週間", "月間", "四半期", "累計"};
         manager.beginTransaction()
                 .replace(R.id.main_container, RankingViewPagerFragment.newInstance(types, titles))
                 .commit();

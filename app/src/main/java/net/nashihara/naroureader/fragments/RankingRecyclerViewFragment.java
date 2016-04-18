@@ -17,6 +17,7 @@ import net.nashihara.naroureader.DividerItemDecoration;
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.adapters.RankingRecycerViewAdapter;
 import net.nashihara.naroureader.databinding.FragmentRankingRecyclerBinding;
+import net.nashihara.naroureader.databinding.ListItemBinding;
 import net.nashihara.naroureader.entities.NovelItem;
 
 import java.util.ArrayList;
@@ -28,13 +29,15 @@ import narou4j.Narou;
 import narou4j.Novel;
 import narou4j.NovelRank;
 import narou4j.Ranking;
+import narou4j.enums.OutputOrder;
 import narou4j.enums.RankingType;
 import rx.Observable;
 import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
-public class RankingRecyclerViewFragment extends Fragment implements RankingRecycerViewAdapter.OnItemClickListener {
+public class RankingRecyclerViewFragment extends Fragment {
     private static final String TAG = RankingRecyclerViewFragment.class.getSimpleName();
 
     private FragmentRankingRecyclerBinding binding;
@@ -42,12 +45,15 @@ public class RankingRecyclerViewFragment extends Fragment implements RankingRecy
     private Fragment mFragment;
     private RecyclerView mRecyclerView;
 
+    private MyProgressDialogFragment progressDialog;
+
     private static final String PARAM_TYPE = "rankingType";
 
-    public static RankingRecyclerViewFragment newInstance(RankingType type) {
+    public static RankingRecyclerViewFragment newInstance(String type) {
         RankingRecyclerViewFragment fragment = new RankingRecyclerViewFragment();
+        Log.d(TAG, "newInstance: " + type);
         Bundle args = new Bundle();
-        args.putString(PARAM_TYPE, type.toString());
+        args.putString(PARAM_TYPE, type);
         fragment.setArguments(args);
         return fragment;
     }
@@ -74,6 +80,30 @@ public class RankingRecyclerViewFragment extends Fragment implements RankingRecy
         mRecyclerView = binding.recycler;
         mRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));
         mRecyclerView.addItemDecoration(new DividerItemDecoration(mContext));
+        mRecyclerView.addOnItemTouchListener(
+                new RankingRecycerViewAdapter.RecyclerItemClickListener(getActivity(),
+                new RankingRecycerViewAdapter.RecyclerItemClickListener.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(View view, int position) {
+                        ListItemBinding binding = DataBindingUtil.bind(view);
+
+                        if (binding.allStory.getVisibility() == View.GONE) {
+                            binding.story.setVisibility(View.GONE);
+                            binding.allStory.setVisibility(View.VISIBLE);
+                            binding.keyword.setVisibility(View.VISIBLE);
+                        } else {
+                            binding.story.setVisibility(View.VISIBLE);
+                            binding.allStory.setVisibility(View.GONE);
+                            binding.keyword.setVisibility(View.GONE);
+                        }
+                    }
+
+                    @Override
+                    public void onItemLongClick(View view, int position) {
+                        RankingRecycerViewAdapter adapter = (RankingRecycerViewAdapter) mRecyclerView.getAdapter();
+                        Log.d(TAG, "onItemLongClick: " + adapter.getList().get(position).toString());
+                    }
+                }));
 
         return binding.getRoot();
     }
@@ -84,100 +114,164 @@ public class RankingRecyclerViewFragment extends Fragment implements RankingRecy
         RankingRecycerViewAdapter adapter = new RankingRecycerViewAdapter(getActivity());
         mRecyclerView.setAdapter(adapter);
 
-        NovelItem item = new NovelItem();
-        Novel novel = new Novel();
-        novel.setTitle("test");
-        item.setNovelDetail(novel);
-        item.setRankingPoint(300);
-        ArrayList<NovelItem> list = new ArrayList();
-        list.add(item);
-
-        NovelItem item2 = new NovelItem();
-        Novel novel2 = new Novel();
-        novel2.setTitle("ssss");
-        item2.setNovelDetail(novel2);
-        item2.setRankingPoint(400);
-        list.add(item2);
-
-        adapter.clearData();
-        adapter.addDataOf(list);
+        progressDialog = MyProgressDialogFragment.newInstance("", "loading...");
+        progressDialog.show(getFragmentManager(), "load");
 
         Bundle args = getArguments();
         if (args != null) {
-            final RankingType type = RankingType.valueOf(args.getString(PARAM_TYPE));
+            String typeStr = args.getString(PARAM_TYPE);
+            Log.d(TAG, "onActivityCreated: " + typeStr);
 
-            Observable.create(new Observable.OnSubscribe<HashMap<String, NovelItem>>() {
-                @Override
-                public void call(Subscriber<? super HashMap<String, NovelItem>> subscriber) {
-                    HashMap<String, NovelItem> map = new HashMap<>();
-                    Ranking ranking = new Ranking();
-                    for (NovelRank rank : ranking.getRanking(type)) {
-                        NovelItem novelItem = new NovelItem();
-                        novelItem.setRankingPoint(rank.getPt());
-                        map.put(rank.getNcode(), novelItem);
-                    }
-                    subscriber.onNext(map);
-                    subscriber.onCompleted();
-                }
-            })
-                    .flatMap(new Func1<HashMap<String, NovelItem>, Observable<List<NovelItem>>>() {
-                        @Override
-                        public Observable<List<NovelItem>> call(final HashMap<String, NovelItem> stringNovelItemHashMap) {
-                            return Observable.create(new Observable.OnSubscribe<List<NovelItem>>() {
-                                @Override
-                                public void call(Subscriber<? super List<NovelItem>> subscriber) {
-                                    Narou narou = new Narou();
-
-                                    HashMap<String, NovelItem> map = stringNovelItemHashMap;
-                                    Set set = map.keySet();
-                                    String[] array = new String[set.size()];
-                                    set.toArray(array);
-
-                                    narou.setNCode(array);
-                                    narou.setLim(300);
-                                    List<Novel> novels = narou.getNovels();
-
-                                    novels.remove(0);
-
-                                    ArrayList<NovelItem> items = new ArrayList<>();
-                                    for (Novel novel : novels) {
-                                        NovelItem item = map.get(novel.getNcode());
-                                        item.setNovelDetail(novel);
-                                        items.add(item);
-                                    }
-
-                                    subscriber.onNext(items);
-                                    subscriber.onCompleted();
-                                }
-                            });
-                        }
-                    })
-                    .subscribeOn(Schedulers.io())
-                    .subscribe(new Subscriber<List<NovelItem>>() {
-                        @Override
-                        public void onCompleted() {
-
-                        }
-
-                        @Override
-                        public void onError(Throwable e) {
-
-                        }
-
-                        @Override
-                        public void onNext(List<NovelItem> novelItems) {
-                            Log.d(TAG, "onNext: add data novelItems: " + novelItems.size());
-
-                            RankingRecycerViewAdapter adapter = (RankingRecycerViewAdapter) mRecyclerView.getAdapter();
-                            adapter.clearData();
-                            adapter.addDataOf(novelItems);
-                        }
-                    });
+            if (typeStr != null && typeStr.equals("all")) {
+                getTotalRanking();
+            }
+            else {
+                final RankingType type = RankingType.valueOf(typeStr);
+                getRanking(type);
+            }
         }
     }
 
-    @Override
-    public void onItemClick(RankingRecycerViewAdapter adapter, int position, NovelItem item) {
+    private void getTotalRanking() {
+        Observable.create(new Observable.OnSubscribe<List<NovelItem>>() {
+            @Override
+            public void call(Subscriber<? super List<NovelItem>> subscriber) {
 
+                Narou narou = new Narou();
+                narou.setOrder(OutputOrder.TOTAL_POINT);
+                narou.setLim(301);
+                List<Novel> novels = narou.getNovels();
+
+                novels.remove(0);
+
+                List<NovelItem> items = new ArrayList<>();
+                NovelItem item;
+                for (Novel novel : novels) {
+                    item = new NovelItem();
+                    item.setNovelDetail(novel);
+                    item.setRankingPoint(novel.getGlobalPoint());
+                    items.add(item);
+                }
+
+                subscriber.onNext(items);
+                subscriber.onCompleted();
+            }
+        })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<List<NovelItem>>() {
+                    @Override
+                    public void onCompleted() {
+                        if (progressDialog != null) {
+                            progressDialog.dismiss();
+                            progressDialog = null;
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        if (progressDialog != null) {
+                            progressDialog.dismiss();
+                            progressDialog = null;
+                        }
+                        Log.e(TAG, "onError: ", e.fillInStackTrace());
+                    }
+
+                    @Override
+                    public void onNext(List<NovelItem> novelItems) {
+                        Log.d(TAG, "onNext: add data novelItems: " + novelItems.size());
+
+                        RankingRecycerViewAdapter adapter = (RankingRecycerViewAdapter) mRecyclerView.getAdapter();
+                        adapter.clearData();
+                        adapter.addDataOf(novelItems);
+                        if (progressDialog != null) {
+                            progressDialog.dismiss();
+                            progressDialog = null;
+                        }
+                    }
+                });
+    }
+
+    private void getRanking(final RankingType type) {
+        Observable.create(new Observable.OnSubscribe<HashMap<String, NovelItem>>() {
+            @Override
+            public void call(Subscriber<? super HashMap<String, NovelItem>> subscriber) {
+                HashMap<String, NovelItem> map = new HashMap<>();
+                Ranking ranking = new Ranking();
+                for (NovelRank rank : ranking.getRanking(type)) {
+                    NovelItem novelItem = new NovelItem();
+                    novelItem.setRankingPoint(rank.getPt());
+                    novelItem.setRanking(rank.getRank());
+                    map.put(rank.getNcode(), novelItem);
+                }
+                subscriber.onNext(map);
+                subscriber.onCompleted();
+            }
+        })
+                .flatMap(new Func1<HashMap<String, NovelItem>, Observable<List<NovelItem>>>() {
+                    @Override
+                    public Observable<List<NovelItem>> call(final HashMap<String, NovelItem> stringNovelItemHashMap) {
+                        return Observable.create(new Observable.OnSubscribe<List<NovelItem>>() {
+                            @Override
+                            public void call(Subscriber<? super List<NovelItem>> subscriber) {
+                                Narou narou = new Narou();
+
+                                HashMap<String, NovelItem> map = stringNovelItemHashMap;
+                                Set set = map.keySet();
+                                String[] array = new String[set.size()];
+                                set.toArray(array);
+
+                                narou.setNCode(array);
+                                narou.setLim(300);
+                                List<Novel> novels = narou.getNovels();
+
+                                novels.remove(0);
+
+                                ArrayList<NovelItem> items = new ArrayList<>();
+                                for (Novel novel : novels) {
+                                    NovelItem item = map.get(novel.getNcode());
+                                    item.setNovelDetail(novel);
+                                    items.add(item);
+                                }
+
+                                subscriber.onNext(items);
+                                subscriber.onCompleted();
+                            }
+                        });
+                    }
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<List<NovelItem>>() {
+                    @Override
+                    public void onCompleted() {
+                        if (progressDialog != null) {
+                            progressDialog.dismiss();
+                            progressDialog = null;
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        if (progressDialog != null) {
+                            progressDialog.dismiss();
+                            progressDialog = null;
+                        }
+                        Log.e(TAG, "onError: ", e.fillInStackTrace());
+                    }
+
+                    @Override
+                    public void onNext(List<NovelItem> novelItems) {
+                        Log.d(TAG, "onNext: add data novelItems: " + novelItems.size());
+
+                        RankingRecycerViewAdapter adapter = (RankingRecycerViewAdapter) mRecyclerView.getAdapter();
+                        adapter.clearData();
+                        adapter.addDataOf(novelItems);
+                        if (progressDialog != null) {
+                            progressDialog.dismiss();
+                            progressDialog = null;
+                        }
+                    }
+                });
     }
 }
