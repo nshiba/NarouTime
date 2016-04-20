@@ -26,9 +26,9 @@ import java.util.List;
 import java.util.Set;
 
 import narou4j.Narou;
-import narou4j.Novel;
-import narou4j.NovelRank;
 import narou4j.Ranking;
+import narou4j.entities.Novel;
+import narou4j.entities.NovelRank;
 import narou4j.enums.OutputOrder;
 import narou4j.enums.RankingType;
 import rx.Observable;
@@ -88,11 +88,9 @@ public class RankingRecyclerViewFragment extends Fragment {
                         ListItemBinding binding = DataBindingUtil.bind(view);
 
                         if (binding.allStory.getVisibility() == View.GONE) {
-                            binding.story.setVisibility(View.GONE);
                             binding.allStory.setVisibility(View.VISIBLE);
                             binding.keyword.setVisibility(View.VISIBLE);
                         } else {
-                            binding.story.setVisibility(View.VISIBLE);
                             binding.allStory.setVisibility(View.GONE);
                             binding.keyword.setVisibility(View.GONE);
                         }
@@ -230,8 +228,10 @@ public class RankingRecyclerViewFragment extends Fragment {
                                 ArrayList<NovelItem> items = new ArrayList<>();
                                 for (Novel novel : novels) {
                                     NovelItem item = map.get(novel.getNcode());
-                                    item.setNovelDetail(novel);
-                                    items.add(item);
+                                    if (item != null) {
+                                        item.setNovelDetail(novel);
+                                        items.add(item);
+                                    }
                                 }
 
                                 subscriber.onNext(items);

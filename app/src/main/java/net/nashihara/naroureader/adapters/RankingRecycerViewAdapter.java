@@ -20,7 +20,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import narou4j.Novel;
+import narou4j.entities.Novel;
 import narou4j.enums.NovelGenre;
 
 public class RankingRecycerViewAdapter extends RecyclerView.Adapter<RankingRecycerViewAdapter.BindingHolder> {
@@ -67,7 +67,6 @@ public class RankingRecycerViewAdapter extends RecyclerView.Adapter<RankingRecyc
             binding.rankingPoint.setText(int2String(novelItem.getRankingPoint()) + "pt");
             binding.writer.setText(novel.getWriter());
             binding.genre.setText(int2Genre(novel.getGenre()));
-            binding.story.setText(novel.getStory());
             binding.allStory.setText(novel.getStory());
             binding.allStory.setVisibility(View.GONE);
             binding.keyword.setText("キーワード：" + novel.getKeyword());

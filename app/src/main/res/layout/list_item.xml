@@ -68,12 +68,6 @@
         </LinearLayout>
 
         <TextView
-            android:id="@+id/story"
-            android:textSize="@dimen/text_normal"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/story_height" />
-
-        <TextView
             android:id="@+id/all_story"
             android:textSize="@dimen/text_normal"
             android:layout_width="match_parent"
