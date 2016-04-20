@@ -2,6 +2,7 @@ package net.nashihara.naroureader.adapters;
 
 import android.content.Context;
 import android.databinding.DataBindingUtil;
+import android.graphics.Color;
 import android.support.annotation.Nullable;
 import android.support.v7.util.SortedList;
 import android.support.v7.widget.RecyclerView;
@@ -21,6 +22,7 @@ import java.util.Date;
 import java.util.List;
 
 import narou4j.entities.Novel;
+import narou4j.entities.NovelRank;
 import narou4j.enums.NovelGenre;
 
 public class RankingRecycerViewAdapter extends RecyclerView.Adapter<RankingRecycerViewAdapter.BindingHolder> {
@@ -57,14 +59,63 @@ public class RankingRecycerViewAdapter extends RecyclerView.Adapter<RankingRecyc
     @Override
     public void onBindViewHolder(BindingHolder holder, int position) {
         if (mSortedList != null && mSortedList.size() > position && mSortedList.get(position) != null) {
-            NovelItem novelItem = mSortedList.get(position);
-            Novel novel = novelItem.getNovelDetail();
-
             ListItemBinding binding = holder.getBinding();
 
-            binding.ranking.setText(String.valueOf(position +1));
+            NovelItem novelItem = mSortedList.get(position);
+            Novel novel = novelItem.getNovelDetail();
+            NovelRank rank = novelItem.getRank();
+            NovelRank prevRank = novelItem.getPrevRank();
+
+            if (rank.getRankingType() == null) {
+                binding.ranking.setText(String.valueOf(position +1) + "位");
+            }
+            else {
+                binding.ranking.setText(rank.getRank() + "位");
+                if (prevRank != null) {
+                    binding.rankNew.setVisibility(View.GONE);
+                    binding.rankDiffKigou.setVisibility(View.VISIBLE);
+                    switch (rank.getRankingType()) {
+                        case DAILY: {
+                            binding.prevRankText.setText("前日：" + String.valueOf(prevRank.getRank()) + "位");
+                            break;
+                        }
+                        case WEEKLY: {
+                            binding.prevRankText.setText("前週：" + String.valueOf(prevRank.getRank()) + "位");
+                            break;
+                        }
+                        case MONTHLY: {
+                            binding.prevRankText.setText("前月：" + String.valueOf(prevRank.getRank()) + "位");
+                            break;
+                        }
+                        case QUARTET: {
+                            binding.prevRankText.setText("前月：" + String.valueOf(prevRank.getRank()) + "位");
+                            break;
+                        }
+                    }
+                    if (rank.getRank() < prevRank.getRank()) {
+//                    binding.prevRankText.setText("前回のランキングから" + String.valueOf(diff) + "位上昇しました！");
+                        binding.rankDiffKigou.setImageResource(R.drawable.ic_up);
+                    }
+                    else if (rank.getRank() > prevRank.getRank()) {
+//                    binding.prevRankText.setText("前回のランキングから" + String.valueOf(diff) + "位下降しました...");
+                        binding.rankDiffKigou.setImageResource(R.drawable.ic_down);
+                    }
+                    else if (rank.getRank() == prevRank.getRank()) {
+//                    binding.prevRankText.setText("前回のランキングと同じだよ");
+                        binding.rankDiffKigou.setImageResource(R.drawable.ic_sonomama);
+                    }
+                }
+                else {
+                    binding.prevRankText.setText("前回：ー");
+                    binding.rankDiffKigou.setVisibility(View.GONE);
+                    binding.rankNew.setVisibility(View.VISIBLE);
+                    binding.rankNew.setTextColor(Color.RED);
+                }
+            }
+
+
             binding.title.setText(novel.getTitle());
-            binding.rankingPoint.setText(int2String(novelItem.getRankingPoint()) + "pt");
+            binding.rankingPoint.setText(int2String(novelItem.getRank().getPt()) + "pt");
             binding.writer.setText(novel.getWriter());
             binding.genre.setText(int2Genre(novel.getGenre()));
             binding.allStory.setText(novel.getStory());
@@ -291,10 +342,10 @@ public class RankingRecycerViewAdapter extends RecyclerView.Adapter<RankingRecyc
 
         @Override
         public int compare(NovelItem o1, NovelItem o2) {
-            if (o2.getRankingPoint() < o1.getRankingPoint()) {
+            if (o2.getRank().getRank() > o1.getRank().getRank()) {
                 return -1;
             }
-            if (o1.getRankingPoint() == o2.getRankingPoint()) {
+            if (o1.getRank().getRank() == o2.getRank().getRank()) {
                 return 0;
             }
             return 1;
@@ -322,7 +373,7 @@ public class RankingRecycerViewAdapter extends RecyclerView.Adapter<RankingRecyc
 
         @Override
         public boolean areContentsTheSame(NovelItem oldItem, NovelItem newItem) {
-            return oldItem.getRankingPoint() == newItem.getRankingPoint();
+            return oldItem.getRank().getRank() == newItem.getRank().getRank();
         }
 
         @Override

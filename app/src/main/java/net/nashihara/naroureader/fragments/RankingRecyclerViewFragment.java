@@ -21,6 +21,8 @@ import net.nashihara.naroureader.databinding.ListItemBinding;
 import net.nashihara.naroureader.entities.NovelItem;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -44,8 +46,6 @@ public class RankingRecyclerViewFragment extends Fragment {
     private Context mContext;
     private Fragment mFragment;
     private RecyclerView mRecyclerView;
-
-    private MyProgressDialogFragment progressDialog;
 
     private static final String PARAM_TYPE = "rankingType";
 
@@ -112,9 +112,6 @@ public class RankingRecyclerViewFragment extends Fragment {
         RankingRecycerViewAdapter adapter = new RankingRecycerViewAdapter(getActivity());
         mRecyclerView.setAdapter(adapter);
 
-        progressDialog = MyProgressDialogFragment.newInstance("", "loading...");
-        progressDialog.show(getFragmentManager(), "load");
-
         Bundle args = getArguments();
         if (args != null) {
             String typeStr = args.getString(PARAM_TYPE);
@@ -146,8 +143,10 @@ public class RankingRecyclerViewFragment extends Fragment {
                 NovelItem item;
                 for (Novel novel : novels) {
                     item = new NovelItem();
+                    NovelRank rank = new NovelRank();
+                    rank.setPt(novel.getGlobalPoint());
                     item.setNovelDetail(novel);
-                    item.setRankingPoint(novel.getGlobalPoint());
+                    item.setRank(rank);
                     items.add(item);
                 }
 
@@ -159,33 +158,16 @@ public class RankingRecyclerViewFragment extends Fragment {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<List<NovelItem>>() {
                     @Override
-                    public void onCompleted() {
-                        if (progressDialog != null) {
-                            progressDialog.dismiss();
-                            progressDialog = null;
-                        }
-                    }
+                    public void onCompleted() {}
 
                     @Override
                     public void onError(Throwable e) {
-                        if (progressDialog != null) {
-                            progressDialog.dismiss();
-                            progressDialog = null;
-                        }
                         Log.e(TAG, "onError: ", e.fillInStackTrace());
                     }
 
                     @Override
                     public void onNext(List<NovelItem> novelItems) {
-                        Log.d(TAG, "onNext: add data novelItems: " + novelItems.size());
-
-                        RankingRecycerViewAdapter adapter = (RankingRecycerViewAdapter) mRecyclerView.getAdapter();
-                        adapter.clearData();
-                        adapter.addDataOf(novelItems);
-                        if (progressDialog != null) {
-                            progressDialog.dismiss();
-                            progressDialog = null;
-                        }
+                        onMyNext(novelItems);
                     }
                 });
     }
@@ -198,14 +180,63 @@ public class RankingRecyclerViewFragment extends Fragment {
                 Ranking ranking = new Ranking();
                 for (NovelRank rank : ranking.getRanking(type)) {
                     NovelItem novelItem = new NovelItem();
-                    novelItem.setRankingPoint(rank.getPt());
-                    novelItem.setRanking(rank.getRank());
+                    rank.setRankingType(type);
+                    novelItem.setRank(rank);
                     map.put(rank.getNcode(), novelItem);
                 }
                 subscriber.onNext(map);
                 subscriber.onCompleted();
             }
         })
+                .flatMap(new Func1<HashMap<String, NovelItem>, Observable<HashMap<String, NovelItem>>>() {
+                    @Override
+                    public Observable<HashMap<String, NovelItem>> call(final HashMap<String, NovelItem> stringNovelItemHashMap) {
+                        return Observable.create(new Observable.OnSubscribe<HashMap<String, NovelItem>>() {
+                            @Override
+                            public void call(Subscriber<? super HashMap<String, NovelItem>> subscriber) {
+                                HashMap<String, NovelItem> map = stringNovelItemHashMap;
+
+                                Ranking ranking = new Ranking();
+                                Calendar cal = Calendar.getInstance();
+                                cal.setTime(new Date());
+
+                                switch (type) {
+                                    case DAILY: {
+                                        cal.add(Calendar.DAY_OF_MONTH, -2);
+                                        break;
+                                    }
+                                    case WEEKLY: {
+                                        cal.add(Calendar.DAY_OF_MONTH, -7);
+                                        break;
+                                    }
+                                    case MONTHLY: {
+                                        cal.add(Calendar.DAY_OF_MONTH, -31);
+                                        break;
+                                    }
+                                    case QUARTET: {
+                                        cal.add(Calendar.DAY_OF_MONTH, -31);
+                                        break;
+                                    }
+                                }
+
+                                List<NovelRank> ranks = ranking.getRanking(type, cal.getTime());
+                                for (NovelRank rank : ranks) {
+                                    NovelItem item = map.get(rank.getNcode());
+
+                                    if (item == null) {
+                                        continue;
+                                    }
+
+                                    item.setPrevRank(rank);
+                                    map.put(rank.getNcode(), item);
+                                }
+
+                                subscriber.onNext(map);
+                                subscriber.onCompleted();
+                            }
+                        });
+                    }
+                })
                 .flatMap(new Func1<HashMap<String, NovelItem>, Observable<List<NovelItem>>>() {
                     @Override
                     public Observable<List<NovelItem>> call(final HashMap<String, NovelItem> stringNovelItemHashMap) {
@@ -244,34 +275,27 @@ public class RankingRecyclerViewFragment extends Fragment {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<List<NovelItem>>() {
                     @Override
-                    public void onCompleted() {
-                        if (progressDialog != null) {
-                            progressDialog.dismiss();
-                            progressDialog = null;
-                        }
-                    }
+                    public void onCompleted() {}
 
                     @Override
                     public void onError(Throwable e) {
-                        if (progressDialog != null) {
-                            progressDialog.dismiss();
-                            progressDialog = null;
-                        }
                         Log.e(TAG, "onError: ", e.fillInStackTrace());
                     }
 
                     @Override
                     public void onNext(List<NovelItem> novelItems) {
-                        Log.d(TAG, "onNext: add data novelItems: " + novelItems.size());
-
-                        RankingRecycerViewAdapter adapter = (RankingRecycerViewAdapter) mRecyclerView.getAdapter();
-                        adapter.clearData();
-                        adapter.addDataOf(novelItems);
-                        if (progressDialog != null) {
-                            progressDialog.dismiss();
-                            progressDialog = null;
-                        }
+                        onMyNext(novelItems);
                     }
                 });
+    }
+
+    public void onMyNext(List<NovelItem> novelItems) {
+        Log.d(TAG, "onNext: add data novelItems: " + novelItems.size());
+
+        RankingRecycerViewAdapter adapter = (RankingRecycerViewAdapter) mRecyclerView.getAdapter();
+        adapter.clearData();
+        adapter.addDataOf(novelItems);
+        binding.progressBar.setVisibility(View.GONE);
+        mRecyclerView.setVisibility(View.VISIBLE);
     }
 }
