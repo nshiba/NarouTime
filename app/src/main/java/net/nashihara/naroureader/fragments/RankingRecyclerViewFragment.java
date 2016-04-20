@@ -2,7 +2,10 @@ package net.nashihara.naroureader.fragments;
 
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -12,8 +15,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import net.nashihara.naroureader.DividerItemDecoration;
+import net.nashihara.naroureader.OnFragmentReplaceListener;
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.adapters.RankingRecycerViewAdapter;
 import net.nashihara.naroureader.databinding.FragmentRankingRecyclerBinding;
@@ -44,8 +49,8 @@ public class RankingRecyclerViewFragment extends Fragment {
 
     private FragmentRankingRecyclerBinding binding;
     private Context mContext;
-    private Fragment mFragment;
     private RecyclerView mRecyclerView;
+    private OnFragmentReplaceListener mReplaceListener;
 
     private static final String PARAM_TYPE = "rankingType";
 
@@ -64,7 +69,7 @@ public class RankingRecyclerViewFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         mContext = context;
-        mFragment = this;
+        mReplaceListener = (OnFragmentReplaceListener) context;
     }
 
     @Override
@@ -100,6 +105,41 @@ public class RankingRecyclerViewFragment extends Fragment {
                     public void onItemLongClick(View view, int position) {
                         RankingRecycerViewAdapter adapter = (RankingRecycerViewAdapter) mRecyclerView.getAdapter();
                         Log.d(TAG, "onItemLongClick: " + adapter.getList().get(position).toString());
+
+                        final NovelItem item = adapter.getList().get(position);
+                        String[] strings = new String[]
+                                {"小説を読む", "ダウンロード", "ブラウザで小説ページを開く", "ブラウザで作者ページを開く"};
+                        ListDailogFragment listDialog =
+                                new ListDailogFragment(item.getNovelDetail().getTitle(), strings, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        switch (which) {
+                                            case 0: {
+                                                mReplaceListener.onFragmentReplaceAction("ranking recycler view fragment");
+                                                break;
+                                            }
+                                            case 1: {
+                                                Toast.makeText(getActivity(), "未実装の機能", Toast.LENGTH_SHORT).show();
+                                                break;
+                                            }
+                                            case 2: {
+                                                String url = "http://ncode.syosetu.com/" + item.getNovelDetail().getNcode() + "/";
+                                                Uri uri = Uri.parse(url);
+                                                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                                                startActivity(intent);
+                                                break;
+                                            }
+                                            case 3: {
+                                                String url = "http://mypage.syosetu.com/" + item.getNovelDetail().getUserId() + "/";
+                                                Uri uri = Uri.parse(url);
+                                                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                                                startActivity(intent);
+                                                break;
+                                            }
+                                        }
+                                    }
+                                });
+                        listDialog.show(getFragmentManager(), "list_dialog");
                     }
                 }));
 
@@ -190,12 +230,10 @@ public class RankingRecyclerViewFragment extends Fragment {
         })
                 .flatMap(new Func1<HashMap<String, NovelItem>, Observable<HashMap<String, NovelItem>>>() {
                     @Override
-                    public Observable<HashMap<String, NovelItem>> call(final HashMap<String, NovelItem> stringNovelItemHashMap) {
+                    public Observable<HashMap<String, NovelItem>> call(final HashMap<String, NovelItem> map) {
                         return Observable.create(new Observable.OnSubscribe<HashMap<String, NovelItem>>() {
                             @Override
                             public void call(Subscriber<? super HashMap<String, NovelItem>> subscriber) {
-                                HashMap<String, NovelItem> map = stringNovelItemHashMap;
-
                                 Ranking ranking = new Ranking();
                                 Calendar cal = Calendar.getInstance();
                                 cal.setTime(new Date());
@@ -239,13 +277,12 @@ public class RankingRecyclerViewFragment extends Fragment {
                 })
                 .flatMap(new Func1<HashMap<String, NovelItem>, Observable<List<NovelItem>>>() {
                     @Override
-                    public Observable<List<NovelItem>> call(final HashMap<String, NovelItem> stringNovelItemHashMap) {
+                    public Observable<List<NovelItem>> call(final HashMap<String, NovelItem> map) {
                         return Observable.create(new Observable.OnSubscribe<List<NovelItem>>() {
                             @Override
                             public void call(Subscriber<? super List<NovelItem>> subscriber) {
                                 Narou narou = new Narou();
 
-                                HashMap<String, NovelItem> map = stringNovelItemHashMap;
                                 Set set = map.keySet();
                                 String[] array = new String[set.size()];
                                 set.toArray(array);

@@ -4,6 +4,7 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -12,7 +13,7 @@ import net.nashihara.naroureader.fragments.RankingViewPagerFragment;
 
 import narou4j.enums.RankingType;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements OnFragmentReplaceListener {
     ActivityMainBinding binding;
     private String TAG = MainActivity.class.getSimpleName();
     private FragmentManager manager;
@@ -53,5 +54,13 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onFragmentReplaceAction(String str) {
+        Log.d(TAG, "onFragmentReplaceAction: " + str);
+//        manager.beginTransaction()
+//                .replace(R.id.main_container, fragment)
+//                .commit();
     }
 }

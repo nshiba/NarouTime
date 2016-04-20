@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.support.annotation.Nullable;
 import android.support.v7.util.SortedList;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -30,8 +31,8 @@ public class RankingRecycerViewAdapter extends RecyclerView.Adapter<RankingRecyc
 
     private LayoutInflater mInflater;
     private RecyclerView mRecycerView;
-    private RecyclerItemClickListener mListener;
     private SortedList<NovelItem> mSortedList;
+    private View.OnClickListener readClickListener;
 
     public RankingRecycerViewAdapter(Context context) {
         this.mInflater = LayoutInflater.from(context);
@@ -112,7 +113,6 @@ public class RankingRecycerViewAdapter extends RecyclerView.Adapter<RankingRecyc
                     binding.rankNew.setTextColor(Color.RED);
                 }
             }
-
 
             binding.title.setText(novel.getTitle());
             binding.rankingPoint.setText(int2String(novelItem.getRank().getPt()) + "pt");
@@ -307,13 +307,23 @@ public class RankingRecycerViewAdapter extends RecyclerView.Adapter<RankingRecyc
             }
 
             @Override
+            public boolean onSingleTapConfirmed(MotionEvent e) {
+//                view.setBackgroundColor(Color.WHITE);
+                return super.onSingleTapConfirmed(e);
+            }
+
+            @Override
             public boolean onSingleTapUp(MotionEvent e) {
+//                int color = 235;
+//                view.setBackgroundColor(Color.argb(255, color, color, color));
                 mListener.onItemClick(view, position);
                 return true;
             }
 
             @Override
             public void onLongPress(MotionEvent e) {
+//                int color = 235;
+//                view.setBackgroundColor(Color.argb(255, color, color, color));
                 mListener.onItemLongClick(view, position);
             }
         }
