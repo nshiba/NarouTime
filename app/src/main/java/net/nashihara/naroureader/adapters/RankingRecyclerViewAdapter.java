@@ -2,12 +2,11 @@ package net.nashihara.naroureader.adapters;
 
 import android.content.Context;
 import android.databinding.DataBindingUtil;
+import android.graphics.Color;
 import android.support.annotation.Nullable;
 import android.support.v7.util.SortedList;
 import android.support.v7.widget.RecyclerView;
-import android.view.GestureDetector;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -21,17 +20,18 @@ import java.util.Date;
 import java.util.List;
 
 import narou4j.entities.Novel;
+import narou4j.entities.NovelRank;
 import narou4j.enums.NovelGenre;
 
-public class RankingRecycerViewAdapter extends RecyclerView.Adapter<RankingRecycerViewAdapter.BindingHolder> {
-    private static final String TAG = RankingRecycerViewAdapter.class.getSimpleName();
+public class RankingRecyclerViewAdapter extends RecyclerView.Adapter<RankingRecyclerViewAdapter.BindingHolder> {
+    private static final String TAG = RankingRecyclerViewAdapter.class.getSimpleName();
 
     private LayoutInflater mInflater;
-    private RecyclerView mRecycerView;
-    private RecyclerItemClickListener mListener;
     private SortedList<NovelItem> mSortedList;
+    private static RecyclerView mRecyclerView;
+    private static OnItemClickListener mListener;
 
-    public RankingRecycerViewAdapter(Context context) {
+    public RankingRecyclerViewAdapter(Context context) {
         this.mInflater = LayoutInflater.from(context);
         mSortedList = new SortedList<>(NovelItem.class, new SortedListCallback(this));
     }
@@ -39,13 +39,13 @@ public class RankingRecycerViewAdapter extends RecyclerView.Adapter<RankingRecyc
     @Override
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
-        mRecycerView = recyclerView;
+        mRecyclerView = recyclerView;
     }
 
     @Override
     public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
         super.onDetachedFromRecyclerView(recyclerView);
-        mRecycerView = null;
+        mRecyclerView = null;
     }
 
     @Override
@@ -57,14 +57,62 @@ public class RankingRecycerViewAdapter extends RecyclerView.Adapter<RankingRecyc
     @Override
     public void onBindViewHolder(BindingHolder holder, int position) {
         if (mSortedList != null && mSortedList.size() > position && mSortedList.get(position) != null) {
-            NovelItem novelItem = mSortedList.get(position);
-            Novel novel = novelItem.getNovelDetail();
-
             ListItemBinding binding = holder.getBinding();
 
-            binding.ranking.setText(String.valueOf(position +1));
+            NovelItem novelItem = mSortedList.get(position);
+            Novel novel = novelItem.getNovelDetail();
+            NovelRank rank = novelItem.getRank();
+            NovelRank prevRank = novelItem.getPrevRank();
+
+            if (rank.getRankingType() == null) {
+                binding.ranking.setText(String.valueOf(position +1) + "位");
+            }
+            else {
+                binding.ranking.setText(rank.getRank() + "位");
+                if (prevRank != null) {
+                    binding.rankNew.setVisibility(View.GONE);
+                    binding.rankDiffKigou.setVisibility(View.VISIBLE);
+                    switch (rank.getRankingType()) {
+                        case DAILY: {
+                            binding.prevRankText.setText("前日：" + String.valueOf(prevRank.getRank()) + "位");
+                            break;
+                        }
+                        case WEEKLY: {
+                            binding.prevRankText.setText("前週：" + String.valueOf(prevRank.getRank()) + "位");
+                            break;
+                        }
+                        case MONTHLY: {
+                            binding.prevRankText.setText("前月：" + String.valueOf(prevRank.getRank()) + "位");
+                            break;
+                        }
+                        case QUARTET: {
+                            binding.prevRankText.setText("前月：" + String.valueOf(prevRank.getRank()) + "位");
+                            break;
+                        }
+                    }
+                    if (rank.getRank() < prevRank.getRank()) {
+//                    binding.prevRankText.setText("前回のランキングから" + String.valueOf(diff) + "位上昇しました！");
+                        binding.rankDiffKigou.setImageResource(R.drawable.ic_up);
+                    }
+                    else if (rank.getRank() > prevRank.getRank()) {
+//                    binding.prevRankText.setText("前回のランキングから" + String.valueOf(diff) + "位下降しました...");
+                        binding.rankDiffKigou.setImageResource(R.drawable.ic_down);
+                    }
+                    else if (rank.getRank() == prevRank.getRank()) {
+//                    binding.prevRankText.setText("前回のランキングと同じだよ");
+                        binding.rankDiffKigou.setImageResource(R.drawable.ic_sonomama);
+                    }
+                }
+                else {
+                    binding.prevRankText.setText("前回：ー");
+                    binding.rankDiffKigou.setVisibility(View.GONE);
+                    binding.rankNew.setVisibility(View.VISIBLE);
+                    binding.rankNew.setTextColor(Color.RED);
+                }
+            }
+
             binding.title.setText(novel.getTitle());
-            binding.rankingPoint.setText(int2String(novelItem.getRankingPoint()) + "pt");
+            binding.rankingPoint.setText(int2String(novelItem.getRank().getPt()) + "pt");
             binding.writer.setText(novel.getWriter());
             binding.genre.setText(int2Genre(novel.getGenre()));
             binding.allStory.setText(novel.getStory());
@@ -136,7 +184,7 @@ public class RankingRecycerViewAdapter extends RecyclerView.Adapter<RankingRecyc
     }
 
     public SortedList<NovelItem> getList() {
-        return mSortedList;
+        return this.mSortedList;
     }
 
     private String int2Genre(NovelGenre target) {
@@ -195,106 +243,63 @@ public class RankingRecycerViewAdapter extends RecyclerView.Adapter<RankingRecyc
         }
     }
 
-    public static class RecyclerItemClickListener implements RecyclerView.OnItemTouchListener {
-        private OnItemClickListener mListener;
-
-        public interface OnItemClickListener {
-            /**
-             * Fires when recycler view receives a single tap event on any item
-             *
-             * @param view     tapped view
-             * @param position item position in the list
-             */
-            public void onItemClick(View view, int position);
-
-            /**
-             * Fires when recycler view receives a long tap event on item
-             *
-             * @param view     long tapped view
-             * @param position item position in the list
-             */
-            public void onItemLongClick(View view, int position);
-        }
-
-        GestureDetector mGestureDetector;
-        ExtendedGestureListener mGestureListener;
-
-        public RecyclerItemClickListener(Context context, OnItemClickListener listener) {
-            mListener = listener;
-            mGestureListener = new ExtendedGestureListener();
-            mGestureDetector = new GestureDetector(context, mGestureListener);
-        }
-
-        @Override
-        public boolean onInterceptTouchEvent(RecyclerView view, MotionEvent e) {
-            View childView = view.findChildViewUnder(e.getX(), e.getY());
-            if (childView != null && mListener != null) {
-                mGestureListener.setHelpers(childView, view.getChildPosition(childView));
-                mGestureDetector.onTouchEvent(e);
-            }
-            return false;
-        }
-
-        @Override
-        public void onTouchEvent(RecyclerView view, MotionEvent motionEvent) {
-        }
-
-        @Override
-        public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
-        }
-
-        /**
-         * Extended Gesture listener react for both item clicks and item long clicks
-         */
-        private class ExtendedGestureListener extends GestureDetector.SimpleOnGestureListener {
-            private View view;
-            private int position;
-
-            public void setHelpers(View view, int position) {
-                this.view = view;
-                this.position = position;
-            }
-
-            @Override
-            public boolean onSingleTapUp(MotionEvent e) {
-                mListener.onItemClick(view, position);
-                return true;
-            }
-
-            @Override
-            public void onLongPress(MotionEvent e) {
-                mListener.onItemLongClick(view, position);
-            }
-        }
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.mListener = listener;
     }
 
-    static class BindingHolder extends RecyclerView.ViewHolder {
+    public interface OnItemClickListener {
+        void onItemClick(View view, int position, ListItemBinding binding, RecyclerView recyclerView);
+        void onItemLongClick(View view, int position, ListItemBinding binding, RecyclerView recyclerView);
+    }
+
+    static class BindingHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
         private final ListItemBinding binding;
 
         public BindingHolder(View itemView) {
             super(itemView);
             binding = DataBindingUtil.bind(itemView);
+
+            binding.btnStory.setOnClickListener(this);
+            binding.getRoot().setOnClickListener(this);
+            binding.getRoot().setOnLongClickListener(this);
         }
 
         public ListItemBinding getBinding(){
             return this.binding;
         }
+
+        @Override
+        public void onClick(View v) {
+            if (mListener != null && mRecyclerView != null) {
+                mListener.onItemClick(v, getLayoutPosition(), binding, mRecyclerView);
+            }
+        }
+
+        @Override
+        public boolean onLongClick(View v) {
+            if (mListener == null || mRecyclerView == null) {
+                return false;
+            }
+
+            mListener.onItemLongClick(v, getLayoutPosition(), binding, mRecyclerView);
+            return true;
+        }
     }
 
 
     private static class SortedListCallback extends SortedList.Callback<NovelItem> {
-        private RankingRecycerViewAdapter adapter;
+        private RankingRecyclerViewAdapter adapter;
 
-        public SortedListCallback(@Nullable RankingRecycerViewAdapter adapter) {
+        public SortedListCallback(@Nullable RankingRecyclerViewAdapter adapter) {
             this.adapter = adapter;
         }
 
         @Override
         public int compare(NovelItem o1, NovelItem o2) {
-            if (o2.getRankingPoint() < o1.getRankingPoint()) {
+            if (o2.getRank().getRank() > o1.getRank().getRank()) {
                 return -1;
             }
-            if (o1.getRankingPoint() == o2.getRankingPoint()) {
+            if (o1.getRank().getRank() == o2.getRank().getRank()) {
                 return 0;
             }
             return 1;
@@ -322,7 +327,7 @@ public class RankingRecycerViewAdapter extends RecyclerView.Adapter<RankingRecyc
 
         @Override
         public boolean areContentsTheSame(NovelItem oldItem, NovelItem newItem) {
-            return oldItem.getRankingPoint() == newItem.getRankingPoint();
+            return oldItem.getRank().getRank() == newItem.getRank().getRank();
         }
 
         @Override

@@ -5,9 +5,8 @@ import narou4j.entities.NovelRank;
 
 public class NovelItem {
     private static final String TAG = NovelItem.class.getSimpleName();
-    private int rankingPoint;
-    private int ranking;
     private Novel novelDetail;
+    private NovelRank rank;
     private NovelRank prevRank;
 
     public Novel getNovelDetail() {
@@ -18,20 +17,12 @@ public class NovelItem {
         this.novelDetail = novelDetail;
     }
 
-    public int getRanking() {
-        return ranking;
+    public NovelRank getRank() {
+        return rank;
     }
 
-    public void setRanking(int ranking) {
-        this.ranking = ranking;
-    }
-
-    public int getRankingPoint() {
-        return rankingPoint;
-    }
-
-    public void setRankingPoint(int rankingPoint) {
-        this.rankingPoint = rankingPoint;
+    public void setRank(NovelRank rank) {
+        this.rank = rank;
     }
 
     public NovelRank getPrevRank() {
@@ -45,10 +36,9 @@ public class NovelItem {
     @Override
     public String toString() {
         return "NovelItem{" + "\n" +
-                "rankingPoint=" + rankingPoint +"\n" +
-                ", ranking=" + ranking +"\n" +
-                ", novelDetail=" + novelDetail +"\n" +
-                ", prevRank=" + prevRank +"\n" +
+                ", novelDetail=" + novelDetail + "\n" +
+                ", rank=" + rank + "\n" +
+                ", prevRank=" + prevRank + "\n" +
                 '}';
     }
 }

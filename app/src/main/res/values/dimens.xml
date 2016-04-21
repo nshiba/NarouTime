@@ -3,6 +3,8 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
+    <dimen name="btn_elevation_up">8dp</dimen>
+    <dimen name="btn_elevation_down">5dp</dimen>
 
     <dimen name="text_margin">8dp</dimen>
 
@@ -10,4 +12,6 @@
     <dimen name="text_normal">16dp</dimen>
     <dimen name="text_small">12dp</dimen>
     <dimen name="story_height">40dp</dimen>
+
+    <dimen name="progress_size">100dp</dimen>
 </resources>
