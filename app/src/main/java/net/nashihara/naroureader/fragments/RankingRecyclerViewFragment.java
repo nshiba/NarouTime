@@ -22,7 +22,7 @@ import net.nashihara.naroureader.OnFragmentReplaceListener;
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.adapters.RankingRecyclerViewAdapter;
 import net.nashihara.naroureader.databinding.FragmentRankingRecyclerBinding;
-import net.nashihara.naroureader.databinding.ListItemBinding;
+import net.nashihara.naroureader.databinding.RankingListItemBinding;
 import net.nashihara.naroureader.entities.NovelItem;
 
 import java.util.ArrayList;
@@ -68,6 +68,7 @@ public class RankingRecyclerViewFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        Log.d(TAG, "onAttach: recyclerfragment");
         mContext = context;
         mReplaceListener = (OnFragmentReplaceListener) context;
     }
@@ -75,11 +76,13 @@ public class RankingRecyclerViewFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "onCreate: recyclerfragment");
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        Log.d(TAG, "onCreateView: recyclerfragment");
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_ranking_recycler, container, false);
 
         mRecyclerView = binding.recycler;
@@ -92,7 +95,8 @@ public class RankingRecyclerViewFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        RankingRecyclerViewAdapter adapter = new RankingRecyclerViewAdapter(this.getContext());
+        Log.d(TAG, "onActivityCreated: recyclerfragment");
+        RankingRecyclerViewAdapter adapter = new RankingRecyclerViewAdapter(mContext);
         mRecyclerView.setAdapter(adapter);
 
         Bundle args = getArguments();
@@ -280,7 +284,7 @@ public class RankingRecyclerViewFragment extends Fragment {
 
         adapter.setOnItemClickListener(new RankingRecyclerViewAdapter.OnItemClickListener() {
             @Override
-            public void onItemClick(View view, int position, ListItemBinding binding, RecyclerView recyclerView) {
+            public void onItemClick(View view, int position, RankingListItemBinding binding) {
                 if (view.getId() == R.id.btn_story) {
                     if (binding.allStory.getVisibility() == View.GONE) {
                         binding.allStory.setVisibility(View.VISIBLE);
@@ -291,14 +295,15 @@ public class RankingRecyclerViewFragment extends Fragment {
                     }
                 }
                 else {
-                    Log.d(TAG, "onItemClick: onClick");
+                    NovelItem item = ((RankingRecyclerViewAdapter) mRecyclerView.getAdapter()).getList().get(position);
+                    mReplaceListener.onFragmentReplaceAction(NovelTableRecyclerViewFragment.newInstance(item.getNovelDetail().getNcode()), item.getNovelDetail().getTitle());
                 }
             }
 
             @Override
-            public void onItemLongClick(View view, int position, ListItemBinding binding, RecyclerView recyclerView) {
+            public void onItemLongClick(View view, final int position, RankingListItemBinding binding) {
 
-                RankingRecyclerViewAdapter adapter = (RankingRecyclerViewAdapter) recyclerView.getAdapter();
+                RankingRecyclerViewAdapter adapter = (RankingRecyclerViewAdapter) mRecyclerView.getAdapter();
                 Log.d(TAG, "onItemLongClick: position -> " + position + "\n" + adapter.getList().get(position).toString());
 
                 final NovelItem item = adapter.getList().get(position);
@@ -310,7 +315,8 @@ public class RankingRecyclerViewFragment extends Fragment {
                             public void onClick(DialogInterface dialog, int which) {
                                 switch (which) {
                                     case 0: {
-                                        mReplaceListener.onFragmentReplaceAction("ranking recycler view fragment");
+                                        NovelItem item = ((RankingRecyclerViewAdapter) mRecyclerView.getAdapter()).getList().get(position);
+                                        mReplaceListener.onFragmentReplaceAction(NovelTableRecyclerViewFragment.newInstance(item.getNovelDetail().getNcode()), item.getNovelDetail().getTitle());
                                         break;
                                     }
                                     case 1: {

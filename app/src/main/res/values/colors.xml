@@ -8,4 +8,7 @@
     <color name="colorAccent">#e040fb</color>
     <color name="lightGray">#e1e1e1</color>
 
+    <color name="colorBackground">#ffffff</color>
+    <color name="colorText">#000000</color>
+
 </resources>
