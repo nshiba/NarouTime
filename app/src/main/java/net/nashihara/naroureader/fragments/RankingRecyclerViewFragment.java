@@ -20,7 +20,7 @@ import android.widget.Toast;
 import net.nashihara.naroureader.DividerItemDecoration;
 import net.nashihara.naroureader.OnFragmentReplaceListener;
 import net.nashihara.naroureader.R;
-import net.nashihara.naroureader.adapters.RankingRecycerViewAdapter;
+import net.nashihara.naroureader.adapters.RankingRecyclerViewAdapter;
 import net.nashihara.naroureader.databinding.FragmentRankingRecyclerBinding;
 import net.nashihara.naroureader.databinding.ListItemBinding;
 import net.nashihara.naroureader.entities.NovelItem;
@@ -85,63 +85,6 @@ public class RankingRecyclerViewFragment extends Fragment {
         mRecyclerView = binding.recycler;
         mRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));
         mRecyclerView.addItemDecoration(new DividerItemDecoration(mContext));
-        mRecyclerView.addOnItemTouchListener(
-                new RankingRecycerViewAdapter.RecyclerItemClickListener(getActivity(),
-                new RankingRecycerViewAdapter.RecyclerItemClickListener.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(View view, int position) {
-                        ListItemBinding binding = DataBindingUtil.bind(view);
-
-                        if (binding.allStory.getVisibility() == View.GONE) {
-                            binding.allStory.setVisibility(View.VISIBLE);
-                            binding.keyword.setVisibility(View.VISIBLE);
-                        } else {
-                            binding.allStory.setVisibility(View.GONE);
-                            binding.keyword.setVisibility(View.GONE);
-                        }
-                    }
-
-                    @Override
-                    public void onItemLongClick(View view, int position) {
-                        RankingRecycerViewAdapter adapter = (RankingRecycerViewAdapter) mRecyclerView.getAdapter();
-                        Log.d(TAG, "onItemLongClick: " + adapter.getList().get(position).toString());
-
-                        final NovelItem item = adapter.getList().get(position);
-                        String[] strings = new String[]
-                                {"小説を読む", "ダウンロード", "ブラウザで小説ページを開く", "ブラウザで作者ページを開く"};
-                        ListDailogFragment listDialog =
-                                new ListDailogFragment(item.getNovelDetail().getTitle(), strings, new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        switch (which) {
-                                            case 0: {
-                                                mReplaceListener.onFragmentReplaceAction("ranking recycler view fragment");
-                                                break;
-                                            }
-                                            case 1: {
-                                                Toast.makeText(getActivity(), "未実装の機能", Toast.LENGTH_SHORT).show();
-                                                break;
-                                            }
-                                            case 2: {
-                                                String url = "http://ncode.syosetu.com/" + item.getNovelDetail().getNcode() + "/";
-                                                Uri uri = Uri.parse(url);
-                                                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-                                                startActivity(intent);
-                                                break;
-                                            }
-                                            case 3: {
-                                                String url = "http://mypage.syosetu.com/" + item.getNovelDetail().getUserId() + "/";
-                                                Uri uri = Uri.parse(url);
-                                                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-                                                startActivity(intent);
-                                                break;
-                                            }
-                                        }
-                                    }
-                                });
-                        listDialog.show(getFragmentManager(), "list_dialog");
-                    }
-                }));
 
         return binding.getRoot();
     }
@@ -149,7 +92,7 @@ public class RankingRecyclerViewFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        RankingRecycerViewAdapter adapter = new RankingRecycerViewAdapter(getActivity());
+        RankingRecyclerViewAdapter adapter = new RankingRecyclerViewAdapter(this.getContext());
         mRecyclerView.setAdapter(adapter);
 
         Bundle args = getArguments();
@@ -329,10 +272,70 @@ public class RankingRecyclerViewFragment extends Fragment {
     public void onMyNext(List<NovelItem> novelItems) {
         Log.d(TAG, "onNext: add data novelItems: " + novelItems.size());
 
-        RankingRecycerViewAdapter adapter = (RankingRecycerViewAdapter) mRecyclerView.getAdapter();
+        RankingRecyclerViewAdapter adapter = (RankingRecyclerViewAdapter) mRecyclerView.getAdapter();
         adapter.clearData();
         adapter.addDataOf(novelItems);
         binding.progressBar.setVisibility(View.GONE);
         mRecyclerView.setVisibility(View.VISIBLE);
+
+        adapter.setOnItemClickListener(new RankingRecyclerViewAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position, ListItemBinding binding, RecyclerView recyclerView) {
+                if (view.getId() == R.id.btn_story) {
+                    if (binding.allStory.getVisibility() == View.GONE) {
+                        binding.allStory.setVisibility(View.VISIBLE);
+                        binding.keyword.setVisibility(View.VISIBLE);
+                    } else {
+                        binding.allStory.setVisibility(View.GONE);
+                        binding.keyword.setVisibility(View.GONE);
+                    }
+                }
+                else {
+                    Log.d(TAG, "onItemClick: onClick");
+                }
+            }
+
+            @Override
+            public void onItemLongClick(View view, int position, ListItemBinding binding, RecyclerView recyclerView) {
+
+                RankingRecyclerViewAdapter adapter = (RankingRecyclerViewAdapter) recyclerView.getAdapter();
+                Log.d(TAG, "onItemLongClick: position -> " + position + "\n" + adapter.getList().get(position).toString());
+
+                final NovelItem item = adapter.getList().get(position);
+                String[] strings = new String[]
+                        {"小説を読む", "ダウンロード", "ブラウザで小説ページを開く", "ブラウザで作者ページを開く"};
+                ListDailogFragment listDialog =
+                        new ListDailogFragment(item.getNovelDetail().getTitle(), strings, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                switch (which) {
+                                    case 0: {
+                                        mReplaceListener.onFragmentReplaceAction("ranking recycler view fragment");
+                                        break;
+                                    }
+                                    case 1: {
+                                        Toast.makeText(getActivity(), "未実装の機能", Toast.LENGTH_SHORT).show();
+                                        break;
+                                    }
+                                    case 2: {
+                                        String url = "http://ncode.syosetu.com/" + item.getNovelDetail().getNcode() + "/";
+                                        Uri uri = Uri.parse(url);
+                                        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                                        startActivity(intent);
+                                        break;
+                                    }
+                                    case 3: {
+                                        String url = "http://mypage.syosetu.com/" + item.getNovelDetail().getUserId() + "/";
+                                        Uri uri = Uri.parse(url);
+                                        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                                        startActivity(intent);
+                                        break;
+                                    }
+                                }
+                            }
+                        });
+                listDialog.show(getFragmentManager(), "list_dialog");
+            }
+        });
     }
 }
