@@ -3,9 +3,14 @@
     <!--<color name="colorprimary">#3f51b5</color>-->
     <!--<color name="colorprimarydark">#303f9f</color>-->
     <!--<color name="coloraccent">#ff4081</color>-->
-    <color name="colorPrimary">#cddc39</color>
-    <color name="colorPrimaryDark">#afb42b</color>
+    <color name="colorPrimary">#009688</color>
+    <color name="colorPrimaryDark">#00796b</color>
     <color name="colorAccent">#e040fb</color>
     <color name="lightGray">#e1e1e1</color>
+
+    <color name="colorTextPrimary">#ffffff</color>
+    <color name="colorTextPrimaryGray">#b4ffffff</color>
+    <color name="colorBackground">#ffffff</color>
+    <color name="colorText">#000000</color>
 
 </resources>

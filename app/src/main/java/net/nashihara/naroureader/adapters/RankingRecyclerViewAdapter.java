@@ -1,6 +1,7 @@
 package net.nashihara.naroureader.adapters;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.support.annotation.Nullable;
@@ -11,7 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import net.nashihara.naroureader.R;
-import net.nashihara.naroureader.databinding.ListItemBinding;
+import net.nashihara.naroureader.databinding.RankingListItemBinding;
 import net.nashihara.naroureader.entities.NovelItem;
 
 import java.text.ParseException;
@@ -28,8 +29,8 @@ public class RankingRecyclerViewAdapter extends RecyclerView.Adapter<RankingRecy
 
     private LayoutInflater mInflater;
     private SortedList<NovelItem> mSortedList;
-    private static RecyclerView mRecyclerView;
-    private static OnItemClickListener mListener;
+    private OnItemClickListener mListener;
+    private RecyclerView mRecyclerView;
 
     public RankingRecyclerViewAdapter(Context context) {
         this.mInflater = LayoutInflater.from(context);
@@ -50,14 +51,14 @@ public class RankingRecyclerViewAdapter extends RecyclerView.Adapter<RankingRecy
 
     @Override
     public BindingHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        final View v = mInflater.inflate(R.layout.list_item, parent, false);
-        return new BindingHolder(v);
+        final View v = mInflater.inflate(R.layout.ranking_list_item, parent, false);
+        return new BindingHolder(v, mListener);
     }
 
     @Override
     public void onBindViewHolder(BindingHolder holder, int position) {
         if (mSortedList != null && mSortedList.size() > position && mSortedList.get(position) != null) {
-            ListItemBinding binding = holder.getBinding();
+            RankingListItemBinding binding = holder.getBinding();
 
             NovelItem novelItem = mSortedList.get(position);
             Novel novel = novelItem.getNovelDetail();
@@ -119,6 +120,7 @@ public class RankingRecyclerViewAdapter extends RecyclerView.Adapter<RankingRecy
             binding.allStory.setVisibility(View.GONE);
             binding.keyword.setText("キーワード：" + novel.getKeyword());
             binding.keyword.setVisibility(View.GONE);
+            binding.btnExpand.setAlpha(0.7f);
 
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             SimpleDateFormat format2 = new SimpleDateFormat("yyyy/MM/dd HH:mm");
@@ -129,15 +131,19 @@ public class RankingRecyclerViewAdapter extends RecyclerView.Adapter<RankingRecy
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-            if (dateString.equals("")) {
-                binding.lastup.setText(novel.getLastUploadDate());
-            } else {
-                binding.lastup.setText(dateString);
-            }
+//            if (dateString.equals("")) {
+//                binding.lastup.setText(novel.getLastUploadDate());
+//            } else {
+//                binding.lastup.setText(dateString);
+//            }
 
             if (novel.getIsNovelContinue() == 1) {
+                Resources res = mRecyclerView.getResources();
+                binding.isContinue.setTextColor(res.getColor(android.support.v7.appcompat.R.color.secondary_text_default_material_light));
                 binding.isContinue.setText("連載中");
             } else {
+                Resources res = mRecyclerView.getResources();
+                binding.isContinue.setTextColor(res.getColor(R.color.colorAccent));
                 binding.isContinue.setText("完結済");
             }
             binding.page.setText("全" + String.valueOf(novel.getAllNumberOfNovel()) + "部分");
@@ -248,44 +254,46 @@ public class RankingRecyclerViewAdapter extends RecyclerView.Adapter<RankingRecy
     }
 
     public interface OnItemClickListener {
-        void onItemClick(View view, int position, ListItemBinding binding, RecyclerView recyclerView);
-        void onItemLongClick(View view, int position, ListItemBinding binding, RecyclerView recyclerView);
+        void onItemClick(View view, int position, RankingListItemBinding binding);
+        void onItemLongClick(View view, int position, RankingListItemBinding binding);
     }
 
     static class BindingHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
-        private final ListItemBinding binding;
+        private final RankingListItemBinding binding;
+        private OnItemClickListener mListener;
 
-        public BindingHolder(View itemView) {
+        public BindingHolder(View itemView, OnItemClickListener listener) {
             super(itemView);
+            this.mListener = listener;
             binding = DataBindingUtil.bind(itemView);
 
-            binding.btnStory.setOnClickListener(this);
+//            binding.btnStory.setOnClickListener(this);
+            binding.btnExpand.setOnClickListener(this);
             binding.getRoot().setOnClickListener(this);
             binding.getRoot().setOnLongClickListener(this);
         }
 
-        public ListItemBinding getBinding(){
+        public RankingListItemBinding getBinding(){
             return this.binding;
         }
 
         @Override
         public void onClick(View v) {
-            if (mListener != null && mRecyclerView != null) {
-                mListener.onItemClick(v, getLayoutPosition(), binding, mRecyclerView);
+            if (mListener != null) {
+                mListener.onItemClick(v, getLayoutPosition(), binding);
             }
         }
 
         @Override
         public boolean onLongClick(View v) {
-            if (mListener == null || mRecyclerView == null) {
+            if (mListener == null) {
                 return false;
             }
 
-            mListener.onItemLongClick(v, getLayoutPosition(), binding, mRecyclerView);
+            mListener.onItemLongClick(v, getLayoutPosition(), binding);
             return true;
         }
     }
-
 
     private static class SortedListCallback extends SortedList.Callback<NovelItem> {
         private RankingRecyclerViewAdapter adapter;

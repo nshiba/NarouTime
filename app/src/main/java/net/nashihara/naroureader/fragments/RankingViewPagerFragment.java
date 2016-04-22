@@ -49,9 +49,9 @@ public class RankingViewPagerFragment extends Fragment {
             for (int i = 0; i < fragments.length; i++) {
                 fragments[i] = RankingRecyclerViewFragment.newInstance(types[i]);
             }
-            RankingFragmentPagerAdapter adapter = new RankingFragmentPagerAdapter(getFragmentManager(), fragments, titles);
+            RankingFragmentPagerAdapter adapter = new RankingFragmentPagerAdapter(getChildFragmentManager(), fragments, titles);
             binding.pager.setAdapter(adapter);
-            binding.pager.setOffscreenPageLimit(4);
+            binding.pager.setOffscreenPageLimit(2);
             binding.tabStrip.setupWithViewPager(binding.pager);
         }
 
