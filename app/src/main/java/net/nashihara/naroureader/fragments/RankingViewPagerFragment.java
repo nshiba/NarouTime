@@ -41,12 +41,6 @@ public class RankingViewPagerFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_ranking_viewpager, container, false);
 
-        return binding.getRoot();
-    }
-
-    @Override
-    public void onResume() {
-
         Bundle args = getArguments();
         if (args != null) {
             String[] titles = args.getStringArray(PARAM_TITLE);
@@ -57,9 +51,10 @@ public class RankingViewPagerFragment extends Fragment {
             }
             RankingFragmentPagerAdapter adapter = new RankingFragmentPagerAdapter(getChildFragmentManager(), fragments, titles);
             binding.pager.setAdapter(adapter);
-            binding.pager.setOffscreenPageLimit(4);
+            binding.pager.setOffscreenPageLimit(2);
             binding.tabStrip.setupWithViewPager(binding.pager);
         }
-        super.onResume();
+
+        return binding.getRoot();
     }
 }

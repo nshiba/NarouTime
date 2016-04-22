@@ -1,6 +1,7 @@
 package net.nashihara.naroureader.adapters;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.support.annotation.Nullable;
@@ -119,6 +120,7 @@ public class RankingRecyclerViewAdapter extends RecyclerView.Adapter<RankingRecy
             binding.allStory.setVisibility(View.GONE);
             binding.keyword.setText("キーワード：" + novel.getKeyword());
             binding.keyword.setVisibility(View.GONE);
+            binding.btnExpand.setAlpha(0.7f);
 
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             SimpleDateFormat format2 = new SimpleDateFormat("yyyy/MM/dd HH:mm");
@@ -129,15 +131,19 @@ public class RankingRecyclerViewAdapter extends RecyclerView.Adapter<RankingRecy
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-            if (dateString.equals("")) {
-                binding.lastup.setText(novel.getLastUploadDate());
-            } else {
-                binding.lastup.setText(dateString);
-            }
+//            if (dateString.equals("")) {
+//                binding.lastup.setText(novel.getLastUploadDate());
+//            } else {
+//                binding.lastup.setText(dateString);
+//            }
 
             if (novel.getIsNovelContinue() == 1) {
+                Resources res = mRecyclerView.getResources();
+                binding.isContinue.setTextColor(res.getColor(android.support.v7.appcompat.R.color.secondary_text_default_material_light));
                 binding.isContinue.setText("連載中");
             } else {
+                Resources res = mRecyclerView.getResources();
+                binding.isContinue.setTextColor(res.getColor(R.color.colorAccent));
                 binding.isContinue.setText("完結済");
             }
             binding.page.setText("全" + String.valueOf(novel.getAllNumberOfNovel()) + "部分");
@@ -261,7 +267,8 @@ public class RankingRecyclerViewAdapter extends RecyclerView.Adapter<RankingRecy
             this.mListener = listener;
             binding = DataBindingUtil.bind(itemView);
 
-            binding.btnStory.setOnClickListener(this);
+//            binding.btnStory.setOnClickListener(this);
+            binding.btnExpand.setOnClickListener(this);
             binding.getRoot().setOnClickListener(this);
             binding.getRoot().setOnLongClickListener(this);
         }

@@ -114,6 +114,10 @@ public class RankingRecyclerViewFragment extends Fragment {
         }
     }
 
+    public Context getContext() {
+        return mContext;
+    }
+
     private void getTotalRanking() {
         Observable.create(new Observable.OnSubscribe<List<NovelItem>>() {
             @Override
@@ -285,13 +289,15 @@ public class RankingRecyclerViewFragment extends Fragment {
         adapter.setOnItemClickListener(new RankingRecyclerViewAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position, RankingListItemBinding binding) {
-                if (view.getId() == R.id.btn_story) {
+                if (view.getId() == R.id.btn_expand) {
                     if (binding.allStory.getVisibility() == View.GONE) {
                         binding.allStory.setVisibility(View.VISIBLE);
                         binding.keyword.setVisibility(View.VISIBLE);
+                        binding.btnExpand.setImageResource(R.drawable.ic_expand_less_black_24dp);
                     } else {
                         binding.allStory.setVisibility(View.GONE);
                         binding.keyword.setVisibility(View.GONE);
+                        binding.btnExpand.setImageResource(R.drawable.ic_expand_more_black_24dp);
                     }
                 }
                 else {

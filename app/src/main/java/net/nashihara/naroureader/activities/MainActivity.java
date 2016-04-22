@@ -1,4 +1,4 @@
-package net.nashihara.naroureader;
+package net.nashihara.naroureader.activities;
 
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
@@ -17,6 +17,8 @@ import android.view.View;
 
 import com.balysv.materialmenu.MaterialMenuDrawable;
 
+import net.nashihara.naroureader.OnFragmentReplaceListener;
+import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.databinding.ActivityMainBinding;
 import net.nashihara.naroureader.fragments.RankingViewPagerFragment;
 
@@ -42,7 +44,7 @@ public class MainActivity extends AppCompatActivity implements OnFragmentReplace
 
         binding.toolbar.setTitle(R.string.app_name);
         binding.toolbar.setTitleTextColor(Color.BLACK);
-        materialMenu = new MaterialMenuDrawable(this, Color.BLACK, MaterialMenuDrawable.Stroke.THIN);
+        materialMenu = new MaterialMenuDrawable(this, Color.WHITE, MaterialMenuDrawable.Stroke.THIN);
         materialMenu.animateIconState(MaterialMenuDrawable.IconState.BURGER);
         binding.toolbar.setNavigationIcon(materialMenu);
         binding.toolbar.setOnClickListener(new View.OnClickListener() {

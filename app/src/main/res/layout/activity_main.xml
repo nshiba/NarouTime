@@ -7,13 +7,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-
         <android.support.design.widget.CoordinatorLayout
             xmlns:tools="http://schemas.android.com/tools"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fitsSystemWindows="true"
-            tools:context="net.nashihara.naroureader.MainActivity">
+            tools:context=".activities.MainActivity">
 
             <android.support.design.widget.AppBarLayout
                 android:layout_width="match_parent"
@@ -22,21 +21,21 @@
 
                 <android.support.v7.widget.Toolbar
                     android:id="@+id/toolbar"
+                    android:elevation="5dp"
                     android:layout_width="match_parent"
                     android:layout_height="?attr/actionBarSize"
-                    android:background="?attr/colorPrimary"
+                    android:theme="@style/NoActionBarTheme"
                     app:popupTheme="@style/AppTheme.PopupOverlay" />
 
             </android.support.design.widget.AppBarLayout>
 
             <RelativeLayout
                 android:id="@+id/main_container"
+                android:layout_marginTop="?attr/actionBarSize"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="?attr/actionBarSize" >
+                android:layout_height="match_parent" >
 
             </RelativeLayout>
-
         </android.support.design.widget.CoordinatorLayout>
 
         <android.support.design.widget.NavigationView android:id="@+id/nav_view"

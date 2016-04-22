@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto">
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <android.support.design.widget.TabLayout
             android:id="@+id/tab_strip"
+            android:background="?attr/colorPrimary"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            app:tabSelectedTextColor="@color/colorTextPrimary"
+            app:tabTextColor="@color/colorTextPrimaryGray" />
+
 
         <android.support.v4.view.ViewPager
             android:id="@+id/pager"
