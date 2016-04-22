@@ -11,7 +11,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import net.nashihara.naroureader.OnFragmentReplaceListener;
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.adapters.NovelTableRecyclerViewAdapter;
 import net.nashihara.naroureader.databinding.FragmentNovelTableViewBinding;
@@ -33,18 +32,19 @@ public class NovelTableRecyclerViewFragment extends Fragment {
 
     private static final String PARAM_NCODE = "ncode";
 
-    private String mNcode;
+    private int totalPage;
+    private String ncode;
     private Context mContext;
-    private OnFragmentReplaceListener mReplaceListener;
+    private OnNovelSelectionListener mListener;
     private RecyclerView mRecyclerView;
     private FragmentNovelTableViewBinding binding;
 
     public NovelTableRecyclerViewFragment() {}
 
-    public static NovelTableRecyclerViewFragment newInstance(String param1) {
+    public static NovelTableRecyclerViewFragment newInstance(String ncode) {
         NovelTableRecyclerViewFragment fragment = new NovelTableRecyclerViewFragment();
         Bundle args = new Bundle();
-        args.putString(PARAM_NCODE, param1);
+        args.putString(PARAM_NCODE, ncode);
         fragment.setArguments(args);
         return fragment;
     }
@@ -53,14 +53,14 @@ public class NovelTableRecyclerViewFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         mContext = context;
-        mReplaceListener = (OnFragmentReplaceListener) context;
+        mListener = (OnNovelSelectionListener) context;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mNcode = getArguments().getString(PARAM_NCODE);
+            ncode = getArguments().getString(PARAM_NCODE);
         }
     }
 
@@ -86,8 +86,8 @@ public class NovelTableRecyclerViewFragment extends Fragment {
                 NovelBody body = clickAdapter.getList().get(position);
                 Log.d(TAG, "NovelTableRecyclerView: list size -> " + clickAdapter.getList().size());
                 Log.d(TAG, "onItemClick: position -> " + position + "\n" + body.toString());
-                mReplaceListener.onFragmentReplaceAction(null, "");
-            }
+                mListener.onSelect(body.getNcode(), body.getTitle(), body.getPage(), totalPage);
+           }
         });
         mRecyclerView.setAdapter(adapter);
 
@@ -97,13 +97,13 @@ public class NovelTableRecyclerViewFragment extends Fragment {
                 @Override
                 public void call(Subscriber<? super Novel> subscriber) {
                     Narou narou = new Narou();
-                    subscriber.onNext(narou.getNovel(mNcode));
+                    subscriber.onNext(narou.getNovel(ncode));
                 }
             }), Observable.create(new Observable.OnSubscribe<List<NovelBody>>() {
                 @Override
                 public void call(Subscriber<? super List<NovelBody>> subscriber) {
                     Narou narou = new Narou();
-                    List<NovelBody> bodies = narou.getNovelTable(mNcode);
+                    List<NovelBody> bodies = narou.getNovelTable(ncode);
                     subscriber.onNext(bodies);
                 }
             }), new Func2<Novel, List<NovelBody>, Novel>() {
@@ -140,10 +140,16 @@ public class NovelTableRecyclerViewFragment extends Fragment {
                     binding.title.setVisibility(View.VISIBLE);
                     binding.writer.setVisibility(View.VISIBLE);
                     binding.story.setVisibility(View.VISIBLE);
+
+                    totalPage = novel.getAllNumberOfNovel();
                 }
             });
         }
 
         return binding.getRoot();
+    }
+
+    public interface OnNovelSelectionListener {
+        public void onSelect(String ncode, String title, int page, int totalPage);
     }
 }

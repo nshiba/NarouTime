@@ -1,5 +1,6 @@
 package net.nashihara.naroureader.activities;
 
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -20,6 +21,7 @@ import com.balysv.materialmenu.MaterialMenuDrawable;
 import net.nashihara.naroureader.OnFragmentReplaceListener;
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.databinding.ActivityMainBinding;
+import net.nashihara.naroureader.fragments.NovelTableRecyclerViewFragment;
 import net.nashihara.naroureader.fragments.RankingViewPagerFragment;
 
 import java.util.Stack;
@@ -28,7 +30,7 @@ import narou4j.enums.RankingType;
 
 import static android.support.v4.view.GravityCompat.START;
 
-public class MainActivity extends AppCompatActivity implements OnFragmentReplaceListener {
+public class MainActivity extends AppCompatActivity implements OnFragmentReplaceListener, NovelTableRecyclerViewFragment.OnNovelSelectionListener {
     ActivityMainBinding binding;
     private String TAG = MainActivity.class.getSimpleName();
     private FragmentManager manager;
@@ -43,7 +45,6 @@ public class MainActivity extends AppCompatActivity implements OnFragmentReplace
         manager = getSupportFragmentManager();
 
         binding.toolbar.setTitle(R.string.app_name);
-        binding.toolbar.setTitleTextColor(Color.BLACK);
         materialMenu = new MaterialMenuDrawable(this, Color.WHITE, MaterialMenuDrawable.Stroke.THIN);
         materialMenu.animateIconState(MaterialMenuDrawable.IconState.BURGER);
         binding.toolbar.setNavigationIcon(materialMenu);
@@ -132,5 +133,15 @@ public class MainActivity extends AppCompatActivity implements OnFragmentReplace
         else {
             return ContextCompat.getDrawable(this, R.drawable.ic_menu_black_24dp);
         }
+    }
+
+    @Override
+    public void onSelect(String ncode, String title, int page, int totalPage) {
+        Intent intent = new Intent(this, NovelViewActivity.class);
+        intent.putExtra("ncode", ncode);
+        intent.putExtra("page", page);
+        intent.putExtra("total", totalPage);
+        intent.putExtra("title", title);
+        startActivity(intent);
     }
 }
