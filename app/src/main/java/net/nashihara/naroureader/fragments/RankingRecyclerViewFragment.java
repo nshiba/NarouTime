@@ -56,7 +56,6 @@ public class RankingRecyclerViewFragment extends Fragment {
 
     public static RankingRecyclerViewFragment newInstance(String type) {
         RankingRecyclerViewFragment fragment = new RankingRecyclerViewFragment();
-        Log.d(TAG, "newInstance: " + type);
         Bundle args = new Bundle();
         args.putString(PARAM_TYPE, type);
         fragment.setArguments(args);
@@ -68,7 +67,6 @@ public class RankingRecyclerViewFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        Log.d(TAG, "onAttach: recyclerfragment");
         mContext = context;
         mReplaceListener = (OnFragmentReplaceListener) context;
     }
@@ -76,33 +74,23 @@ public class RankingRecyclerViewFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG, "onCreate: recyclerfragment");
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Log.d(TAG, "onCreateView: recyclerfragment");
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_ranking_recycler, container, false);
 
         mRecyclerView = binding.recycler;
         mRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));
         mRecyclerView.addItemDecoration(new DividerItemDecoration(mContext));
 
-        return binding.getRoot();
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        Log.d(TAG, "onActivityCreated: recyclerfragment");
         RankingRecyclerViewAdapter adapter = new RankingRecyclerViewAdapter(mContext);
         mRecyclerView.setAdapter(adapter);
 
         Bundle args = getArguments();
         if (args != null) {
             String typeStr = args.getString(PARAM_TYPE);
-            Log.d(TAG, "onActivityCreated: " + typeStr);
 
             if (typeStr != null && typeStr.equals("all")) {
                 getTotalRanking();
@@ -112,6 +100,13 @@ public class RankingRecyclerViewFragment extends Fragment {
                 getRanking(type);
             }
         }
+
+        return binding.getRoot();
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
     }
 
     public Context getContext() {
@@ -278,8 +273,6 @@ public class RankingRecyclerViewFragment extends Fragment {
     }
 
     public void onMyNext(List<NovelItem> novelItems) {
-        Log.d(TAG, "onNext: add data novelItems: " + novelItems.size());
-
         RankingRecyclerViewAdapter adapter = (RankingRecyclerViewAdapter) mRecyclerView.getAdapter();
         adapter.clearData();
         adapter.addDataOf(novelItems);
@@ -310,7 +303,6 @@ public class RankingRecyclerViewFragment extends Fragment {
             public void onItemLongClick(View view, final int position, RankingListItemBinding binding) {
 
                 RankingRecyclerViewAdapter adapter = (RankingRecyclerViewAdapter) mRecyclerView.getAdapter();
-                Log.d(TAG, "onItemLongClick: position -> " + position + "\n" + adapter.getList().get(position).toString());
 
                 final NovelItem item = adapter.getList().get(position);
                 String[] strings = new String[]
