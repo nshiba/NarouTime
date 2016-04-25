@@ -24,17 +24,18 @@ import rx.schedulers.Schedulers;
 public class NovelBodyFragment extends Fragment {
     private static final String TAG = NovelBodyFragment.class.getSimpleName();
     private static final String ARG_NCODE = "ncode";
+    private static final String ARG_TITLE = "title";
     private static final String ARG_BODY = "body";
     private static final String ARG_PAGE = "page";
     private static final String ARG_TOTAL_PAGE = "total_page";
 
     private int page;
     private int totalPage;
+    private String title;
     private String body;
     private String ncode;
     private String nextBody = "";
     private String prevBody = "";
-    private String title = "";
 
     private Context mContext;
     private OnNovelBodyInteraction mListener;
@@ -42,9 +43,10 @@ public class NovelBodyFragment extends Fragment {
 
     public NovelBodyFragment() {}
 
-    public static NovelBodyFragment newInstance(String ncode, String body, int page, int totalPage) {
+    public static NovelBodyFragment newInstance(String ncode, String title, String body, int page, int totalPage) {
         NovelBodyFragment fragment = new NovelBodyFragment();
         Bundle args = new Bundle();
+        args.putString(ARG_TITLE, title);
         args.putString(ARG_BODY, body);
         args.putString(ARG_NCODE, ncode);
         args.putInt(ARG_PAGE, page);
@@ -58,6 +60,7 @@ public class NovelBodyFragment extends Fragment {
         super.onCreate(savedInstanceState);
         Bundle args = getArguments();
         if (args != null) {
+            title = args.getString(ARG_TITLE);
             body = args.getString(ARG_BODY);
             ncode = args.getString(ARG_NCODE);
             totalPage = args.getInt(ARG_TOTAL_PAGE);
@@ -97,6 +100,8 @@ public class NovelBodyFragment extends Fragment {
             binding.body.setVisibility(View.VISIBLE);
             binding.progressBar.setVisibility(View.GONE);
         }
+
+        binding.title.setText(title);
 
         return binding.getRoot();
     }

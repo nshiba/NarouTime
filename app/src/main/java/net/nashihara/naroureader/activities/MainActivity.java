@@ -24,6 +24,7 @@ import net.nashihara.naroureader.databinding.ActivityMainBinding;
 import net.nashihara.naroureader.fragments.NovelTableRecyclerViewFragment;
 import net.nashihara.naroureader.fragments.RankingViewPagerFragment;
 
+import java.util.ArrayList;
 import java.util.Stack;
 
 import narou4j.enums.RankingType;
@@ -48,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements OnFragmentReplace
         materialMenu = new MaterialMenuDrawable(this, Color.WHITE, MaterialMenuDrawable.Stroke.THIN);
         materialMenu.animateIconState(MaterialMenuDrawable.IconState.BURGER);
         binding.toolbar.setNavigationIcon(materialMenu);
-        binding.toolbar.setOnClickListener(new View.OnClickListener() {
+        binding.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 int stack = manager.getBackStackEntryCount();
@@ -136,12 +137,12 @@ public class MainActivity extends AppCompatActivity implements OnFragmentReplace
     }
 
     @Override
-    public void onSelect(String ncode, String title, int page, int totalPage) {
+    public void onSelect(String ncode, int page, String title, ArrayList<String> titles) {
         Intent intent = new Intent(this, NovelViewActivity.class);
         intent.putExtra("ncode", ncode);
         intent.putExtra("page", page);
-        intent.putExtra("total", totalPage);
         intent.putExtra("title", title);
+        intent.putExtra("titles", titles);
         startActivity(intent);
     }
 }

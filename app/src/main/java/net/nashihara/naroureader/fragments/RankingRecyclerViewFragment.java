@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -36,6 +37,7 @@ import narou4j.Narou;
 import narou4j.Ranking;
 import narou4j.entities.Novel;
 import narou4j.entities.NovelRank;
+import narou4j.enums.NovelGenre;
 import narou4j.enums.OutputOrder;
 import narou4j.enums.RankingType;
 import rx.Observable;
@@ -51,6 +53,7 @@ public class RankingRecyclerViewFragment extends Fragment {
     private Context mContext;
     private RecyclerView mRecyclerView;
     private OnFragmentReplaceListener mReplaceListener;
+    private ArrayList<NovelItem> allItems = new ArrayList<>();
 
     private static final String PARAM_TYPE = "rankingType";
 
@@ -80,6 +83,49 @@ public class RankingRecyclerViewFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_ranking_recycler, container, false);
+
+        binding.fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String[] filters = new String[]{
+                        "文学", "恋愛", "歴史", "推理", "ファンタジー",
+                        "SF", "ホラー", "コメディー", "冒険", "学園",
+                        "戦記", "童話", "詩", "エッセイ", "リプレイ", "その他"
+                };
+                final ArrayList<NovelItem> filterList = new ArrayList<>();
+                final Set<NovelGenre> trueSet = new HashSet<>();
+                DialogInterface.OnMultiChoiceClickListener onMultiChoiceClickListener
+                        = new DialogInterface.OnMultiChoiceClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                        int genreNumber = which +1;
+
+                        NovelGenre checkedGenre = NovelGenre.valueOf(genreNumber);
+                        if (isChecked) {
+                            trueSet.add(checkedGenre);
+                        }
+                        else {
+                            trueSet.remove(checkedGenre);
+                        }
+
+                        for (NovelItem item : allItems) {
+                            if (trueSet.contains(item.getNovelDetail().getGenre())) {
+                                filterList.add(item);
+                            }
+                        }
+                    }
+                };
+                CheckBoxDialogFragment checkBoxDialog = new CheckBoxDialogFragment("fliter list", filters, onMultiChoiceClickListener) {
+                    @Override
+                    void onPositiveButton(int which) {
+                        RankingRecyclerViewAdapter adapter = (RankingRecyclerViewAdapter) mRecyclerView.getAdapter();
+                        adapter.getList().clear();
+                        adapter.getList().addAll(filterList);
+                    }
+                };
+                checkBoxDialog.show(getFragmentManager(), "multiple");
+            }
+        });
 
         mRecyclerView = binding.recycler;
         mRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));
@@ -276,6 +322,7 @@ public class RankingRecyclerViewFragment extends Fragment {
         RankingRecyclerViewAdapter adapter = (RankingRecyclerViewAdapter) mRecyclerView.getAdapter();
         adapter.clearData();
         adapter.addDataOf(novelItems);
+        allItems = new ArrayList<>(novelItems);
         binding.progressBar.setVisibility(View.GONE);
         mRecyclerView.setVisibility(View.VISIBLE);
 

@@ -15,6 +15,8 @@ import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.databinding.ActivityNovelViewBinding;
 import net.nashihara.naroureader.fragments.NovelBodyFragment;
 
+import java.util.ArrayList;
+
 import narou4j.Narou;
 import rx.Observable;
 import rx.Subscriber;
@@ -27,7 +29,8 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
     private FragmentManager manager;
     private MaterialMenuDrawable materialMenu;
 
-    private String title = "";
+    private ArrayList<String> bodyTitles;
+    private String title;
     private int totalPage;
     private String ncode;
 
@@ -41,14 +44,15 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
         ncode = intent.getStringExtra("ncode");
         final int page = intent.getIntExtra("page", 1);
 
-        totalPage = intent.getIntExtra("total", 0);
         title = intent.getStringExtra("title");
+        bodyTitles = intent.getStringArrayListExtra("titles");
+        totalPage = bodyTitles.size();
 
-//        binding.toolbar.setTitle(title);
+        binding.toolbar.setTitle(bodyTitles.get(page -1));
         materialMenu = new MaterialMenuDrawable(this, Color.WHITE, MaterialMenuDrawable.Stroke.THIN);
         materialMenu.animateIconState(MaterialMenuDrawable.IconState.X);
         binding.toolbar.setNavigationIcon(materialMenu);
-        binding.toolbar.setOnClickListener(new View.OnClickListener() {
+        binding.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();
@@ -77,7 +81,7 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
                     @Override
                     public void onNext(String s) {
                         manager.beginTransaction()
-                                .add(R.id.novel_container, NovelBodyFragment.newInstance(ncode, s, page, totalPage))
+                                .add(R.id.novel_container, NovelBodyFragment.newInstance(ncode, bodyTitles.get(page -1), s, page, totalPage))
                                 .commit();
                     }
                 });
@@ -85,8 +89,9 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
 
     @Override
     public void onNovelBodyLoadAction(String body, int nextPage) {
+        binding.toolbar.setTitle(bodyTitles.get(nextPage -1));
         manager.beginTransaction()
-                .replace(R.id.novel_container, NovelBodyFragment.newInstance(ncode, body, nextPage, totalPage))
+                .replace(R.id.novel_container, NovelBodyFragment.newInstance(ncode, bodyTitles.get(nextPage -1), body, nextPage, totalPage))
                 .commit();
     }
 }

@@ -16,6 +16,7 @@ import net.nashihara.naroureader.adapters.NovelTableRecyclerViewAdapter;
 import net.nashihara.naroureader.databinding.FragmentNovelTableViewBinding;
 import net.nashihara.naroureader.databinding.TableListItemBinding;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import narou4j.Narou;
@@ -32,7 +33,8 @@ public class NovelTableRecyclerViewFragment extends Fragment {
 
     private static final String PARAM_NCODE = "ncode";
 
-    private int totalPage;
+    private ArrayList<String> bodyTitles;
+    private String title;
     private String ncode;
     private Context mContext;
     private OnNovelSelectionListener mListener;
@@ -86,7 +88,7 @@ public class NovelTableRecyclerViewFragment extends Fragment {
                 NovelBody body = clickAdapter.getList().get(position);
                 Log.d(TAG, "NovelTableRecyclerView: list size -> " + clickAdapter.getList().size());
                 Log.d(TAG, "onItemClick: position -> " + position + "\n" + body.toString());
-                mListener.onSelect(body.getNcode(), body.getTitle(), body.getPage(), totalPage);
+                mListener.onSelect(body.getNcode(), body.getPage(), title, bodyTitles);
            }
         });
         mRecyclerView.setAdapter(adapter);
@@ -141,7 +143,13 @@ public class NovelTableRecyclerViewFragment extends Fragment {
                     binding.writer.setVisibility(View.VISIBLE);
                     binding.story.setVisibility(View.VISIBLE);
 
-                    totalPage = novel.getAllNumberOfNovel();
+                    title = novel.getTitle();
+                    bodyTitles = new ArrayList<>();
+                    for (NovelBody body : novel.getBodies()) {
+                        if (!body.isChapter()) {
+                            bodyTitles.add(body.getTitle());
+                        }
+                    }
                 }
             });
         }
@@ -150,6 +158,6 @@ public class NovelTableRecyclerViewFragment extends Fragment {
     }
 
     public interface OnNovelSelectionListener {
-        public void onSelect(String ncode, String title, int page, int totalPage);
+        public void onSelect(String ncode, int page, String title, ArrayList<String> titles);
     }
 }
