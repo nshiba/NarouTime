@@ -122,6 +122,13 @@ public class RankingRecyclerViewFragment extends Fragment {
                         adapter.getList().clear();
                         adapter.getList().addAll(filterList);
                     }
+
+                    @Override
+                    void onNeutralButton(int which) {
+                        RankingRecyclerViewAdapter adapter = (RankingRecyclerViewAdapter) mRecyclerView.getAdapter();
+                        adapter.getList().clear();
+                        adapter.getList().addAll(allItems);
+                    }
                 };
                 checkBoxDialog.show(getFragmentManager(), "multiple");
             }

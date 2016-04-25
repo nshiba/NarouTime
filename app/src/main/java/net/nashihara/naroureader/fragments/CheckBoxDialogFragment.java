@@ -39,8 +39,15 @@ public abstract class CheckBoxDialogFragment extends DialogFragment {
                         dialog.dismiss();
                     }
                 })
+                .setNeutralButton("reset", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        onNeutralButton(which);
+                    }
+                })
                 .create();
     }
 
     abstract void onPositiveButton(int which);
+    abstract void onNeutralButton(int which);
 }
