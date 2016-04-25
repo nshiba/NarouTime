@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
@@ -18,11 +19,11 @@ import android.view.View;
 
 import com.balysv.materialmenu.MaterialMenuDrawable;
 
-import net.nashihara.naroureader.listeners.OnFragmentReplaceListener;
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.databinding.ActivityMainBinding;
 import net.nashihara.naroureader.fragments.NovelTableRecyclerViewFragment;
 import net.nashihara.naroureader.fragments.RankingViewPagerFragment;
+import net.nashihara.naroureader.listeners.OnFragmentReplaceListener;
 
 import java.util.ArrayList;
 import java.util.Stack;
@@ -31,7 +32,9 @@ import narou4j.enums.RankingType;
 
 import static android.support.v4.view.GravityCompat.START;
 
-public class MainActivity extends AppCompatActivity implements OnFragmentReplaceListener, NovelTableRecyclerViewFragment.OnNovelSelectionListener {
+public class MainActivity extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener, OnFragmentReplaceListener, NovelTableRecyclerViewFragment.OnNovelSelectionListener {
+
     ActivityMainBinding binding;
     private String TAG = MainActivity.class.getSimpleName();
     private FragmentManager manager;
@@ -45,7 +48,7 @@ public class MainActivity extends AppCompatActivity implements OnFragmentReplace
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         manager = getSupportFragmentManager();
 
-        binding.toolbar.setTitle(R.string.app_name);
+        binding.toolbar.setTitle("Ranking");
         materialMenu = new MaterialMenuDrawable(this, Color.WHITE, MaterialMenuDrawable.Stroke.THIN);
         materialMenu.animateIconState(MaterialMenuDrawable.IconState.BURGER);
         binding.toolbar.setNavigationIcon(materialMenu);
@@ -62,13 +65,11 @@ public class MainActivity extends AppCompatActivity implements OnFragmentReplace
             }
         });
 
-        String[] types = new String[]{
-                RankingType.DAILY.toString(), RankingType.WEEKLY.toString(),
-                RankingType.MONTHLY.toString(), RankingType.QUARTET.toString(), "all"};
-        String[] titles = new String[]{"日間", "週間", "月間", "四半期", "累計"};
-        manager.beginTransaction()
-                .add(R.id.main_container, RankingViewPagerFragment.newInstance(types, titles))
-                .commit();
+        binding.navView.setNavigationItemSelectedListener(this);
+
+        binding.drawer.setStatusBarBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
+
+        initFragment();
     }
 
     @Override
@@ -110,6 +111,53 @@ public class MainActivity extends AppCompatActivity implements OnFragmentReplace
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        switch (id) {
+            case R.id.nav_ranking: {
+                binding.toolbar.setTitle("Ranking");
+                binding.navView.setCheckedItem(R.id.nav_ranking);
+                break;
+            }
+            case R.id.nav_bookmark: {
+                binding.toolbar.setTitle("Bookmark");
+                binding.navView.setCheckedItem(R.id.nav_bookmark);
+                break;
+            }
+            case R.id.nav_search: {
+                binding.toolbar.setTitle("Search");
+                binding.navView.setCheckedItem(R.id.nav_search);
+                break;
+            }
+            case R.id.nav_setting: {
+                binding.toolbar.setTitle("Settings");
+                binding.navView.setCheckedItem(R.id.nav_setting);
+                Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                startActivity(intent);
+                break;
+            }
+            case R.id.nav_feedback: {
+                binding.toolbar.setTitle("Feedback");
+                binding.navView.setCheckedItem(R.id.nav_feedback);
+                break;
+            }
+        }
+
+        binding.drawer.closeDrawer(GravityCompat.START);
+        return false;
+    }
+
+    private void initFragment() {
+        String[] types = new String[]{
+                RankingType.DAILY.toString(), RankingType.WEEKLY.toString(),
+                RankingType.MONTHLY.toString(), RankingType.QUARTET.toString(), "all"};
+        String[] titles = new String[]{"日間", "週間", "月間", "四半期", "累計"};
+        manager.beginTransaction()
+                .add(R.id.main_container, RankingViewPagerFragment.newInstance(types, titles))
+                .commit();
+    }
 
     @Override
     public void onFragmentReplaceAction(Fragment fragment, String title) {
