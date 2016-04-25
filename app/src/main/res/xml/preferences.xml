@@ -20,14 +20,12 @@
         <android.support.v14.preference.SwitchPreference
             android:key="@string/auto_bookmark"
             android:title="自動でしおりをはさむ"
-            android:summary="小説を閉じた時に自動でしおりをはさみます"
-            android:checked="true" />
+            android:summary="小説を閉じた時に自動でしおりをはさみます" />
 
         <android.support.v14.preference.SwitchPreference
             android:key="@string/auto_remove_bookmark"
             android:title="自動でしおりをはずす"
-            android:summary="小説を開いた時に自動でしおりをはずします"
-            android:checked="true" />
+            android:summary="小説を開いた時に自動でしおりをはずします" />
     </PreferenceCategory>
 
 </PreferenceScreen>
