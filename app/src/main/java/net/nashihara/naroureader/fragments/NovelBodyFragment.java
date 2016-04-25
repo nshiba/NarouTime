@@ -2,11 +2,13 @@ package net.nashihara.naroureader.fragments;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.util.Pair;
+import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,6 +36,8 @@ public class NovelBodyFragment extends Fragment {
     private static final String ARG_BODY = "body";
     private static final String ARG_PAGE = "page";
     private static final String ARG_TOTAL_PAGE = "total_page";
+
+    private SharedPreferences pref;
 
     private int page;
     private int totalPage;
@@ -64,6 +68,8 @@ public class NovelBodyFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        pref = PreferenceManager.getDefaultSharedPreferences(mContext);
+
         Bundle args = getArguments();
         if (args != null) {
             title = args.getString(ARG_TITLE);
@@ -77,6 +83,34 @@ public class NovelBodyFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_novel_body, container, false);
+
+        boolean autoRemoveBookmark = pref.getBoolean(getString(R.string.auto_remove_bookmark), false);
+        if (autoRemoveBookmark) {
+            RealmConfiguration realmConfig = new RealmConfiguration.Builder(getActivity().getApplicationContext()).build();
+            Realm.setDefaultConfiguration(realmConfig);
+            Realm realm = Realm.getDefaultInstance();
+
+            ncode = ncode.toLowerCase();
+            RealmQuery<Novel4Realm> query = realm.where(Novel4Realm.class);
+            query.equalTo("ncode", ncode);
+            RealmResults<Novel4Realm> results = query.findAll();
+
+            if (results.size() != 0) {
+                realm.beginTransaction();
+
+                Novel4Realm novel4Realm = results.get(0);
+                int bookmarkPage = novel4Realm.getBookmark();
+
+                if (bookmarkPage == page) {
+                    novel4Realm.setBookmark(0);
+                    realm.commitTransaction();
+                }
+                else {
+                    realm.cancelTransaction();
+                }
+            }
+        }
+
         binding.page.setText(String.valueOf(page) + "/" + String.valueOf(totalPage));
         binding.btnNext.setOnClickListener(new View.OnClickListener() {
             @Override

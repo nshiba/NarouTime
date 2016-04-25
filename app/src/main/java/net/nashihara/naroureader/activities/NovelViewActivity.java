@@ -2,11 +2,13 @@ package net.nashihara.naroureader.activities;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 
@@ -42,15 +44,20 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
     private String ncode;
     private String writer;
 
+    private int nowPage;
+    private SharedPreferences pref;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_novel_view);
         manager = getSupportFragmentManager();
+        pref = PreferenceManager.getDefaultSharedPreferences(this);
 
         Intent intent = getIntent();
         ncode = intent.getStringExtra("ncode");
         final int page = intent.getIntExtra("page", 1);
+        nowPage = page;
 
         title = intent.getStringExtra("title");
         writer = intent.getStringExtra("writer");
@@ -64,7 +71,7 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
         binding.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
+                onBackPressed();
             }
         });
 
@@ -111,7 +118,44 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
     }
 
     @Override
+    public void onBackPressed() {
+        boolean autoRemoveBookmark = pref.getBoolean(getString(R.string.auto_bookmark), false);
+        if (autoRemoveBookmark) {
+            RealmConfiguration realmConfig = new RealmConfiguration.Builder(getApplicationContext()).build();
+            Realm.setDefaultConfiguration(realmConfig);
+            Realm realm = Realm.getDefaultInstance();
+
+            ncode = ncode.toLowerCase();
+            RealmQuery<Novel4Realm> query = realm.where(Novel4Realm.class);
+            query.equalTo("ncode", ncode);
+            RealmResults<Novel4Realm> results = query.findAll();
+
+            if (results.size() != 0) {
+                realm.beginTransaction();
+
+                Novel4Realm novel4Realm = results.get(0);
+                novel4Realm.setBookmark(nowPage);
+
+                realm.commitTransaction();
+            }
+            else {
+                realm.beginTransaction();
+
+                Novel4Realm bookmarkNovel = getNovel4RealmInstance(realm);
+                bookmarkNovel.setBookmark(nowPage);
+
+                realm.commitTransaction();
+            }
+        }
+
+        finish();
+
+        super.onBackPressed();
+    }
+
+    @Override
     public void onNovelBodyLoadAction(String body, int nextPage) {
+        nowPage = nextPage -1;
         binding.toolbar.setTitle(bodyTitles.get(nextPage -1));
         manager.beginTransaction()
                 .replace(R.id.novel_container, NovelBodyFragment.newInstance(ncode, bodyTitles.get(nextPage -1), body, nextPage, totalPage))
