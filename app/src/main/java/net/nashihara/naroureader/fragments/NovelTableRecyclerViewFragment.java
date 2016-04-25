@@ -79,7 +79,7 @@ public class NovelTableRecyclerViewFragment extends Fragment {
 
         // TODO: RecyclerView
         mRecyclerView = binding.recycler;
-        LinearLayoutManager manager = new LinearLayoutManager(mContext) {
+        final LinearLayoutManager manager = new LinearLayoutManager(mContext) {
             @Override
             public boolean canScrollVertically() {
                 return false;
@@ -169,6 +169,7 @@ public class NovelTableRecyclerViewFragment extends Fragment {
                     binding.title.setVisibility(View.VISIBLE);
                     binding.writer.setVisibility(View.VISIBLE);
                     binding.story.setVisibility(View.VISIBLE);
+                    setFabMargin();
 
                     writer = novel.getWriter();
                     title = novel.getTitle();
@@ -183,6 +184,13 @@ public class NovelTableRecyclerViewFragment extends Fragment {
         }
 
         return binding.getRoot();
+    }
+
+    private void setFabMargin() {
+        int margin = binding.fab.getHeight() /2 * -1;
+        ViewGroup.MarginLayoutParams mlp = (ViewGroup.MarginLayoutParams) binding.fab.getLayoutParams();
+        mlp.setMargins(mlp.leftMargin, margin, mlp.rightMargin, mlp.bottomMargin);
+        binding.fab.setLayoutParams(mlp);
     }
 
     private int loadBookmark() {
