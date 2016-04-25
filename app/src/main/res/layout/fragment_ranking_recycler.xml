@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
-    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:app="http://schemas.android.com/apk/res-auto">
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <ProgressBar
-            android:id="@+id/progress_bar"
-            style="?android:progressBarStyle"
-            android:layout_gravity="center"
-            android:layout_width="@dimen/progress_size"
-            android:layout_height="@dimen/progress_size" />
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <ProgressBar
+                android:id="@+id/progress_bar"
+                style="?android:progressBarStyle"
+                android:layout_gravity="center"
+                android:layout_width="@dimen/progress_size"
+                android:layout_height="@dimen/progress_size" />
+        </FrameLayout>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recycler"
@@ -18,5 +22,16 @@
             android:visibility="gone"
             android:scrollbars="vertical" />
 
-    </FrameLayout>
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:src="@drawable/ic_filter_list_white_24dp"
+            app:backgroundTint="@color/colorAccent"/>
+
+    </RelativeLayout>
 </layout>

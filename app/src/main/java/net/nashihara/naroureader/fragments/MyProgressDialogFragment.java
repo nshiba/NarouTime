@@ -6,9 +6,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 
-/**
- * Created by naoya on 16/02/28.
- */
 public class MyProgressDialogFragment extends DialogFragment {
     private static final String TAG = MyProgressDialogFragment.class.getSimpleName();
     private static ProgressDialog mProgressDialog = null;
