@@ -1,6 +1,7 @@
 package net.nashihara.naroureader.fragments;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -13,7 +14,12 @@ import android.view.ViewGroup;
 
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.databinding.FragmentNovelBodyBinding;
+import net.nashihara.naroureader.entities.Novel4Realm;
 
+import io.realm.Realm;
+import io.realm.RealmConfiguration;
+import io.realm.RealmQuery;
+import io.realm.RealmResults;
 import narou4j.Narou;
 import rx.Observable;
 import rx.Subscriber;
@@ -103,6 +109,25 @@ public class NovelBodyFragment extends Fragment {
 
         binding.title.setText(title);
 
+        binding.fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                StringBuilder builder = new StringBuilder();
+                builder.append(title);
+                builder.append("にしおりをはさみますか？");
+                OkCancelDialogFragment dialogFragment
+                        = new OkCancelDialogFragment("Bookmark", builder.toString(), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (which == OkCancelDialogFragment.OK) {
+                            bookmark();
+                        }
+                    }
+                });
+                dialogFragment.show(getFragmentManager(), "okcansel");
+            }
+        });
+
         return binding.getRoot();
     }
 
@@ -191,7 +216,36 @@ public class NovelBodyFragment extends Fragment {
         mListener = null;
     }
 
+    public void bookmark() {
+        RealmConfiguration realmConfig = new RealmConfiguration.Builder(getActivity().getApplicationContext()).build();
+        Realm.setDefaultConfiguration(realmConfig);
+        Realm realm = Realm.getDefaultInstance();
+
+        ncode = ncode.toLowerCase();
+        RealmQuery<Novel4Realm> query = realm.where(Novel4Realm.class);
+        query.equalTo("ncode", ncode);
+        RealmResults<Novel4Realm> results = query.findAll();
+
+        if (results.size() != 0) {
+            realm.beginTransaction();
+
+            Novel4Realm novel4Realm = results.get(0);
+            novel4Realm.setBookmark(page);
+
+            realm.commitTransaction();
+        }
+        else {
+            realm.beginTransaction();
+
+            Novel4Realm novel4Realm = mListener.getNovel4RealmInstance(realm);
+            novel4Realm.setBookmark(page);
+
+            realm.commitTransaction();
+        }
+    }
+
     public interface OnNovelBodyInteraction {
         public void onNovelBodyLoadAction(String body, int nextPage);
+        public Novel4Realm getNovel4RealmInstance(Realm realm);
     }
 }

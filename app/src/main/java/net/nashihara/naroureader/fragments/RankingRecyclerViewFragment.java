@@ -18,7 +18,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import net.nashihara.naroureader.DividerItemDecoration;
-import net.nashihara.naroureader.OnFragmentReplaceListener;
+import net.nashihara.naroureader.listeners.OnFragmentReplaceListener;
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.adapters.RankingRecyclerViewAdapter;
 import net.nashihara.naroureader.databinding.FragmentRankingRecyclerBinding;

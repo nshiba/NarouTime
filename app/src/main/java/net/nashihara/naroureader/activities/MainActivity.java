@@ -18,7 +18,7 @@ import android.view.View;
 
 import com.balysv.materialmenu.MaterialMenuDrawable;
 
-import net.nashihara.naroureader.OnFragmentReplaceListener;
+import net.nashihara.naroureader.listeners.OnFragmentReplaceListener;
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.databinding.ActivityMainBinding;
 import net.nashihara.naroureader.fragments.NovelTableRecyclerViewFragment;
@@ -137,11 +137,12 @@ public class MainActivity extends AppCompatActivity implements OnFragmentReplace
     }
 
     @Override
-    public void onSelect(String ncode, int page, String title, ArrayList<String> titles) {
+    public void onSelect(String ncode, int page, String title, String writer, ArrayList<String> titles) {
         Intent intent = new Intent(this, NovelViewActivity.class);
         intent.putExtra("ncode", ncode);
         intent.putExtra("page", page);
         intent.putExtra("title", title);
+        intent.putExtra("writer", writer);
         intent.putExtra("titles", titles);
         startActivity(intent);
     }

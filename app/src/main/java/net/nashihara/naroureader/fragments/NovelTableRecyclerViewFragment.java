@@ -1,6 +1,7 @@
 package net.nashihara.naroureader.fragments;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -15,10 +16,15 @@ import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.adapters.NovelTableRecyclerViewAdapter;
 import net.nashihara.naroureader.databinding.FragmentNovelTableViewBinding;
 import net.nashihara.naroureader.databinding.TableListItemBinding;
+import net.nashihara.naroureader.entities.Novel4Realm;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import io.realm.Realm;
+import io.realm.RealmConfiguration;
+import io.realm.RealmQuery;
+import io.realm.RealmResults;
 import narou4j.Narou;
 import narou4j.entities.Novel;
 import narou4j.entities.NovelBody;
@@ -35,6 +41,7 @@ public class NovelTableRecyclerViewFragment extends Fragment {
 
     private ArrayList<String> bodyTitles;
     private String title;
+    private String writer;
     private String ncode;
     private Context mContext;
     private OnNovelSelectionListener mListener;
@@ -88,10 +95,30 @@ public class NovelTableRecyclerViewFragment extends Fragment {
                 NovelBody body = clickAdapter.getList().get(position);
                 Log.d(TAG, "NovelTableRecyclerView: list size -> " + clickAdapter.getList().size());
                 Log.d(TAG, "onItemClick: position -> " + position + "\n" + body.toString());
-                mListener.onSelect(body.getNcode(), body.getPage(), title, bodyTitles);
+                mListener.onSelect(body.getNcode(), body.getPage(), title, writer, bodyTitles);
            }
         });
         mRecyclerView.setAdapter(adapter);
+
+        binding.fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int bookmark = loadBookmark();
+                if (bookmark == 0) {
+                    OkCancelDialogFragment dialogFragment
+                            = new OkCancelDialogFragment("Bookmark", "この小説にはしおりをはさんでいません。", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    });
+                    dialogFragment.show(getFragmentManager(), "okcansel");
+                }
+                else {
+                    mListener.onSelect(ncode, bookmark, title, writer, bodyTitles);
+                }
+            }
+        });
 
         Bundle args = getArguments();
         if (args != null) {
@@ -143,6 +170,7 @@ public class NovelTableRecyclerViewFragment extends Fragment {
                     binding.writer.setVisibility(View.VISIBLE);
                     binding.story.setVisibility(View.VISIBLE);
 
+                    writer = novel.getWriter();
                     title = novel.getTitle();
                     bodyTitles = new ArrayList<>();
                     for (NovelBody body : novel.getBodies()) {
@@ -157,7 +185,28 @@ public class NovelTableRecyclerViewFragment extends Fragment {
         return binding.getRoot();
     }
 
+    private int loadBookmark() {
+        RealmConfiguration realmConfig = new RealmConfiguration.Builder(getActivity().getApplicationContext()).build();
+        Realm.setDefaultConfiguration(realmConfig);
+        Realm realm = Realm.getDefaultInstance();
+
+        ncode = ncode.toLowerCase();
+        RealmQuery<Novel4Realm> query = realm.where(Novel4Realm.class);
+        query.equalTo("ncode", ncode);
+        RealmResults<Novel4Realm> results = query.findAll();
+
+        Log.d(TAG, "loadBookmark: " + results.size());
+
+        if (results.size() == 0) {
+            return 0;
+        }
+        else {
+            Novel4Realm novel4Realm = results.get(0);
+            return novel4Realm.getBookmark();
+        }
+    }
+
     public interface OnNovelSelectionListener {
-        public void onSelect(String ncode, int page, String title, ArrayList<String> titles);
+        public void onSelect(String ncode, int page, String title, String writer, ArrayList<String> titles);
     }
 }

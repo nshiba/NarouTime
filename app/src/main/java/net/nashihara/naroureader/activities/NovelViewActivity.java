@@ -1,5 +1,6 @@
 package net.nashihara.naroureader.activities;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
@@ -13,10 +14,16 @@ import com.balysv.materialmenu.MaterialMenuDrawable;
 
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.databinding.ActivityNovelViewBinding;
+import net.nashihara.naroureader.entities.Novel4Realm;
 import net.nashihara.naroureader.fragments.NovelBodyFragment;
+import net.nashihara.naroureader.fragments.OkCancelDialogFragment;
 
 import java.util.ArrayList;
 
+import io.realm.Realm;
+import io.realm.RealmConfiguration;
+import io.realm.RealmQuery;
+import io.realm.RealmResults;
 import narou4j.Narou;
 import rx.Observable;
 import rx.Subscriber;
@@ -33,6 +40,7 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
     private String title;
     private int totalPage;
     private String ncode;
+    private String writer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +53,7 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
         final int page = intent.getIntExtra("page", 1);
 
         title = intent.getStringExtra("title");
+        writer = intent.getStringExtra("writer");
         bodyTitles = intent.getStringArrayListExtra("titles");
         totalPage = bodyTitles.size();
 
@@ -63,8 +72,12 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
             @Override
             public void call(Subscriber<? super String> subscriber) {
                 Narou narou = new Narou();
-                String body = narou.getNovelBody(ncode, page);
-                subscriber.onNext(body);
+                try {
+                    String body = narou.getNovelBody(ncode, page);
+                    subscriber.onNext(body);
+                } catch (Exception e) {
+                    subscriber.onError(e);
+                }
             }
         })
                 .subscribeOn(Schedulers.io())
@@ -76,6 +89,7 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
                     @Override
                     public void onError(Throwable e) {
                         Log.e(TAG, "onError: ", e.fillInStackTrace());
+                        onLoadError();
                     }
 
                     @Override
@@ -85,6 +99,15 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
                                 .commit();
                     }
                 });
+
+        Realm.setDefaultConfiguration(new RealmConfiguration.Builder(getApplicationContext()).build());
+        Realm realm = Realm.getDefaultInstance();
+        RealmQuery<Novel4Realm> query = realm.where(Novel4Realm.class);
+        query.equalTo("ncode", ncode);
+        RealmResults<Novel4Realm> results = query.findAll();
+        for (Novel4Realm item : results) {
+            Log.d(TAG, "RealmResults: " + item.getTitle() + "page -> " + item.getBookmark());
+        }
     }
 
     @Override
@@ -93,5 +116,36 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
         manager.beginTransaction()
                 .replace(R.id.novel_container, NovelBodyFragment.newInstance(ncode, bodyTitles.get(nextPage -1), body, nextPage, totalPage))
                 .commit();
+    }
+
+    @Override
+    public Novel4Realm getNovel4RealmInstance(Realm realm) {
+        ncode = ncode.toLowerCase();
+
+        Novel4Realm novel4Realm = realm.createObject(Novel4Realm.class);
+        novel4Realm.setTitle(title);
+        novel4Realm.setWriter(writer);
+        novel4Realm.setNcode(ncode);
+        return novel4Realm;
+    }
+
+    private void onLoadError() {
+        OkCancelDialogFragment dialogFragment =
+                new OkCancelDialogFragment("読み込みに失敗しました。", "再読み込みしますか？", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (which == OkCancelDialogFragment.OK) {
+                            Intent intent = getIntent();
+                            finish();
+                            startActivity(intent);
+                        }
+
+                        if (which == OkCancelDialogFragment.CANSEL) {
+                            finish();
+                        }
+                    }
+                });
+
+        dialogFragment.show(getSupportFragmentManager(), "okcansel");
     }
 }

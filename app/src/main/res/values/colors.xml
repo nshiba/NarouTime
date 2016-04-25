@@ -8,6 +8,8 @@
     <color name="colorAccent">#e040fb</color>
     <color name="lightGray">#e1e1e1</color>
 
+    <color name="shadow">#c8828282</color>
+
     <color name="colorTextPrimary">#ffffff</color>
     <color name="colorTextPrimaryGray">#b4ffffff</color>
     <color name="colorBackground">#ffffff</color>

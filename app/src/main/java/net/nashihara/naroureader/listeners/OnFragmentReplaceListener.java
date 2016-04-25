@@ -1,4 +1,4 @@
-package net.nashihara.naroureader;
+package net.nashihara.naroureader.listeners;
 
 import android.support.v4.app.Fragment;
 
