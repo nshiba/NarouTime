@@ -1,11 +1,10 @@
 package net.nashihara.naroureader.entities;
 
 import io.realm.RealmObject;
-import io.realm.annotations.PrimaryKey;
 
 public class NovelBody4Realm extends RealmObject {
-    @PrimaryKey
     private int page;
+    private String ncode;
     private String title;
     private String body;
 
@@ -15,6 +14,14 @@ public class NovelBody4Realm extends RealmObject {
 
     public void setPage(int page) {
         this.page = page;
+    }
+
+    public String getNcode() {
+        return ncode;
+    }
+
+    public void setNcode(String ncode) {
+        this.ncode = ncode;
     }
 
     public String getTitle() {

@@ -7,7 +7,6 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.util.Pair;
 import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,18 +14,18 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import net.nashihara.naroureader.R;
+import net.nashihara.naroureader.RealmUtils;
 import net.nashihara.naroureader.databinding.FragmentNovelBodyBinding;
 import net.nashihara.naroureader.entities.Novel4Realm;
+import net.nashihara.naroureader.entities.NovelBody4Realm;
 
 import io.realm.Realm;
-import io.realm.RealmConfiguration;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
 import narou4j.Narou;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 
 public class NovelBodyFragment extends Fragment {
@@ -38,6 +37,7 @@ public class NovelBodyFragment extends Fragment {
     private static final String ARG_TOTAL_PAGE = "total_page";
 
     private SharedPreferences pref;
+    private Realm realm;
 
     private int page;
     private int totalPage;
@@ -69,6 +69,7 @@ public class NovelBodyFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         pref = PreferenceManager.getDefaultSharedPreferences(mContext);
+        realm = RealmUtils.getRealm(mContext, 0);
 
         Bundle args = getArguments();
         if (args != null) {
@@ -86,10 +87,6 @@ public class NovelBodyFragment extends Fragment {
 
         boolean autoRemoveBookmark = pref.getBoolean(getString(R.string.auto_remove_bookmark), false);
         if (autoRemoveBookmark) {
-            RealmConfiguration realmConfig = new RealmConfiguration.Builder(getActivity().getApplicationContext()).build();
-            Realm.setDefaultConfiguration(realmConfig);
-            Realm realm = Realm.getDefaultInstance();
-
             ncode = ncode.toLowerCase();
             RealmQuery<Novel4Realm> query = realm.where(Novel4Realm.class);
             query.equalTo("ncode", ncode);
@@ -118,6 +115,7 @@ public class NovelBodyFragment extends Fragment {
                 if (page >= totalPage) {
                     return;
                 }
+                realm.close();
                 mListener.onNovelBodyLoadAction(nextBody, page+1);
             }
         });
@@ -127,6 +125,7 @@ public class NovelBodyFragment extends Fragment {
                 if (page <= 1) {
                     return;
                 }
+                realm.close();
                 mListener.onNovelBodyLoadAction(prevBody, page-1);
             }
         });
@@ -154,6 +153,7 @@ public class NovelBodyFragment extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if (which == OkCancelDialogFragment.OK) {
+                            realm.close();
                             bookmark();
                         }
                     }
@@ -168,73 +168,98 @@ public class NovelBodyFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
+        ncode = ncode.toLowerCase();
+        RealmQuery<Novel4Realm> query = realm.where(Novel4Realm.class);
+        query.equalTo("ncode", ncode);
+        RealmResults<Novel4Realm> results = query.findAll();
+
         if (body.equals("")) {
-            Observable.create(new Observable.OnSubscribe<String>() {
-                @Override
-                public void call(Subscriber<? super String> subscriber) {
-                    Narou narou = new Narou();
-                    String str = narou.getNovelBody(ncode, page);
-                    subscriber.onNext(str);
-                    subscriber.onCompleted();
+            Log.d(TAG, "onActivityCreated: body equals \"\"");
+            if (results.size() == 0) {
+                Log.d(TAG, "onActivityCreated: results.size == 0");
+                Novel4Realm tmpNovel = mListener.getNovel4RealmInstance(realm);
+                updateNovelBody(page, tmpNovel);
+            }
+            else {
+                Log.d(TAG, "onActivityCreated: results.size != 0");
+                Novel4Realm novel4Realm = results.get(0);
+                RealmResults<NovelBody4Realm> targetBody = getNovelBody(ncode, page);
+
+                if (targetBody.size() > 0) {
+                    Log.d(TAG, "onActivityCreated: getNovelBody true");
+                    binding.body.setText(targetBody.get(0).getBody());
+                    binding.body.setVisibility(View.VISIBLE);
+                    binding.progressBar.setVisibility(View.GONE);
                 }
-            })
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Subscriber<String>() {
-                        @Override
-                        public void onCompleted() {}
-
-                        @Override
-                        public void onError(Throwable e) {
-                            Log.e(TAG, "onError: ", e.fillInStackTrace());
-                        }
-
-                        @Override
-                        public void onNext(String s) {
-                            binding.body.setText(s);
-                            binding.body.setVisibility(View.VISIBLE);
-                            binding.progressBar.setVisibility(View.GONE);
-                        }
-                    });
+                else {
+                    Log.d(TAG, "onActivityCreated: getNovelBody false");
+                    updateNovelBody(page, novel4Realm);
+                }
+            }
         }
+        else {
+            Log.d(TAG, "onActivityCreated: body not equals \"\"");
+            if (results.size() == 0) {
+                Log.d(TAG, "onActivityCreated: results.size == 0");
+                if (pref.getBoolean(getString(R.string.auto_download), false)) {
+                    addNovelBody(page, title, body);
+                }
+            } else {
+                Log.d(TAG, "onActivityCreated: results.size != 0");
+                Novel4Realm novel4Realm = results.get(0);
+                RealmResults<NovelBody4Realm> targetBody = getNovelBody(ncode, page);
 
-        Log.d(TAG, "onActivityCreated: ncode -> " + ncode);
-        Observable.combineLatest(Observable.create(new Observable.OnSubscribe<String>() {
-            @Override
-            public void call(Subscriber<? super String> subscriber) {
-                Narou narou = new Narou();
-                String str = narou.getNovelBody(ncode, page +1);
-                subscriber.onNext(str);
-            }
-        }), Observable.create(new Observable.OnSubscribe<String>() {
-            @Override
-            public void call(Subscriber<? super String> subscriber) {
-                Narou narou = new Narou();
-                String str = narou.getNovelBody(ncode, page -1);
-                subscriber.onNext(str);
-            }
-        }), new Func2<String, String, Pair<String, String>>() {
-            @Override
-            public Pair<String, String> call(String s, String s2) {
-                return Pair.create(s, s2);
-            }
-        })
-                .subscribeOn(Schedulers.io())
-                .subscribe(new Subscriber<Pair<String, String>>() {
-                    @Override
-                    public void onCompleted() {}
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Log.e(TAG, "onError: ", e.fillInStackTrace());
+                if (targetBody.size() > 0) {
+                    Log.d(TAG, "onActivityCreated: getNovelBody true");
+                    if (pref.getBoolean(getString(R.string.auto_sync), false)) {
+                        addNovelBody(page, title, body);
                     }
-
-                    @Override
-                    public void onNext(Pair<String, String> stringStringPair) {
-                        nextBody = stringStringPair.first;
-                        prevBody = stringStringPair.second;
+                }
+                else {
+                    Log.d(TAG, "onActivityCreated: getNovelBody false");
+                    if (pref.getBoolean(getString(R.string.auto_download), false)) {
+                        addNovelBody(page, title, body);
                     }
-                });
+                }
+            }
+
+//            Log.d(TAG, "onActivityCreated: ncode -> " + ncode);
+//            Observable.combineLatest(Observable.create(new Observable.OnSubscribe<String>() {
+//                        @Override
+//                        public void call(Subscriber<? super String> subscriber) {
+//                            getNextPage4Rx(page + 1, subscriber);
+//                        }
+//                    })
+//                    , Observable.create(new Observable.OnSubscribe<String>() {
+//                        @Override
+//                        public void call(Subscriber<? super String> subscriber) {
+//                            getNextPage4Rx(page - 1, subscriber);
+//                        }
+//                    })
+//                    , new Func2<String, String, Pair<String, String>>() {
+//                        @Override
+//                        public Pair<String, String> call(String s, String s2) {
+//                            return Pair.create(s, s2);
+//                        }
+//                    })
+//                    .subscribe(new Subscriber<Pair<String, String>>() {
+//                        @Override
+//                        public void onCompleted() {
+//                        }
+//
+//                        @Override
+//                        public void onError(Throwable e) {
+//                            Log.e(TAG, "onError: ", e.fillInStackTrace());
+//                        }
+//
+//                        @Override
+//                        public void onNext(Pair<String, String> stringStringPair) {
+//                            nextBody = stringStringPair.first;
+//                            prevBody = stringStringPair.second;
+//                        }
+//                    });
+        }
     }
 
     @Override
@@ -248,17 +273,59 @@ public class NovelBodyFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+        realm.close();
     }
 
-    public void bookmark() {
-        RealmConfiguration realmConfig = new RealmConfiguration.Builder(getActivity().getApplicationContext()).build();
-        Realm.setDefaultConfiguration(realmConfig);
-        Realm realm = Realm.getDefaultInstance();
+    private void addNovelBody(int page, String title, String body) {
 
+        realm.beginTransaction();
+
+        RealmResults<NovelBody4Realm> results = getNovelBody(ncode, page);
+        if (results.size() > 0) {
+            results.get(0).setNcode(ncode);
+            results.get(0).setPage(page);
+            results.get(0).setTitle(title);
+            results.get(0).setBody(body);
+        }
+        else {
+            NovelBody4Realm tmpBody = realm.createObject(NovelBody4Realm.class);
+            tmpBody.setNcode(ncode);
+            tmpBody.setPage(page);
+            tmpBody.setTitle(title);
+            tmpBody.setBody(body);
+        }
+
+        realm.commitTransaction();
+
+    }
+
+//    private void getNextPage4Rx(int targetPage, Subscriber<? super String> subscriber) {
+//        RealmResults<Novel4Realm> results = getRealmResult();
+//        if (results.size() > 0) {
+//            Novel4Realm novel4Realm = results.get(0);
+//            RealmResults<NovelBody4Realm> resultBodies = novel4Realm.getBodies().where().equalTo("page", page).findAll();
+//            if (resultBodies.size() > 0) {
+//                String body = resultBodies.get(0).getBody();
+//                subscriber.onNext(body);
+//                return;
+//            }
+//        }
+//
+//        Narou narou = new Narou();
+//        String str = narou.getNovelBody(ncode, targetPage);
+//        subscriber.onNext(str);
+//    }
+    
+    private RealmResults<Novel4Realm> getRealmResult() {
         ncode = ncode.toLowerCase();
         RealmQuery<Novel4Realm> query = realm.where(Novel4Realm.class);
         query.equalTo("ncode", ncode);
         RealmResults<Novel4Realm> results = query.findAll();
+        return results;
+    }
+
+    public void bookmark() {
+        RealmResults<Novel4Realm> results = getRealmResult();
 
         if (results.size() != 0) {
             realm.beginTransaction();
@@ -269,13 +336,67 @@ public class NovelBodyFragment extends Fragment {
             realm.commitTransaction();
         }
         else {
-            realm.beginTransaction();
-
             Novel4Realm novel4Realm = mListener.getNovel4RealmInstance(realm);
+            realm.beginTransaction();
             novel4Realm.setBookmark(page);
-
             realm.commitTransaction();
         }
+    }
+
+    private RealmResults<NovelBody4Realm> getNovelBody(String ncode, int page) {
+        RealmResults<NovelBody4Realm> ncodeResults = realm.where(NovelBody4Realm.class).equalTo("ncode", ncode).findAll();
+        return ncodeResults.where().equalTo("page", page).findAll();
+    }
+
+    private void updateNovelBody(final int targetPage, final Novel4Realm novel4Realm) {
+        Observable.create(new Observable.OnSubscribe<String>() {
+            @Override
+            public void call(Subscriber<? super String> subscriber) {
+                Narou narou = new Narou();
+                String str = narou.getNovelBody(ncode, targetPage);
+                subscriber.onNext(str);
+                subscriber.onCompleted();
+            }
+        })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<String>() {
+                    @Override
+                    public void onCompleted() {}
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e(TAG, "onError: ", e.fillInStackTrace());
+                    }
+
+                    @Override
+                    public void onNext(String s) {
+                        if (pref.getBoolean(getString(R.string.auto_download), false)) {
+                            realm.beginTransaction();
+
+                            RealmResults<NovelBody4Realm> results = getNovelBody(ncode, targetPage);
+                            if (results.size() <= 0) {
+                                NovelBody4Realm body4Realm = realm.createObject(NovelBody4Realm.class);
+                                body4Realm.setNcode(ncode);
+                                body4Realm.setTitle(title);
+                                body4Realm.setBody(s);
+                                body4Realm.setPage(targetPage);
+                            }
+                            else {
+                                NovelBody4Realm body4Realm = results.get(0);
+                                body4Realm.setNcode(ncode);
+                                body4Realm.setTitle(title);
+                                body4Realm.setBody(s);
+                                body4Realm.setPage(targetPage);
+                            }
+
+                            realm.commitTransaction();
+                        }
+                        binding.body.setText(s);
+                        binding.body.setVisibility(View.VISIBLE);
+                        binding.progressBar.setVisibility(View.GONE);
+                    }
+                });
     }
 
     public interface OnNovelBodyInteraction {
