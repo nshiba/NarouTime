@@ -106,15 +106,6 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
                                 .commit();
                     }
                 });
-
-        Realm.setDefaultConfiguration(new RealmConfiguration.Builder(getApplicationContext()).build());
-        Realm realm = Realm.getDefaultInstance();
-        RealmQuery<Novel4Realm> query = realm.where(Novel4Realm.class);
-        query.equalTo("ncode", ncode);
-        RealmResults<Novel4Realm> results = query.findAll();
-        for (Novel4Realm item : results) {
-            Log.d(TAG, "RealmResults: " + item.getTitle() + "page -> " + item.getBookmark());
-        }
     }
 
     @Override
@@ -166,10 +157,14 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
     public Novel4Realm getNovel4RealmInstance(Realm realm) {
         ncode = ncode.toLowerCase();
 
+        realm.beginTransaction();
+
         Novel4Realm novel4Realm = realm.createObject(Novel4Realm.class);
         novel4Realm.setTitle(title);
         novel4Realm.setWriter(writer);
         novel4Realm.setNcode(ncode);
+
+        realm.commitTransaction();
         return novel4Realm;
     }
 

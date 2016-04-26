@@ -8,12 +8,11 @@
             android:summary="本文を開いた時に自動で本文を端末に保存する"
             android:checked="false" />
 
-        <!--TODO: 自動更新-->
-        <!--<android.support.v14.preference.SwitchPreference-->
-            <!--android:key="@string/auto_sync"-->
-            <!--android:title="小説の自動更新"-->
-            <!--android:summary="小説の開いた時に自動で小説の本文を更新します(すでに端末に保存してある本文のみ更新)"-->
-            <!--android:checked="false" />-->
+        <android.support.v14.preference.SwitchPreference
+            android:key="@string/auto_sync"
+            android:title="小説の自動更新"
+            android:summary="小説の開いた時に自動で小説の本文を更新します(すでに端末に保存してある本文のみ更新)"
+            android:checked="false" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="しおり" >
