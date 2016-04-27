@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         manager = getSupportFragmentManager();
 
-        binding.toolbar.setTitle("Ranking");
+        binding.toolbar.setTitle("ランキング");
         materialMenu = new MaterialMenuDrawable(this, Color.WHITE, MaterialMenuDrawable.Stroke.THIN);
         materialMenu.animateIconState(MaterialMenuDrawable.IconState.BURGER);
         binding.toolbar.setNavigationIcon(materialMenu);
@@ -117,29 +117,29 @@ public class MainActivity extends AppCompatActivity
 
         switch (id) {
             case R.id.nav_ranking: {
-                binding.toolbar.setTitle("Ranking");
+                binding.toolbar.setTitle("ランキング");
                 binding.navView.setCheckedItem(R.id.nav_ranking);
                 break;
             }
             case R.id.nav_bookmark: {
-                binding.toolbar.setTitle("Bookmark");
+                binding.toolbar.setTitle("しおり");
                 binding.navView.setCheckedItem(R.id.nav_bookmark);
                 break;
             }
             case R.id.nav_search: {
-                binding.toolbar.setTitle("Search");
+                binding.toolbar.setTitle("検索");
                 binding.navView.setCheckedItem(R.id.nav_search);
                 break;
             }
             case R.id.nav_setting: {
-                binding.toolbar.setTitle("Settings");
+                binding.toolbar.setTitle("設定");
                 binding.navView.setCheckedItem(R.id.nav_setting);
                 Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
                 startActivity(intent);
                 break;
             }
             case R.id.nav_feedback: {
-                binding.toolbar.setTitle("Feedback");
+                binding.toolbar.setTitle("フィードバック");
                 binding.navView.setCheckedItem(R.id.nav_feedback);
                 break;
             }
