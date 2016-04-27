@@ -19,6 +19,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:theme="@style/NoActionBarTheme"
+                app:layout_scrollFlags="scroll|enterAlwaysCollapsed"
                 app:popupTheme="@style/AppTheme.PopupOverlay" />
 
         </android.support.design.widget.AppBarLayout>

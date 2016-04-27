@@ -9,7 +9,9 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -28,7 +30,7 @@ import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
-public class NovelBodyFragment extends Fragment {
+public class NovelBodyFragment extends Fragment implements GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener {
     private static final String TAG = NovelBodyFragment.class.getSimpleName();
     private static final String ARG_NCODE = "ncode";
     private static final String ARG_TITLE = "title";
@@ -50,6 +52,7 @@ public class NovelBodyFragment extends Fragment {
     private Context mContext;
     private OnNovelBodyInteraction mListener;
     private FragmentNovelBodyBinding binding;
+    private GestureDetector gestureDetector;
 
     public NovelBodyFragment() {}
 
@@ -70,6 +73,7 @@ public class NovelBodyFragment extends Fragment {
         super.onCreate(savedInstanceState);
         pref = PreferenceManager.getDefaultSharedPreferences(mContext);
         realm = RealmUtils.getRealm(mContext, 0);
+        gestureDetector = new GestureDetector(mContext, this);
 
         Bundle args = getArguments();
         if (args != null) {
@@ -84,6 +88,13 @@ public class NovelBodyFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_novel_body, container, false);
+
+        binding.body.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return gestureDetector.onTouchEvent(event);
+            }
+        });
 
         boolean autoRemoveBookmark = pref.getBoolean(getString(R.string.auto_remove_bookmark), false);
         if (autoRemoveBookmark) {
@@ -153,7 +164,6 @@ public class NovelBodyFragment extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if (which == OkCancelDialogFragment.OK) {
-                            realm.close();
                             bookmark();
                         }
                     }
@@ -398,9 +408,60 @@ public class NovelBodyFragment extends Fragment {
                     }
                 });
     }
+    @Override
+    public boolean onDown(MotionEvent e) {
+        return true;
+    }
+
+    @Override
+    public boolean onSingleTapUp(MotionEvent e) {
+        Log.d(TAG, "onSingleTapUp: ");
+        return false;
+    }
+
+    @Override
+    public void onLongPress(MotionEvent e) {
+        Log.d(TAG, "onLongPress: ");
+    }
+
+    @Override
+    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+        Log.d(TAG, "onScroll: ");
+        return false;
+    }
+
+    @Override
+    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+        Log.d(TAG, "onFling: ");
+        return false;
+    }
+
+    @Override
+    public void onShowPress(MotionEvent e) {
+        Log.d(TAG, "onShowPress: ");
+    }
+
+    @Override
+    public boolean onDoubleTap(MotionEvent e) {
+        Log.d(TAG, "onDoubleTap: ");
+        return false;
+    }
+
+    @Override
+    public boolean onDoubleTapEvent(MotionEvent e) {
+        Log.d(TAG, "onDoubleTapEvent: ");
+        return false;
+    }
+
+    @Override
+    public boolean onSingleTapConfirmed(MotionEvent e) {
+        Log.d(TAG, "onSingleTapConfirmed: ");
+        return false;
+    }
 
     public interface OnNovelBodyInteraction {
         public void onNovelBodyLoadAction(String body, int nextPage);
         public Novel4Realm getNovel4RealmInstance(Realm realm);
     }
+
 }

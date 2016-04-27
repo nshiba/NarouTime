@@ -1,6 +1,7 @@
 <layout xmlns:app="http://schemas.android.com/apk/res-auto">
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/root"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context="net.nashihara.naroureader.fragments.NovelBodyFragment">
@@ -56,24 +57,40 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
 
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_marginTop="@dimen/text_margin_normal"
+                    android:paddingBottom="60dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <Button
+                        android:id="@+id/btn_prev"
+                        android:layout_alignParentBottom="true"
+                        android:layout_alignParentLeft="true"
+                        android:text="前のページ"
+                        style="?android:borderlessButtonStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <FrameLayout
+                        android:layout_weight="1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <Button
+                        android:id="@+id/btn_next"
+                        android:layout_alignParentBottom="true"
+                        android:layout_alignParentRight="true"
+                        android:text="次のページ"
+                        style="?android:borderlessButtonStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                </LinearLayout>
+
             </LinearLayout>
         </ScrollView>
-
-        <Button
-            android:id="@+id/btn_next"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            android:text="次へ"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <Button
-            android:id="@+id/btn_prev"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true"
-            android:text="前へ"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab"
