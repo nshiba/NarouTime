@@ -18,5 +18,5 @@
     <dimen name="story_height">40dp</dimen>
 
     <dimen name="btn_expand_size">30dp</dimen>
-    <dimen name="progress_size">70dp</dimen>
+    <dimen name="progress_size">50dp</dimen>
 </resources>
