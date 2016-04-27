@@ -7,17 +7,17 @@
             android:id="@+id/nav_ranking"
             android:checked="true"
             android:icon="@drawable/ic_show_chart_black_24dp"
-            android:title="Ranking" />
+            android:title="ランキング" />
 
         <item
             android:id="@+id/nav_bookmark"
             android:icon="@drawable/ic_bookmark_black_24dp"
-            android:title="Bookmark" />
+            android:title="しおり" />
 
         <item
             android:id="@+id/nav_search"
             android:icon="@drawable/ic_search_black_24dp"
-            android:title="Search" />
+            android:title="検索" />
     </group>
 
     <group android:id="@+id/menu_bottom">

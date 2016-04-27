@@ -17,13 +17,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import net.nashihara.naroureader.DividerItemDecoration;
-import net.nashihara.naroureader.listeners.OnFragmentReplaceListener;
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.adapters.RankingRecyclerViewAdapter;
 import net.nashihara.naroureader.databinding.FragmentRankingRecyclerBinding;
 import net.nashihara.naroureader.databinding.RankingListItemBinding;
 import net.nashihara.naroureader.entities.NovelItem;
+import net.nashihara.naroureader.listeners.OnFragmentReplaceListener;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -136,7 +135,7 @@ public class RankingRecyclerViewFragment extends Fragment {
 
         mRecyclerView = binding.recycler;
         mRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));
-        mRecyclerView.addItemDecoration(new DividerItemDecoration(mContext));
+//        mRecyclerView.addItemDecoration(new DividerItemDecoration(mContext));
 
         RankingRecyclerViewAdapter adapter = new RankingRecyclerViewAdapter(mContext);
         mRecyclerView.setAdapter(adapter);
