@@ -46,6 +46,7 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
 
     private int nowPage;
     private SharedPreferences pref;
+    private static final String PREF_IS_HIDE = "is_hide";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +75,6 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
                 onBackPressed();
             }
         });
-
         Observable.create(new Observable.OnSubscribe<String>() {
             @Override
             public void call(Subscriber<? super String> subscriber) {
@@ -110,6 +110,8 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
 
     @Override
     public void onBackPressed() {
+        pref.edit().putBoolean(PREF_IS_HIDE, false);
+
         boolean autoRemoveBookmark = pref.getBoolean(getString(R.string.auto_bookmark), false);
         if (autoRemoveBookmark) {
             RealmConfiguration realmConfig = new RealmConfiguration.Builder(getApplicationContext()).build();
@@ -166,6 +168,19 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
 
         realm.commitTransaction();
         return novel4Realm;
+    }
+
+    @Override
+    public void onSingleTapConfirmedAction(boolean isHide) {
+        View decor = this.getWindow().getDecorView();
+        if (isHide) {
+            decor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+            binding.appBar.setVisibility(View.VISIBLE);
+        }
+        else {
+            decor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_IMMERSIVE);
+            binding.appBar.setVisibility(View.GONE);
+        }
     }
 
     private void onLoadError() {

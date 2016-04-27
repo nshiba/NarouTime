@@ -38,8 +38,11 @@ public class NovelBodyFragment extends Fragment implements GestureDetector.OnGes
     private static final String ARG_PAGE = "page";
     private static final String ARG_TOTAL_PAGE = "total_page";
 
+    private static final String PREF_IS_HIDE = "is_hide";
+
     private SharedPreferences pref;
     private Realm realm;
+    private boolean isHide = false;
 
     private int page;
     private int totalPage;
@@ -178,6 +181,11 @@ public class NovelBodyFragment extends Fragment implements GestureDetector.OnGes
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
+        isHide = pref.getBoolean(PREF_IS_HIDE, isHide);
+        if (isHide) {
+            binding.fab.setVisibility(View.GONE);
+        }
 
         ncode = ncode.toLowerCase();
         RealmQuery<Novel4Realm> query = realm.where(Novel4Realm.class);
@@ -456,12 +464,26 @@ public class NovelBodyFragment extends Fragment implements GestureDetector.OnGes
     @Override
     public boolean onSingleTapConfirmed(MotionEvent e) {
         Log.d(TAG, "onSingleTapConfirmed: ");
+        isHide = pref.getBoolean(PREF_IS_HIDE, isHide);
+
+        mListener.onSingleTapConfirmedAction(isHide);
+
+        if (isHide) {
+            binding.fab.setVisibility(View.VISIBLE);
+        }
+        else {
+            binding.fab.setVisibility(View.GONE);
+        }
+
+        isHide = !isHide;
+        pref.edit().putBoolean(PREF_IS_HIDE, isHide).apply();
         return false;
     }
 
     public interface OnNovelBodyInteraction {
         public void onNovelBodyLoadAction(String body, int nextPage);
         public Novel4Realm getNovel4RealmInstance(Realm realm);
+        public void onSingleTapConfirmedAction(boolean isHide);
     }
 
 }

@@ -34,6 +34,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize" />
+
                 <TextView
                     android:id="@+id/page"
                     android:textSize="@dimen/text_small"
@@ -60,7 +64,6 @@
                 <LinearLayout
                     android:orientation="horizontal"
                     android:layout_marginTop="@dimen/text_margin_normal"
-                    android:paddingBottom="60dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
