@@ -20,7 +20,7 @@ import android.widget.Toast;
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.adapters.RankingRecyclerViewAdapter;
 import net.nashihara.naroureader.databinding.FragmentRankingRecyclerBinding;
-import net.nashihara.naroureader.databinding.RankingListItemBinding;
+import net.nashihara.naroureader.databinding.ItemRankingRecyclerBinding;
 import net.nashihara.naroureader.entities.NovelItem;
 import net.nashihara.naroureader.listeners.OnFragmentReplaceListener;
 
@@ -334,7 +334,7 @@ public class RankingRecyclerViewFragment extends Fragment {
 
         adapter.setOnItemClickListener(new RankingRecyclerViewAdapter.OnItemClickListener() {
             @Override
-            public void onItemClick(View view, int position, RankingListItemBinding binding) {
+            public void onItemClick(View view, int position, ItemRankingRecyclerBinding binding) {
                 if (view.getId() == R.id.btn_expand) {
                     if (binding.allStory.getVisibility() == View.GONE) {
                         binding.allStory.setVisibility(View.VISIBLE);
@@ -353,7 +353,7 @@ public class RankingRecyclerViewFragment extends Fragment {
             }
 
             @Override
-            public void onItemLongClick(View view, final int position, RankingListItemBinding binding) {
+            public void onItemLongClick(View view, final int position, ItemRankingRecyclerBinding binding) {
 
                 RankingRecyclerViewAdapter adapter = (RankingRecyclerViewAdapter) mRecyclerView.getAdapter();
 

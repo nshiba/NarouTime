@@ -12,7 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import net.nashihara.naroureader.R;
-import net.nashihara.naroureader.databinding.RankingListItemBinding;
+import net.nashihara.naroureader.databinding.ItemRankingRecyclerBinding;
 import net.nashihara.naroureader.entities.NovelItem;
 
 import java.text.ParseException;
@@ -51,14 +51,14 @@ public class RankingRecyclerViewAdapter extends RecyclerView.Adapter<RankingRecy
 
     @Override
     public BindingHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        final View v = mInflater.inflate(R.layout.ranking_list_item, parent, false);
+        final View v = mInflater.inflate(R.layout.item_ranking_recycler, parent, false);
         return new BindingHolder(v, mListener);
     }
 
     @Override
     public void onBindViewHolder(BindingHolder holder, int position) {
         if (mSortedList != null && mSortedList.size() > position && mSortedList.get(position) != null) {
-            RankingListItemBinding binding = holder.getBinding();
+            ItemRankingRecyclerBinding binding = holder.getBinding();
 
             NovelItem novelItem = mSortedList.get(position);
             Novel novel = novelItem.getNovelDetail();
@@ -254,12 +254,12 @@ public class RankingRecyclerViewAdapter extends RecyclerView.Adapter<RankingRecy
     }
 
     public interface OnItemClickListener {
-        void onItemClick(View view, int position, RankingListItemBinding binding);
-        void onItemLongClick(View view, int position, RankingListItemBinding binding);
+        void onItemClick(View view, int position, ItemRankingRecyclerBinding binding);
+        void onItemLongClick(View view, int position, ItemRankingRecyclerBinding binding);
     }
 
     static class BindingHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
-        private final RankingListItemBinding binding;
+        private final ItemRankingRecyclerBinding binding;
         private OnItemClickListener mListener;
 
         public BindingHolder(View itemView, OnItemClickListener listener) {
@@ -273,7 +273,7 @@ public class RankingRecyclerViewAdapter extends RecyclerView.Adapter<RankingRecy
             binding.getRoot().setOnLongClickListener(this);
         }
 
-        public RankingListItemBinding getBinding(){
+        public ItemRankingRecyclerBinding getBinding(){
             return this.binding;
         }
 
