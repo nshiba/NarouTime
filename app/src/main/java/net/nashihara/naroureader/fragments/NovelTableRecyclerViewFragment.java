@@ -15,7 +15,7 @@ import android.view.ViewGroup;
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.adapters.NovelTableRecyclerViewAdapter;
 import net.nashihara.naroureader.databinding.FragmentNovelTableViewBinding;
-import net.nashihara.naroureader.databinding.TableListItemBinding;
+import net.nashihara.naroureader.databinding.ItemTableRecyclerBinding;
 import net.nashihara.naroureader.entities.Novel4Realm;
 
 import java.util.ArrayList;
@@ -90,7 +90,7 @@ public class NovelTableRecyclerViewFragment extends Fragment {
         NovelTableRecyclerViewAdapter adapter = new NovelTableRecyclerViewAdapter(mContext);
         adapter.setOnItemClickListener(new NovelTableRecyclerViewAdapter.OnItemClickListener() {
             @Override
-            public void onItemClick(View view, int position, TableListItemBinding binding) {
+            public void onItemClick(View view, int position, ItemTableRecyclerBinding binding) {
                 NovelTableRecyclerViewAdapter clickAdapter = (NovelTableRecyclerViewAdapter) mRecyclerView.getAdapter();
                 NovelBody body = clickAdapter.getList().get(position);
                 Log.d(TAG, "NovelTableRecyclerView: list size -> " + clickAdapter.getList().size());

@@ -21,6 +21,7 @@ import com.balysv.materialmenu.MaterialMenuDrawable;
 
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.databinding.ActivityMainBinding;
+import net.nashihara.naroureader.fragments.BookmarkRecyclerViewFragment;
 import net.nashihara.naroureader.fragments.NovelTableRecyclerViewFragment;
 import net.nashihara.naroureader.fragments.RankingViewPagerFragment;
 import net.nashihara.naroureader.listeners.OnFragmentReplaceListener;
@@ -117,13 +118,15 @@ public class MainActivity extends AppCompatActivity
 
         switch (id) {
             case R.id.nav_ranking: {
-                binding.toolbar.setTitle("ランキング");
+//                binding.toolbar.setTitle("ランキング");
                 binding.navView.setCheckedItem(R.id.nav_ranking);
                 break;
             }
             case R.id.nav_bookmark: {
-                binding.toolbar.setTitle("しおり");
+//                binding.toolbar.setTitle("しおり");
                 binding.navView.setCheckedItem(R.id.nav_bookmark);
+                BookmarkRecyclerViewFragment fragment = BookmarkRecyclerViewFragment.newInstance();
+                onFragmentReplaceAction(fragment, "しおり");
                 break;
             }
             case R.id.nav_search: {

@@ -75,7 +75,7 @@ public class NovelBodyFragment extends Fragment implements GestureDetector.OnGes
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         pref = PreferenceManager.getDefaultSharedPreferences(mContext);
-        realm = RealmUtils.getRealm(mContext, 0);
+        realm = RealmUtils.getRealm(mContext);
         gestureDetector = new GestureDetector(mContext, this);
 
         Bundle args = getArguments();

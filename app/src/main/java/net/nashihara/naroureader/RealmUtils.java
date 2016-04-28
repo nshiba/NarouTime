@@ -9,17 +9,19 @@ public class RealmUtils {
     private static Migration migration = new Migration();
     private static RealmConfiguration defaultConfig;
 
-    public static Realm getRealm(Context contenxt, int version) {
+    private static int VERSION = 0;
+
+    public static Realm getRealm(Context context) {
         if (defaultConfig == null) {
-            defaultConfig = getConfig(contenxt, version);
+            defaultConfig = getConfig(context);
         }
 
         return Realm.getInstance(defaultConfig);
     }
 
-    private static RealmConfiguration getConfig(Context context, int version) {
+    private static RealmConfiguration getConfig(Context context) {
         defaultConfig = new RealmConfiguration.Builder(context)
-                .schemaVersion(version)
+                .schemaVersion(VERSION)
 //                .migration(migration)
                 .build();
         return defaultConfig;

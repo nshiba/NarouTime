@@ -8,23 +8,23 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import net.nashihara.naroureader.R;
-import net.nashihara.naroureader.databinding.ItemTableRecyclerBinding;
+import net.nashihara.naroureader.databinding.ItemBookmarkRecyclerBinding;
+import net.nashihara.naroureader.entities.Novel4Realm;
 import net.nashihara.naroureader.entities.NovelItem;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import narou4j.entities.NovelBody;
-
-public class NovelTableRecyclerViewAdapter extends RecyclerView.Adapter<NovelTableRecyclerViewAdapter.BindingHolder> {
-    private static final String TAG = NovelTableRecyclerViewAdapter.class.getSimpleName();
+public class BookmarkRecyclerViewAdapter extends RecyclerView.Adapter<BookmarkRecyclerViewAdapter.BindingHolder> {
+    private static final String TAG = BookmarkRecyclerViewAdapter.class.getSimpleName();
 
     private LayoutInflater mInflater;
-    private ArrayList<NovelBody> mArrayList;
+    private ArrayList<Novel4Realm> mArrayList;
     private OnItemClickListener mListener;
     private RecyclerView mRecyclerView;
+    private Context mContext;
 
-    public NovelTableRecyclerViewAdapter(Context context) {
+    public BookmarkRecyclerViewAdapter(Context context) {
         this.mInflater = LayoutInflater.from(context);
         mArrayList = new ArrayList<>();
     }
@@ -43,26 +43,16 @@ public class NovelTableRecyclerViewAdapter extends RecyclerView.Adapter<NovelTab
 
     @Override
     public BindingHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        final View v = mInflater.inflate(R.layout.item_table_recycler, parent, false);
+        final View v = mInflater.inflate(R.layout.item_bookmark_recycler, parent, false);
         return new BindingHolder(v, mListener);
     }
 
     @Override
     public void onBindViewHolder(BindingHolder holder, int position) {
         if (mArrayList != null && mArrayList.size() > position && mArrayList.get(position) != null) {
-            ItemTableRecyclerBinding binding = holder.getBinding();
+            ItemBookmarkRecyclerBinding binding = holder.getBinding();
 
-            NovelBody body = mArrayList.get(position);
-            if (body.isChapter()) {
-                binding.chapter.setText(body.getTitle());
-                binding.chapter.setVisibility(View.VISIBLE);
-                binding.pageTitle.setVisibility(View.GONE);
-            }
-            else {
-                binding.pageTitle.setText(body.getTitle());
-                binding.pageTitle.setVisibility(View.VISIBLE);
-                binding.chapter.setVisibility(View.GONE);
-            }
+            binding.title.setText(mArrayList.get(position).getTitle());
         }
     }
 
@@ -74,7 +64,7 @@ public class NovelTableRecyclerViewAdapter extends RecyclerView.Adapter<NovelTab
         return mArrayList.size();
     }
 
-    public void addDataOf(List<NovelBody> dataList) {
+    public void addDataOf(List<Novel4Realm> dataList) {
         mArrayList.addAll(dataList);
     }
 
@@ -88,7 +78,7 @@ public class NovelTableRecyclerViewAdapter extends RecyclerView.Adapter<NovelTab
         mArrayList.clear();
     }
 
-    public ArrayList<NovelBody> getList() {
+    public ArrayList<Novel4Realm> getList() {
         return this.mArrayList;
     }
 
@@ -97,11 +87,11 @@ public class NovelTableRecyclerViewAdapter extends RecyclerView.Adapter<NovelTab
     }
 
     public interface OnItemClickListener {
-        void onItemClick(View view, int position, ItemTableRecyclerBinding binding);
+        void onItemClick(View view, int position, ItemBookmarkRecyclerBinding binding);
     }
 
     static class BindingHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        private final ItemTableRecyclerBinding binding;
+        private ItemBookmarkRecyclerBinding binding;
         private OnItemClickListener mListener;
 
         public BindingHolder(View itemView, OnItemClickListener listener) {
@@ -109,10 +99,10 @@ public class NovelTableRecyclerViewAdapter extends RecyclerView.Adapter<NovelTab
             this.mListener = listener;
             binding = DataBindingUtil.bind(itemView);
 
-            binding.pageTitle.setOnClickListener(this);
+            binding.itemContainer.setOnClickListener(this);
         }
 
-        public ItemTableRecyclerBinding getBinding(){
+        public ItemBookmarkRecyclerBinding getBinding(){
             return this.binding;
         }
 
