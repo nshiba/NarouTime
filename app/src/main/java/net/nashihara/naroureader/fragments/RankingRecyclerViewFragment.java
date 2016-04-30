@@ -21,6 +21,8 @@ import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.adapters.RankingRecyclerViewAdapter;
 import net.nashihara.naroureader.databinding.FragmentRankingRecyclerBinding;
 import net.nashihara.naroureader.databinding.ItemRankingRecyclerBinding;
+import net.nashihara.naroureader.dialogs.CheckBoxDialogFragment;
+import net.nashihara.naroureader.dialogs.ListDailogFragment;
 import net.nashihara.naroureader.entities.NovelItem;
 import net.nashihara.naroureader.listeners.OnFragmentReplaceListener;
 

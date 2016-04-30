@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.RealmUtils;
 import net.nashihara.naroureader.databinding.FragmentNovelBodyBinding;
+import net.nashihara.naroureader.dialogs.OkCancelDialogFragment;
 import net.nashihara.naroureader.entities.Novel4Realm;
 import net.nashihara.naroureader.entities.NovelBody4Realm;
 

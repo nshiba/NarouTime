@@ -19,7 +19,7 @@ import net.nashihara.naroureader.RealmUtils;
 import net.nashihara.naroureader.databinding.ActivityNovelViewBinding;
 import net.nashihara.naroureader.entities.Novel4Realm;
 import net.nashihara.naroureader.fragments.NovelBodyFragment;
-import net.nashihara.naroureader.fragments.OkCancelDialogFragment;
+import net.nashihara.naroureader.dialogs.OkCancelDialogFragment;
 
 import io.realm.Realm;
 import io.realm.RealmQuery;
@@ -112,7 +112,7 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
 
     @Override
     public void onBackPressed() {
-        pref.edit().putBoolean(PREF_IS_HIDE, false);
+        pref.edit().putBoolean(PREF_IS_HIDE, false).apply();
 
         boolean autoRemoveBookmark = pref.getBoolean(getString(R.string.auto_bookmark), false);
         if (autoRemoveBookmark) {
