@@ -195,8 +195,8 @@ public class NovelBodyFragment extends Fragment implements GestureDetector.OnGes
             Log.d(TAG, "onActivityCreated: body equals \"\"");
             if (results.size() == 0) {
                 Log.d(TAG, "onActivityCreated: results.size == 0");
-                Novel4Realm tmpNovel = mListener.getNovel4RealmInstance(realm);
-                updateNovelBody(page, tmpNovel);
+                Novel4Realm tmpNovel = mListener.getNovel4RealmInstance();
+                updateNovelBody(page);
             }
             else {
                 Log.d(TAG, "onActivityCreated: results.size != 0");
@@ -211,7 +211,7 @@ public class NovelBodyFragment extends Fragment implements GestureDetector.OnGes
                 }
                 else {
                     Log.d(TAG, "onActivityCreated: getNovelBody false");
-                    updateNovelBody(page, novel4Realm);
+                    updateNovelBody(page);
                 }
             }
         }
@@ -296,11 +296,12 @@ public class NovelBodyFragment extends Fragment implements GestureDetector.OnGes
 
             Novel4Realm novel4Realm = results.get(0);
             novel4Realm.setBookmark(page);
+            novel4Realm.setTotalPage(totalPage);
 
             realm.commitTransaction();
         }
         else {
-            Novel4Realm novel4Realm = mListener.getNovel4RealmInstance(realm);
+            Novel4Realm novel4Realm = mListener.getNovel4RealmInstance();
             realm.beginTransaction();
             novel4Realm.setBookmark(page);
             realm.commitTransaction();
@@ -312,7 +313,7 @@ public class NovelBodyFragment extends Fragment implements GestureDetector.OnGes
         return ncodeResults.where().equalTo("page", page).findAll();
     }
 
-    private void updateNovelBody(final int targetPage, final Novel4Realm novel4Realm) {
+    private void updateNovelBody(final int targetPage) {
         Observable.create(new Observable.OnSubscribe<NovelBody>() {
             @Override
             public void call(Subscriber<? super NovelBody> subscriber) {
@@ -450,7 +451,7 @@ public class NovelBodyFragment extends Fragment implements GestureDetector.OnGes
 
     public interface OnNovelBodyInteraction {
         public void onNovelBodyLoadAction(String body, int nextPage, String bodyTitle);
-        public Novel4Realm getNovel4RealmInstance(Realm realm);
+        public Novel4Realm getNovel4RealmInstance();
         public void onSingleTapConfirmedAction(boolean isHide);
     }
 }
