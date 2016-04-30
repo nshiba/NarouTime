@@ -22,7 +22,6 @@ import net.nashihara.naroureader.fragments.NovelBodyFragment;
 import net.nashihara.naroureader.fragments.OkCancelDialogFragment;
 
 import io.realm.Realm;
-import io.realm.RealmConfiguration;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
 import narou4j.Narou;
@@ -117,9 +116,6 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
 
         boolean autoRemoveBookmark = pref.getBoolean(getString(R.string.auto_bookmark), false);
         if (autoRemoveBookmark) {
-            RealmConfiguration realmConfig = new RealmConfiguration.Builder(getApplicationContext()).build();
-            Realm.setDefaultConfiguration(realmConfig);
-            Realm realm = Realm.getDefaultInstance();
 
             ncode = ncode.toLowerCase();
             RealmQuery<Novel4Realm> query = realm.where(Novel4Realm.class);
@@ -137,7 +133,7 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
             else {
                 realm.beginTransaction();
 
-                Novel4Realm bookmarkNovel = getNovel4RealmInstance(realm);
+                Novel4Realm bookmarkNovel = getNovel4RealmInstance();
                 bookmarkNovel.setBookmark(nowPage);
 
                 realm.commitTransaction();
@@ -158,7 +154,7 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
     }
 
     @Override
-    public Novel4Realm getNovel4RealmInstance(Realm realm) {
+    public Novel4Realm getNovel4RealmInstance() {
         ncode = ncode.toLowerCase();
 
         realm.beginTransaction();
@@ -167,6 +163,7 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
         novel4Realm.setTitle(title);
         novel4Realm.setWriter(writer);
         novel4Realm.setNcode(ncode);
+        novel4Realm.setTotalPage(totalPage);
 
         realm.commitTransaction();
         return novel4Realm;

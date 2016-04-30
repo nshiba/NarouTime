@@ -9,7 +9,7 @@ public class RealmUtils {
     private static Migration migration = new Migration();
     private static RealmConfiguration defaultConfig;
 
-    private static int VERSION = 0;
+    private static int VERSION = 1;
 
     public static Realm getRealm(Context context) {
         if (defaultConfig == null) {
@@ -22,7 +22,7 @@ public class RealmUtils {
     private static RealmConfiguration getConfig(Context context) {
         defaultConfig = new RealmConfiguration.Builder(context)
                 .schemaVersion(VERSION)
-//                .migration(migration)
+                .migration(migration)
                 .build();
         return defaultConfig;
     }

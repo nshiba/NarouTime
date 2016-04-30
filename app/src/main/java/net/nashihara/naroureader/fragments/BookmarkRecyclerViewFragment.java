@@ -70,12 +70,12 @@ public class BookmarkRecyclerViewFragment extends Fragment {
             public void onItemClick(View view, int position, ItemBookmarkRecyclerBinding binding) {
                 final Novel4Realm novel = novels.get(position);
 
-                final String ncode = novel.getNcode();
                 Intent intent = new Intent(mContext, NovelViewActivity.class);
                 intent.putExtra("ncode", novel.getNcode());
                 intent.putExtra("page", novel.getBookmark());
                 intent.putExtra("title", novel.getTitle());
                 intent.putExtra("writer", novel.getWriter());
+                intent.putExtra("totalPage", novel.getTotalPage());
 
                 startActivity(intent);
             }

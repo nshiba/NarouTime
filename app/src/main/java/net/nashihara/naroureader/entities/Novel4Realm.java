@@ -10,6 +10,7 @@ public class Novel4Realm extends RealmObject {
     private String writer;
     private int bookmark;
     private boolean fav;
+    private int totalPage;
 
     public String getNcode() {
         return ncode;
@@ -49,5 +50,13 @@ public class Novel4Realm extends RealmObject {
 
     public void setFav(boolean fav) {
         this.fav = fav;
+    }
+
+    public int getTotalPage() {
+        return totalPage;
+    }
+
+    public void setTotalPage(int totalPage) {
+        this.totalPage = totalPage;
     }
 }

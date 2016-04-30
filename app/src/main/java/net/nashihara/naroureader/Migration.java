@@ -31,6 +31,9 @@ public class Migration implements RealmMigration {
          ************************************************/
         // Migrate from version 0 to version 1
         if (oldVersion == 0) {
+            // Novel4Realm に totalPage field を追加
+            schema.get("Novel4Realm").addField("totalPage", int.class);
+
             oldVersion++;
         }
     }

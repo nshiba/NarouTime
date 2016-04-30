@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import net.nashihara.naroureader.R;
+import net.nashihara.naroureader.RealmUtils;
 import net.nashihara.naroureader.adapters.NovelTableRecyclerViewAdapter;
 import net.nashihara.naroureader.databinding.FragmentNovelTableViewBinding;
 import net.nashihara.naroureader.databinding.ItemTableRecyclerBinding;
@@ -22,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.realm.Realm;
-import io.realm.RealmConfiguration;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
 import narou4j.Narou;
@@ -194,9 +194,7 @@ public class NovelTableRecyclerViewFragment extends Fragment {
     }
 
     private int loadBookmark() {
-        RealmConfiguration realmConfig = new RealmConfiguration.Builder(getActivity().getApplicationContext()).build();
-        Realm.setDefaultConfiguration(realmConfig);
-        Realm realm = Realm.getDefaultInstance();
+        Realm realm = RealmUtils.getRealm(mContext);
 
         ncode = ncode.toLowerCase();
         RealmQuery<Novel4Realm> query = realm.where(Novel4Realm.class);
