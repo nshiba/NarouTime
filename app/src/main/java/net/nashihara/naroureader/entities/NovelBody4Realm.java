@@ -17,10 +17,16 @@ public class NovelBody4Realm extends RealmObject {
     }
 
     public String getNcode() {
+        if (ncode != null) {
+            ncode = ncode.toLowerCase();
+        }
         return ncode;
     }
 
     public void setNcode(String ncode) {
+        if (ncode != null) {
+            ncode = ncode.toLowerCase();
+        }
         this.ncode = ncode;
     }
 

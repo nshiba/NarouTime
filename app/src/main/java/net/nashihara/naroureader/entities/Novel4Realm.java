@@ -8,15 +8,23 @@ public class Novel4Realm extends RealmObject {
     private String ncode;
     private String title;
     private String writer;
+    private String story;
     private int bookmark;
     private boolean fav;
     private int totalPage;
+    private boolean isDownload = false;
 
     public String getNcode() {
+        if (ncode != null) {
+            ncode = ncode.toLowerCase();
+        }
         return ncode;
     }
 
     public void setNcode(String ncode) {
+        if (ncode != null) {
+            ncode = ncode.toLowerCase();
+        }
         this.ncode = ncode;
     }
 
@@ -34,6 +42,14 @@ public class Novel4Realm extends RealmObject {
 
     public void setWriter(String writer) {
         this.writer = writer;
+    }
+
+    public String getStory() {
+        return story;
+    }
+
+    public void setStory(String story) {
+        this.story = story;
     }
 
     public int getBookmark() {
@@ -58,5 +74,13 @@ public class Novel4Realm extends RealmObject {
 
     public void setTotalPage(int totalPage) {
         this.totalPage = totalPage;
+    }
+
+    public boolean isDownload() {
+        return isDownload;
+    }
+
+    public void setDownload(boolean download) {
+        isDownload = download;
     }
 }

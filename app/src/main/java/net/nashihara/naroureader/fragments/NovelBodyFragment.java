@@ -103,7 +103,6 @@ public class NovelBodyFragment extends Fragment implements GestureDetector.OnGes
 
         boolean autoRemoveBookmark = pref.getBoolean(getString(R.string.auto_remove_bookmark), false);
         if (autoRemoveBookmark) {
-            ncode = ncode.toLowerCase();
             RealmQuery<Novel4Realm> query = realm.where(Novel4Realm.class);
             query.equalTo("ncode", ncode);
             RealmResults<Novel4Realm> results = query.findAll();
@@ -187,7 +186,6 @@ public class NovelBodyFragment extends Fragment implements GestureDetector.OnGes
             binding.fab.setVisibility(View.GONE);
         }
 
-        ncode = ncode.toLowerCase();
         RealmQuery<Novel4Realm> query = realm.where(Novel4Realm.class);
         query.equalTo("ncode", ncode);
         RealmResults<Novel4Realm> results = query.findAll();
@@ -282,7 +280,6 @@ public class NovelBodyFragment extends Fragment implements GestureDetector.OnGes
     }
 
     private RealmResults<Novel4Realm> getRealmResult() {
-        ncode = ncode.toLowerCase();
         RealmQuery<Novel4Realm> query = realm.where(Novel4Realm.class);
         query.equalTo("ncode", ncode);
         RealmResults<Novel4Realm> results = query.findAll();
@@ -310,11 +307,14 @@ public class NovelBodyFragment extends Fragment implements GestureDetector.OnGes
     }
 
     private RealmResults<NovelBody4Realm> getNovelBody(String ncode, int page) {
+        Log.d(TAG, "getNovelBody: ncode -> " + ncode);
+        Log.d(TAG, "getNovelBody: page -> " + page);
         RealmResults<NovelBody4Realm> ncodeResults = realm.where(NovelBody4Realm.class).equalTo("ncode", ncode).findAll();
         return ncodeResults.where().equalTo("page", page).findAll();
     }
 
     private void updateNovelBody(final int targetPage) {
+        Log.d(TAG, "updateNovelBody: ");
         Observable.create(new Observable.OnSubscribe<NovelBody>() {
             @Override
             public void call(Subscriber<? super NovelBody> subscriber) {

@@ -48,6 +48,6 @@ public abstract class CheckBoxDialogFragment extends DialogFragment {
                 .create();
     }
 
-    abstract void onPositiveButton(int which);
-    abstract void onNeutralButton(int which);
+    public abstract void onPositiveButton(int which);
+    public abstract void onNeutralButton(int which);
 }

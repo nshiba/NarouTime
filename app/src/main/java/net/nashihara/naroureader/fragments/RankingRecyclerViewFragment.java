@@ -15,14 +15,16 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
+import net.nashihara.naroureader.DownloadUtil;
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.adapters.RankingRecyclerViewAdapter;
 import net.nashihara.naroureader.databinding.FragmentRankingRecyclerBinding;
 import net.nashihara.naroureader.databinding.ItemRankingRecyclerBinding;
 import net.nashihara.naroureader.dialogs.CheckBoxDialogFragment;
 import net.nashihara.naroureader.dialogs.ListDailogFragment;
+import net.nashihara.naroureader.dialogs.NovelDownloadDialogFragment;
+import net.nashihara.naroureader.dialogs.OkCancelDialogFragment;
 import net.nashihara.naroureader.entities.NovelItem;
 import net.nashihara.naroureader.listeners.OnFragmentReplaceListener;
 
@@ -118,14 +120,14 @@ public class RankingRecyclerViewFragment extends Fragment {
                 };
                 CheckBoxDialogFragment checkBoxDialog = new CheckBoxDialogFragment("fliter list", filters, onMultiChoiceClickListener) {
                     @Override
-                    void onPositiveButton(int which) {
+                    public void onPositiveButton(int which) {
                         RankingRecyclerViewAdapter adapter = (RankingRecyclerViewAdapter) mRecyclerView.getAdapter();
                         adapter.getList().clear();
                         adapter.getList().addAll(filterList);
                     }
 
                     @Override
-                    void onNeutralButton(int which) {
+                    public void onNeutralButton(int which) {
                         RankingRecyclerViewAdapter adapter = (RankingRecyclerViewAdapter) mRecyclerView.getAdapter();
                         adapter.getList().clear();
                         adapter.getList().addAll(allItems);
@@ -373,7 +375,34 @@ public class RankingRecyclerViewFragment extends Fragment {
                                         break;
                                     }
                                     case 1: {
-                                        Toast.makeText(getActivity(), "未実装の機能", Toast.LENGTH_SHORT).show();
+                                        DownloadUtil downloadUtil = new DownloadUtil() {
+                                            @Override
+                                            public void onDownloadSuccess(NovelDownloadDialogFragment dialog, final Novel novel) {
+                                                Log.d(TAG, "onSuccess: ");
+                                                dialog.dismiss();
+
+                                                OkCancelDialogFragment okCancelDialog =
+                                                        new OkCancelDialogFragment("ダウンロード完了", "ダウンロードした小説を開きますか？", new DialogInterface.OnClickListener() {
+                                                            @Override
+                                                            public void onClick(DialogInterface dialog, int which) {
+                                                                if (OkCancelDialogFragment.OK == which) {
+                                                                    dialog.dismiss();
+                                                                    mReplaceListener.onFragmentReplaceAction(
+                                                                            NovelTableRecyclerViewFragment.newInstance(novel.getNcode()), novel.getTitle());
+                                                                }
+                                                            }
+                                                        });
+                                                okCancelDialog.show(getFragmentManager(), "okcansel");
+                                            }
+
+                                            @Override
+                                            public void onDownloadError(NovelDownloadDialogFragment dialog) {
+                                                Log.d(TAG, "onDownloadError: ");
+
+                                                dialog.dismiss();
+                                            }
+                                        };
+                                        downloadUtil.novelDownlaod(item.getNovelDetail(), getFragmentManager(), mContext);
                                         break;
                                     }
                                     case 2: {

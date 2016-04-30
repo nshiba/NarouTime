@@ -117,7 +117,6 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
         boolean autoRemoveBookmark = pref.getBoolean(getString(R.string.auto_bookmark), false);
         if (autoRemoveBookmark) {
 
-            ncode = ncode.toLowerCase();
             RealmQuery<Novel4Realm> query = realm.where(Novel4Realm.class);
             query.equalTo("ncode", ncode);
             RealmResults<Novel4Realm> results = query.findAll();
@@ -155,7 +154,6 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
 
     @Override
     public Novel4Realm getNovel4RealmInstance() {
-        ncode = ncode.toLowerCase();
 
         realm.beginTransaction();
 
