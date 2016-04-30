@@ -197,7 +197,6 @@ public class NovelTableRecyclerViewFragment extends Fragment {
     private int loadBookmark() {
         Realm realm = RealmUtils.getRealm(mContext);
 
-        ncode = ncode.toLowerCase();
         RealmQuery<Novel4Realm> query = realm.where(Novel4Realm.class);
         query.equalTo("ncode", ncode);
         RealmResults<Novel4Realm> results = query.findAll();
