@@ -15,18 +15,18 @@ import android.view.View;
 import com.balysv.materialmenu.MaterialMenuDrawable;
 
 import net.nashihara.naroureader.R;
+import net.nashihara.naroureader.RealmUtils;
 import net.nashihara.naroureader.databinding.ActivityNovelViewBinding;
 import net.nashihara.naroureader.entities.Novel4Realm;
 import net.nashihara.naroureader.fragments.NovelBodyFragment;
 import net.nashihara.naroureader.fragments.OkCancelDialogFragment;
-
-import java.util.ArrayList;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
 import narou4j.Narou;
+import narou4j.entities.NovelBody;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -37,8 +37,9 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
     ActivityNovelViewBinding binding;
     private FragmentManager manager;
     private MaterialMenuDrawable materialMenu;
+    private Realm realm;
 
-    private ArrayList<String> bodyTitles;
+    private String bodyTitle;
     private String title;
     private int totalPage;
     private String ncode;
@@ -54,6 +55,7 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
         binding = DataBindingUtil.setContentView(this, R.layout.activity_novel_view);
         manager = getSupportFragmentManager();
         pref = PreferenceManager.getDefaultSharedPreferences(this);
+        realm = RealmUtils.getRealm(this);
 
         Intent intent = getIntent();
         ncode = intent.getStringExtra("ncode");
@@ -62,12 +64,13 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
 
         title = intent.getStringExtra("title");
         writer = intent.getStringExtra("writer");
-        bodyTitles = intent.getStringArrayListExtra("titles");
-        totalPage = bodyTitles.size();
+        bodyTitle = intent.getStringExtra("bodyTitle");
+        totalPage = intent.getIntExtra("totalPage", 0);
 
-        binding.toolbar.setTitle(bodyTitles.get(page -1));
+        binding.toolbar.setTitle(bodyTitle);
         materialMenu = new MaterialMenuDrawable(this, Color.WHITE, MaterialMenuDrawable.Stroke.THIN);
         materialMenu.animateIconState(MaterialMenuDrawable.IconState.X);
+        binding.toolbar.setTitle(title);
         binding.toolbar.setNavigationIcon(materialMenu);
         binding.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -75,12 +78,12 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
                 onBackPressed();
             }
         });
-        Observable.create(new Observable.OnSubscribe<String>() {
+        Observable.create(new Observable.OnSubscribe<NovelBody>() {
             @Override
-            public void call(Subscriber<? super String> subscriber) {
+            public void call(Subscriber<? super NovelBody> subscriber) {
                 Narou narou = new Narou();
                 try {
-                    String body = narou.getNovelBody(ncode, page);
+                    NovelBody body = narou.getNovelBody(ncode, page);
                     subscriber.onNext(body);
                 } catch (Exception e) {
                     subscriber.onError(e);
@@ -89,7 +92,7 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
         })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<String>() {
+                .subscribe(new Subscriber<NovelBody>() {
                     @Override
                     public void onCompleted() {}
 
@@ -100,9 +103,9 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
                     }
 
                     @Override
-                    public void onNext(String s) {
+                    public void onNext(NovelBody novelBody) {
                         manager.beginTransaction()
-                                .add(R.id.novel_container, NovelBodyFragment.newInstance(ncode, bodyTitles.get(page -1), s, page, totalPage))
+                                .add(R.id.novel_container, NovelBodyFragment.newInstance(ncode, novelBody.getTitle(), novelBody.getBody(), novelBody.getPage(), totalPage))
                                 .commit();
                     }
                 });
@@ -147,11 +150,10 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
     }
 
     @Override
-    public void onNovelBodyLoadAction(String body, int nextPage) {
+    public void onNovelBodyLoadAction(String body, int nextPage, String bodyTitle) {
         nowPage = nextPage -1;
-        binding.toolbar.setTitle(bodyTitles.get(nextPage -1));
         manager.beginTransaction()
-                .replace(R.id.novel_container, NovelBodyFragment.newInstance(ncode, bodyTitles.get(nextPage -1), body, nextPage, totalPage))
+                .replace(R.id.novel_container, NovelBodyFragment.newInstance(ncode, bodyTitle, body, nextPage, totalPage))
                 .commit();
     }
 

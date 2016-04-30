@@ -26,7 +26,6 @@ import net.nashihara.naroureader.fragments.NovelTableRecyclerViewFragment;
 import net.nashihara.naroureader.fragments.RankingViewPagerFragment;
 import net.nashihara.naroureader.listeners.OnFragmentReplaceListener;
 
-import java.util.ArrayList;
 import java.util.Stack;
 
 import narou4j.enums.RankingType;
@@ -135,7 +134,6 @@ public class MainActivity extends AppCompatActivity
                 break;
             }
             case R.id.nav_setting: {
-                binding.toolbar.setTitle("設定");
                 binding.navView.setCheckedItem(R.id.nav_setting);
                 Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
                 startActivity(intent);
@@ -188,13 +186,14 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onSelect(String ncode, int page, String title, String writer, ArrayList<String> titles) {
+    public void onSelect(String ncode, int totalPage, int page, String title, String writer, String bodyTitle) {
         Intent intent = new Intent(this, NovelViewActivity.class);
         intent.putExtra("ncode", ncode);
         intent.putExtra("page", page);
         intent.putExtra("title", title);
         intent.putExtra("writer", writer);
-        intent.putExtra("titles", titles);
+        intent.putExtra("bodyTitle", bodyTitle);
+        intent.putExtra("totalPage", totalPage);
         startActivity(intent);
     }
 }
