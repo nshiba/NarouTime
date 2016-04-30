@@ -25,6 +25,7 @@ import io.realm.Realm;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
 import narou4j.Narou;
+import narou4j.entities.NovelBody;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -130,7 +131,7 @@ public class NovelBodyFragment extends Fragment implements GestureDetector.OnGes
                     return;
                 }
                 realm.close();
-                mListener.onNovelBodyLoadAction(nextBody, page+1);
+                mListener.onNovelBodyLoadAction(nextBody, page+1, "");
             }
         });
         binding.btnPrev.setOnClickListener(new View.OnClickListener() {
@@ -140,25 +141,23 @@ public class NovelBodyFragment extends Fragment implements GestureDetector.OnGes
                     return;
                 }
                 realm.close();
-                mListener.onNovelBodyLoadAction(prevBody, page-1);
+                mListener.onNovelBodyLoadAction(prevBody, page-1, "");
             }
         });
 
         if (body.equals("")) {
-            binding.body.setVisibility(View.GONE);
-            binding.progressBar.setVisibility(View.VISIBLE);
+            goneBody();
         }
         else {
             binding.body.setText(body);
-            binding.body.setVisibility(View.VISIBLE);
-            binding.progressBar.setVisibility(View.GONE);
+            binding.title.setText(title);
+            visibleBody();
         }
-
-        binding.title.setText(title);
 
         binding.fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                title = (String) binding.title.getText();
                 StringBuilder builder = new StringBuilder();
                 builder.append(title);
                 builder.append("にしおりをはさみますか？");
@@ -207,8 +206,8 @@ public class NovelBodyFragment extends Fragment implements GestureDetector.OnGes
                 if (targetBody.size() > 0) {
                     Log.d(TAG, "onActivityCreated: getNovelBody true");
                     binding.body.setText(targetBody.get(0).getBody());
-                    binding.body.setVisibility(View.VISIBLE);
-                    binding.progressBar.setVisibility(View.GONE);
+                    binding.title.setText(targetBody.get(0).getTitle());
+                    visibleBody();
                 }
                 else {
                     Log.d(TAG, "onActivityCreated: getNovelBody false");
@@ -241,42 +240,6 @@ public class NovelBodyFragment extends Fragment implements GestureDetector.OnGes
                     }
                 }
             }
-
-//            Log.d(TAG, "onActivityCreated: ncode -> " + ncode);
-//            Observable.combineLatest(Observable.create(new Observable.OnSubscribe<String>() {
-//                        @Override
-//                        public void call(Subscriber<? super String> subscriber) {
-//                            getNextPage4Rx(page + 1, subscriber);
-//                        }
-//                    })
-//                    , Observable.create(new Observable.OnSubscribe<String>() {
-//                        @Override
-//                        public void call(Subscriber<? super String> subscriber) {
-//                            getNextPage4Rx(page - 1, subscriber);
-//                        }
-//                    })
-//                    , new Func2<String, String, Pair<String, String>>() {
-//                        @Override
-//                        public Pair<String, String> call(String s, String s2) {
-//                            return Pair.create(s, s2);
-//                        }
-//                    })
-//                    .subscribe(new Subscriber<Pair<String, String>>() {
-//                        @Override
-//                        public void onCompleted() {
-//                        }
-//
-//                        @Override
-//                        public void onError(Throwable e) {
-//                            Log.e(TAG, "onError: ", e.fillInStackTrace());
-//                        }
-//
-//                        @Override
-//                        public void onNext(Pair<String, String> stringStringPair) {
-//                            nextBody = stringStringPair.first;
-//                            prevBody = stringStringPair.second;
-//                        }
-//                    });
         }
     }
 
@@ -317,23 +280,6 @@ public class NovelBodyFragment extends Fragment implements GestureDetector.OnGes
 
     }
 
-//    private void getNextPage4Rx(int targetPage, Subscriber<? super String> subscriber) {
-//        RealmResults<Novel4Realm> results = getRealmResult();
-//        if (results.size() > 0) {
-//            Novel4Realm novel4Realm = results.get(0);
-//            RealmResults<NovelBody4Realm> resultBodies = novel4Realm.getBodies().where().equalTo("page", page).findAll();
-//            if (resultBodies.size() > 0) {
-//                String body = resultBodies.get(0).getBody();
-//                subscriber.onNext(body);
-//                return;
-//            }
-//        }
-//
-//        Narou narou = new Narou();
-//        String str = narou.getNovelBody(ncode, targetPage);
-//        subscriber.onNext(str);
-//    }
-    
     private RealmResults<Novel4Realm> getRealmResult() {
         ncode = ncode.toLowerCase();
         RealmQuery<Novel4Realm> query = realm.where(Novel4Realm.class);
@@ -367,18 +313,18 @@ public class NovelBodyFragment extends Fragment implements GestureDetector.OnGes
     }
 
     private void updateNovelBody(final int targetPage, final Novel4Realm novel4Realm) {
-        Observable.create(new Observable.OnSubscribe<String>() {
+        Observable.create(new Observable.OnSubscribe<NovelBody>() {
             @Override
-            public void call(Subscriber<? super String> subscriber) {
+            public void call(Subscriber<? super NovelBody> subscriber) {
                 Narou narou = new Narou();
-                String str = narou.getNovelBody(ncode, targetPage);
-                subscriber.onNext(str);
+                NovelBody novelBody = narou.getNovelBody(ncode, targetPage);
+                subscriber.onNext(novelBody);
                 subscriber.onCompleted();
             }
         })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<String>() {
+                .subscribe(new Subscriber<NovelBody>() {
                     @Override
                     public void onCompleted() {}
 
@@ -388,7 +334,7 @@ public class NovelBodyFragment extends Fragment implements GestureDetector.OnGes
                     }
 
                     @Override
-                    public void onNext(String s) {
+                    public void onNext(NovelBody s) {
                         if (pref.getBoolean(getString(R.string.auto_download), false)) {
                             realm.beginTransaction();
 
@@ -396,26 +342,48 @@ public class NovelBodyFragment extends Fragment implements GestureDetector.OnGes
                             if (results.size() <= 0) {
                                 NovelBody4Realm body4Realm = realm.createObject(NovelBody4Realm.class);
                                 body4Realm.setNcode(ncode);
-                                body4Realm.setTitle(title);
-                                body4Realm.setBody(s);
+                                body4Realm.setTitle(s.getTitle());
+                                body4Realm.setBody(s.getBody());
                                 body4Realm.setPage(targetPage);
                             }
                             else {
                                 NovelBody4Realm body4Realm = results.get(0);
                                 body4Realm.setNcode(ncode);
-                                body4Realm.setTitle(title);
-                                body4Realm.setBody(s);
+                                body4Realm.setTitle(s.getTitle());
+                                body4Realm.setBody(s.getBody());
                                 body4Realm.setPage(targetPage);
                             }
 
                             realm.commitTransaction();
                         }
-                        binding.body.setText(s);
-                        binding.body.setVisibility(View.VISIBLE);
-                        binding.progressBar.setVisibility(View.GONE);
+                        binding.body.setText(s.getBody());
+                        binding.title.setText(s.getTitle());
+
+                        visibleBody();
                     }
                 });
     }
+
+    private void visibleBody() {
+        binding.body.setVisibility(View.VISIBLE);
+        binding.title.setVisibility(View.VISIBLE);
+        binding.btnNext.setVisibility(View.VISIBLE);
+        binding.btnPrev.setVisibility(View.VISIBLE);
+        binding.page.setVisibility(View.VISIBLE);
+
+        binding.progressBar.setVisibility(View.GONE);
+    }
+
+    private void goneBody() {
+        binding.body.setVisibility(View.GONE);
+        binding.title.setVisibility(View.GONE);
+        binding.btnNext.setVisibility(View.GONE);
+        binding.btnPrev.setVisibility(View.GONE);
+        binding.page.setVisibility(View.GONE);
+
+        binding.progressBar.setVisibility(View.VISIBLE);
+    }
+
     @Override
     public boolean onDown(MotionEvent e) {
         return true;
@@ -481,9 +449,8 @@ public class NovelBodyFragment extends Fragment implements GestureDetector.OnGes
     }
 
     public interface OnNovelBodyInteraction {
-        public void onNovelBodyLoadAction(String body, int nextPage);
+        public void onNovelBodyLoadAction(String body, int nextPage, String bodyTitle);
         public Novel4Realm getNovel4RealmInstance(Realm realm);
         public void onSingleTapConfirmedAction(boolean isHide);
     }
-
 }

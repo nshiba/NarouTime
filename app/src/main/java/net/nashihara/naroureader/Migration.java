@@ -13,11 +13,21 @@ public class Migration implements RealmMigration {
 
         /************************************************
          // Version 0
-         class {@link net.nashihara.naroureader.entities.NovelBody4Realm}
-         private int page;
+         class {@link net.nashihara.naroureader.entities.Novel4Realm}
          private String ncode;
          private String title;
-         private String body;
+         private String writer;
+         private int bookmark;
+         private boolean fav;
+
+         // Version 1
+         class {@link net.nashihara.naroureader.entities.Novel4Realm}
+         private String ncode;
+         private String title;
+         private String writer;
+         private int totalPage;
+         private int bookmark;
+         private boolean fav;
          ************************************************/
         // Migrate from version 0 to version 1
         if (oldVersion == 0) {

@@ -43,6 +43,7 @@ public class NovelTableRecyclerViewFragment extends Fragment {
     private String title;
     private String writer;
     private String ncode;
+    private int totalPage;
     private Context mContext;
     private OnNovelSelectionListener mListener;
     private RecyclerView mRecyclerView;
@@ -95,7 +96,7 @@ public class NovelTableRecyclerViewFragment extends Fragment {
                 NovelBody body = clickAdapter.getList().get(position);
                 Log.d(TAG, "NovelTableRecyclerView: list size -> " + clickAdapter.getList().size());
                 Log.d(TAG, "onItemClick: position -> " + position + "\n" + body.toString());
-                mListener.onSelect(body.getNcode(), body.getPage(), title, writer, bodyTitles);
+                mListener.onSelect(body.getNcode(), totalPage, body.getPage(), title, writer, body.getTitle());
            }
         });
         mRecyclerView.setAdapter(adapter);
@@ -113,7 +114,7 @@ public class NovelTableRecyclerViewFragment extends Fragment {
                     dialogFragment.show(getFragmentManager(), "okcansel");
                 }
                 else {
-                    mListener.onSelect(ncode, bookmark, title, writer, bodyTitles);
+                    mListener.onSelect(ncode, totalPage, bookmark, title, writer, bodyTitles.get(bookmark -1));
                 }
             }
         });
@@ -171,6 +172,7 @@ public class NovelTableRecyclerViewFragment extends Fragment {
 
                     writer = novel.getWriter();
                     title = novel.getTitle();
+                    totalPage = novel.getAllNumberOfNovel();
                     bodyTitles = new ArrayList<>();
                     for (NovelBody body : novel.getBodies()) {
                         if (!body.isChapter()) {
@@ -213,6 +215,6 @@ public class NovelTableRecyclerViewFragment extends Fragment {
     }
 
     public interface OnNovelSelectionListener {
-        public void onSelect(String ncode, int page, String title, String writer, ArrayList<String> titles);
+        public void onSelect(String ncode, int totalPage, int page, String title, String writer, String bodyTitle);
     }
 }

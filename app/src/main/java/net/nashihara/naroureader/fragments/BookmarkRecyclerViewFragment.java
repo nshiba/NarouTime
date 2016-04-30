@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,16 +21,9 @@ import net.nashihara.naroureader.entities.Novel4Realm;
 import net.nashihara.naroureader.listeners.OnFragmentReplaceListener;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
-import narou4j.Narou;
-import narou4j.entities.NovelBody;
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 public class BookmarkRecyclerViewFragment extends Fragment {
     private static final String TAG = BookmarkRecyclerViewFragment.class.getSimpleName();
@@ -78,48 +70,14 @@ public class BookmarkRecyclerViewFragment extends Fragment {
             public void onItemClick(View view, int position, ItemBookmarkRecyclerBinding binding) {
                 final Novel4Realm novel = novels.get(position);
 
-                final MyProgressDialogFragment dialog = MyProgressDialogFragment.newInstance("読込中", "小説情報を読み込んでいます");
-                dialog.show(getFragmentManager(), "progress");
-
                 final String ncode = novel.getNcode();
-                Observable.create(new Observable.OnSubscribe<List<NovelBody>>() {
-                    @Override
-                    public void call(Subscriber<? super List<NovelBody>> subscriber) {
-                        Narou narou = new Narou();
-                        List<NovelBody> bodies = narou.getNovelTable(ncode);
-                        subscriber.onNext(bodies);
-                    }
-                }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new Subscriber<List<NovelBody>>() {
-                            @Override
-                            public void onCompleted() {}
+                Intent intent = new Intent(mContext, NovelViewActivity.class);
+                intent.putExtra("ncode", novel.getNcode());
+                intent.putExtra("page", novel.getBookmark());
+                intent.putExtra("title", novel.getTitle());
+                intent.putExtra("writer", novel.getWriter());
 
-                            @Override
-                            public void onError(Throwable e) {
-                                Log.e(TAG, "onError: ", e.fillInStackTrace());
-                                dialog.dismiss();
-                            }
-
-                            @Override
-                            public void onNext(List<NovelBody> novelBodies) {
-                                Intent intent = new Intent(mContext, NovelViewActivity.class);
-                                intent.putExtra("ncode", novel.getNcode());
-                                intent.putExtra("page", novel.getBookmark());
-                                intent.putExtra("title", novel.getTitle());
-                                intent.putExtra("writer", novel.getWriter());
-
-                                ArrayList<String> bodyTitles = new ArrayList<>();
-                                for (NovelBody body : novelBodies) {
-                                    if (!body.isChapter()) {
-                                        bodyTitles.add(body.getTitle());
-                                    }
-                                }
-                                intent.putExtra("titles", bodyTitles);
-                                startActivity(intent);
-
-                                dialog.dismiss();
-                            }
-                        });
+                startActivity(intent);
             }
         });
         mRecyclerView.setAdapter(adapter);
