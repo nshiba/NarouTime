@@ -184,6 +184,9 @@ public class RankingRecyclerViewFragment extends Fragment {
                 List<NovelItem> items = new ArrayList<>();
                 NovelItem item;
                 for (Novel novel : novels) {
+                    // ncodeが大文字と小文字が混在しているので小文字に統一
+                    novel.setNcode(novel.getNcode().toLowerCase());
+
                     item = new NovelItem();
                     NovelRank rank = new NovelRank();
                     rank.setPt(novel.getGlobalPoint());
@@ -299,6 +302,9 @@ public class RankingRecyclerViewFragment extends Fragment {
                                 for (Novel novel : novels) {
                                     NovelItem item = map.get(novel.getNcode());
                                     if (item != null) {
+                                        // 大文字 → 小文字
+                                        novel.setNcode(novel.getNcode().toLowerCase());
+
                                         item.setNovelDetail(novel);
                                         items.add(item);
                                     }
