@@ -2,6 +2,7 @@ package net.nashihara.naroureader;
 
 import io.realm.DynamicRealm;
 import io.realm.RealmMigration;
+import io.realm.RealmObjectSchema;
 import io.realm.RealmSchema;
 
 public class Migration implements RealmMigration {
@@ -87,11 +88,31 @@ public class Migration implements RealmMigration {
          private boolean fav;
          private int totalPage;
          private boolean isDownload = false;
+
+         // add new model
+         class {@link net.nashihara.naroureader.entities.NovelTable4Realm}
+         private int tableNumber;
+         private String ncode;
+         private int page;
+         private String title;
+         private boolean isChapter;
          ************************************************/
         // Migrate from version 0 to version 1
         if (oldVersion == 2) {
             // Novel4Realm に totalPage field を追加
             schema.get("Novel4Realm").addField("story", String.class);
+
+            // add new realm object
+            // Create a new class
+            RealmObjectSchema novelTable = schema.create("Pet")
+                    .addField("tableNumber", int.class)
+                    .addField("ncode", String.class)
+                    .addField("page", int.class)
+                    .addField("title", String.class)
+                    .addField("isChapter", boolean.class);
+
+//                    .addField("name", String.class, FieldAttribute.REQUIRED)
+//                    .addField("type", String.class, FieldAttribute.REQUIRED);
 
             oldVersion++;
         }

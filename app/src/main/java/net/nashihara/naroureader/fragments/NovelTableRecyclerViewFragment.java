@@ -72,6 +72,7 @@ public class NovelTableRecyclerViewFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             ncode = getArguments().getString(PARAM_NCODE);
+            Log.d(TAG, "onCreate: " + ncode);
         }
     }
 
@@ -196,6 +197,8 @@ public class NovelTableRecyclerViewFragment extends Fragment {
 
     private int loadBookmark() {
         Realm realm = RealmUtils.getRealm(mContext);
+
+        Log.d(TAG, "loadBookmark: " + ncode);
 
         RealmQuery<Novel4Realm> query = realm.where(Novel4Realm.class);
         query.equalTo("ncode", ncode);
