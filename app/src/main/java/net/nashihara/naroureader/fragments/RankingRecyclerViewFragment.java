@@ -16,17 +16,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import net.nashihara.naroureader.utils.DownloadUtils;
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.adapters.RankingRecyclerViewAdapter;
 import net.nashihara.naroureader.databinding.FragmentRankingRecyclerBinding;
 import net.nashihara.naroureader.databinding.ItemRankingRecyclerBinding;
-import net.nashihara.naroureader.dialogs.CheckBoxDialogFragment;
+import net.nashihara.naroureader.dialogs.FilterDialogFragment;
 import net.nashihara.naroureader.dialogs.ListDailogFragment;
 import net.nashihara.naroureader.dialogs.NovelDownloadDialogFragment;
 import net.nashihara.naroureader.dialogs.OkCancelDialogFragment;
 import net.nashihara.naroureader.entities.NovelItem;
 import net.nashihara.naroureader.listeners.OnFragmentReplaceListener;
+import net.nashihara.naroureader.utils.DownloadUtils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -84,50 +84,93 @@ public class RankingRecyclerViewFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, @Nullable final ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_ranking_recycler, container, false);
 
         binding.fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String[] filters = new String[]{
-                        "文学", "恋愛", "歴史", "推理", "ファンタジー",
+                        "完結済み", "文学", "恋愛", "歴史", "推理", "ファンタジー",
                         "SF", "ホラー", "コメディー", "冒険", "学園",
                         "戦記", "童話", "詩", "エッセイ", "リプレイ", "その他"
                 };
-                final ArrayList<NovelItem> filterList = new ArrayList<>();
-                final Set<NovelGenre> trueSet = new HashSet<>();
-                DialogInterface.OnMultiChoiceClickListener onMultiChoiceClickListener
-                        = new DialogInterface.OnMultiChoiceClickListener() {
+                boolean[] checked = new boolean[filters.length];
+                checked[0] = false;
+                for (int i = 1; i < checked.length; i++) {
+                    checked[i] = true;
+                }
+
+                FilterDialogFragment checkBoxDialog = FilterDialogFragment
+                        .newInstance("小説絞込み", filters, checked, new FilterDialogFragment.OnDialogButtonClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-                        int genreNumber = which +1;
+                    public void onPositiveButton(int which, boolean[] itemChecked, String min, String max) {
+                        Set<NovelGenre> trueSet = new HashSet<>();
+                        ArrayList<NovelItem> filterList = new ArrayList<>();
+                        ArrayList<NovelItem> resultList = new ArrayList<>();
+                        int maxLength = 0;
+                        int minLength = 0;
 
-                        NovelGenre checkedGenre = NovelGenre.valueOf(genreNumber);
-                        if (isChecked) {
-                            trueSet.add(checkedGenre);
+                        if (!min.equals("")) {
+                            minLength = Integer.parseInt(min);
                         }
-                        else {
-                            trueSet.remove(checkedGenre);
+                        if (!max.equals("")) {
+                            maxLength = Integer.parseInt(max);
                         }
 
-                        for (NovelItem item : allItems) {
-                            if (trueSet.contains(item.getNovelDetail().getGenre())) {
-                                filterList.add(item);
+                        for (int i = 0; i < itemChecked.length; i++) {
+                            if (i == 0) {
+                                // 完結済チェック
+                                if (itemChecked[i]) {
+                                    for (int j = 0; j < allItems.size(); j++) {
+                                        Log.d(TAG, "onPositiveButton: isContinue: " + allItems.get(j).getNovelDetail().getIsNovelContinue());
+                                        if (allItems.get(j).getNovelDetail().getIsNovelContinue() == 0) {
+                                            filterList.add(allItems.get(j));
+                                        }
+                                    }
+                                }
+                                else {
+                                    filterList.addAll(allItems);
+                                }
+
+                                continue;
+                            }
+
+                            // ジャンルチェック
+                            NovelGenre checkedGenre = NovelGenre.valueOf(i);
+                            if (itemChecked[i]) {
+                                trueSet.add(checkedGenre);
                             }
                         }
-                    }
-                };
-                CheckBoxDialogFragment checkBoxDialog = CheckBoxDialogFragment
-                        .newInstance("小説絞込み", filters, onMultiChoiceClickListener, new CheckBoxDialogFragment.OnDialogButtonClickListener() {
-                    @Override
-                    public void onPositiveButton(int which) {
+
+                        for (int i = 0; i < filterList.size(); i++) {
+                            NovelItem target = filterList.get(i);
+
+                            if (!trueSet.contains(target.getNovelDetail().getGenre())) {
+                                continue;
+                            }
+
+                            // 文字数チェック
+                            if (maxLength <= 0) {
+                                if (minLength > target.getNovelDetail().getNumberOfChar()) {
+                                    continue;
+                                }
+                            }
+                            else {
+                                if (minLength > target.getNovelDetail().getNumberOfChar() || target.getNovelDetail().getNumberOfChar() > maxLength) {
+                                    continue;
+                                }
+                            }
+
+                            resultList.add(target);
+                        }
+
                         RankingRecyclerViewAdapter adapter = (RankingRecyclerViewAdapter) mRecyclerView.getAdapter();
                         adapter.getList().clear();
-                        adapter.getList().addAll(filterList);
+                        adapter.getList().addAll(resultList);
                     }
 
-                    @Override
+                            @Override
                     public void onNeutralButton(int which) {
 
                         RankingRecyclerViewAdapter adapter = (RankingRecyclerViewAdapter) mRecyclerView.getAdapter();
