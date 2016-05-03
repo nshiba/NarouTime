@@ -8,15 +8,16 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import net.nashihara.naroureader.R;
-import net.nashihara.naroureader.databinding.ItemBookmarkRecyclerBinding;
+import net.nashihara.naroureader.databinding.ItemSimpleRecyclerBinding;
 import net.nashihara.naroureader.entities.Novel4Realm;
 import net.nashihara.naroureader.entities.NovelItem;
+import net.nashihara.naroureader.listeners.OnItemClickListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class BookmarkRecyclerViewAdapter extends RecyclerView.Adapter<BookmarkRecyclerViewAdapter.BindingHolder> {
-    private static final String TAG = BookmarkRecyclerViewAdapter.class.getSimpleName();
+public class SimpleRecyclerViewAdapter extends RecyclerView.Adapter<SimpleRecyclerViewAdapter.BindingHolder> {
+    private static final String TAG = SimpleRecyclerViewAdapter.class.getSimpleName();
 
     private LayoutInflater mInflater;
     private ArrayList<Novel4Realm> mArrayList;
@@ -24,7 +25,7 @@ public class BookmarkRecyclerViewAdapter extends RecyclerView.Adapter<BookmarkRe
     private RecyclerView mRecyclerView;
     private Context mContext;
 
-    public BookmarkRecyclerViewAdapter(Context context) {
+    public SimpleRecyclerViewAdapter(Context context) {
         this.mInflater = LayoutInflater.from(context);
         mArrayList = new ArrayList<>();
     }
@@ -43,14 +44,14 @@ public class BookmarkRecyclerViewAdapter extends RecyclerView.Adapter<BookmarkRe
 
     @Override
     public BindingHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        final View v = mInflater.inflate(R.layout.item_bookmark_recycler, parent, false);
+        final View v = mInflater.inflate(R.layout.item_simple_recycler, parent, false);
         return new BindingHolder(v, mListener);
     }
 
     @Override
     public void onBindViewHolder(BindingHolder holder, int position) {
         if (mArrayList != null && mArrayList.size() > position && mArrayList.get(position) != null) {
-            ItemBookmarkRecyclerBinding binding = holder.getBinding();
+            ItemSimpleRecyclerBinding binding = holder.getBinding();
 
             binding.title.setText(mArrayList.get(position).getTitle());
         }
@@ -86,12 +87,8 @@ public class BookmarkRecyclerViewAdapter extends RecyclerView.Adapter<BookmarkRe
         this.mListener = listener;
     }
 
-    public interface OnItemClickListener {
-        void onItemClick(View view, int position, ItemBookmarkRecyclerBinding binding);
-    }
-
     static class BindingHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        private ItemBookmarkRecyclerBinding binding;
+        private ItemSimpleRecyclerBinding binding;
         private OnItemClickListener mListener;
 
         public BindingHolder(View itemView, OnItemClickListener listener) {
@@ -102,14 +99,14 @@ public class BookmarkRecyclerViewAdapter extends RecyclerView.Adapter<BookmarkRe
             binding.itemContainer.setOnClickListener(this);
         }
 
-        public ItemBookmarkRecyclerBinding getBinding(){
+        public ItemSimpleRecyclerBinding getBinding(){
             return this.binding;
         }
 
         @Override
         public void onClick(View v) {
             if (mListener != null) {
-                mListener.onItemClick(v, getLayoutPosition(), binding);
+                mListener.onItemClick(v, getLayoutPosition());
             }
         }
     }

@@ -29,6 +29,7 @@ import net.nashihara.naroureader.dialogs.NovelDownloadDialogFragment;
 import net.nashihara.naroureader.dialogs.OkCancelDialogFragment;
 import net.nashihara.naroureader.entities.NovelItem;
 import net.nashihara.naroureader.fragments.BookmarkRecyclerViewFragment;
+import net.nashihara.naroureader.fragments.DownloadedRecyclerViewFragment;
 import net.nashihara.naroureader.fragments.NovelTableRecyclerViewFragment;
 import net.nashihara.naroureader.fragments.RankingViewPagerFragment;
 import net.nashihara.naroureader.listeners.OnFragmentReplaceListener;
@@ -182,11 +183,18 @@ public class MainActivity extends AppCompatActivity
                 onFragmentReplaceAction(fragment, "しおり", null);
                 break;
             }
-            case R.id.nav_search: {
-                binding.toolbar.setTitle("検索");
-                binding.navView.setCheckedItem(R.id.nav_search);
+            case R.id.nav_download: {
+                binding.toolbar.setTitle("ダウンロード済み小説");
+                binding.navView.setCheckedItem(R.id.nav_download);
+                DownloadedRecyclerViewFragment fragment = DownloadedRecyclerViewFragment.newInstance();
+                onFragmentReplaceAction(fragment, "ダウンロード済み小説", null);
                 break;
             }
+//            case R.id.nav_search: {
+//                binding.toolbar.setTitle("検索");
+//                binding.navView.setCheckedItem(R.id.nav_search);
+//                break;
+//            }
             case R.id.nav_setting: {
                 binding.navView.setCheckedItem(R.id.nav_setting);
                 Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
