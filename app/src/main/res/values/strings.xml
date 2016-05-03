@@ -1,4 +1,15 @@
 <resources>
-    <string name="app_name">NarouReader</string>
+    <string name="app_name">なろうTime</string>
     <string name="action_settings">Settings</string>
+
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_novel_view">NovelViewActivity</string>
+    <string name="title_activity_settings">SettingsActivity</string>
+    <string name="title_activity_licenses">LicensesActivity</string>
+
+    <string name="auto_download">pref_auto_download</string>
+    <string name="auto_sync">pref_auto_sync</string>
+    <string name="auto_bookmark">pref_auto_bookmark</string>
+    <string name="auto_remove_bookmark">pref_auto_remove_bookmark</string>
+    <string name="download">download</string>
 </resources>

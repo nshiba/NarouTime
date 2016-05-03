@@ -1,4 +1,6 @@
 apply plugin: 'com.android.application'
+apply plugin: 'realm-android'
+apply plugin: 'com.cookpad.android.licensetools'
 
 android {
     compileSdkVersion 23
@@ -22,17 +24,24 @@ android {
     }
 }
 
+repositories {
+    maven {
+        url 'https://github.com/uPhyca/stetho-realm/raw/master/maven-repo'
+    }
+}
+
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:23.3.0'
-    compile 'com.android.support:design:23.3.0'
 
-//    compile 'net.nashihara:narou4j:1.2.2'
+    compile 'com.android.support:appcompat-v7:23.3.0'
+    compile 'com.android.support:support-v4:23.3.0'
+    compile 'com.android.support:design:23.3.0'
+    compile 'com.android.support:preference-v7:23.3.0'
+    compile 'com.android.support:preference-v14:23.3.0'
+    compile 'com.android.support:cardview-v7:23.3.0'
     compile 'io.reactivex:rxjava:1.1.1'
     compile 'io.reactivex:rxandroid:1.1.0'
-    compile 'com.squareup.okhttp3:okhttp:3.2.0'
-    compile 'com.fasterxml.jackson.core:jackson-databind:2.7.0'
-    compile 'com.fasterxml.jackson.core:jackson-core:2.7.0'
-    compile 'com.fasterxml.jackson.core:jackson-annotations:2.7.0'
+    compile 'com.balysv.materialmenu:material-menu-toolbar:1.5.4'
+    compile 'net.nashihara:narou4j:1.2.4'
 }

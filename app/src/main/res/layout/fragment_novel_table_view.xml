@@ -1,0 +1,103 @@
+<layout xmlns:app="http://schemas.android.com/apk/res-auto">
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".fragments.NovelTableRecyclerViewFragment">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:id="@+id/top_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:id="@+id/story_container"
+                        android:paddingBottom="@dimen/activity_vertical_margin"
+                        android:paddingTop="@dimen/activity_vertical_margin"
+                        android:paddingRight="@dimen/activity_horizontal_margin"
+                        android:paddingLeft="@dimen/activity_horizontal_margin"
+                        android:background="@color/colorPrimary"
+                        android:orientation="vertical"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/title"
+                            android:visibility="gone"
+                            android:textStyle="bold"
+                            android:textColor="@color/colorTextPrimary"
+                            android:layout_gravity="center"
+                            android:textSize="@dimen/text_large"
+                            android:layout_marginBottom="@dimen/text_margin_normal"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:id="@+id/writer"
+                            android:visibility="gone"
+                            android:textColor="@color/colorTextPrimary"
+                            android:textSize="@dimen/text_normal"
+                            android:layout_marginBottom="@dimen/text_margin_normal"
+                            android:layout_gravity="center"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
+                            android:id="@+id/story"
+                            android:visibility="gone"
+                            android:textColor="@color/colorTextPrimary"
+                            android:textSize="@dimen/text_normal"
+                            android:layout_marginBottom="@dimen/text_margin_normal"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                    </LinearLayout>
+
+                    <android.support.design.widget.FloatingActionButton
+                        android:id="@+id/fab"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="16dp"
+                        android:layout_marginBottom="8dp"
+                        android:layout_alignParentRight="true"
+                        android:layout_below="@id/story_container"
+                        android:src="@drawable/ic_bookmark_border_white_24dp"
+                        app:backgroundTint="@color/colorAccent"/>
+
+                </RelativeLayout>
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/recycler"
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+
+        </ScrollView>
+
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            style="?android:progressBarStyle"
+            android:layout_gravity="center"
+            android:layout_width="@dimen/progress_size"
+            android:layout_height="@dimen/progress_size" />
+
+        <Button
+            android:id="@+id/btn_reload"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            android:text="再読み込み"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </FrameLayout>
+</layout>
