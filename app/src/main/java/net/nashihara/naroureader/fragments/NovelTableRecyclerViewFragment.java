@@ -72,7 +72,6 @@ public class NovelTableRecyclerViewFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             ncode = getArguments().getString(PARAM_NCODE);
-            Log.d(TAG, "onCreate: " + ncode);
         }
     }
 

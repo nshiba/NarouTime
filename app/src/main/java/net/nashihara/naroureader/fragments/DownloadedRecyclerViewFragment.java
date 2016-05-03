@@ -13,7 +13,7 @@ import android.view.ViewGroup;
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.RealmUtils;
 import net.nashihara.naroureader.adapters.SimpleRecyclerViewAdapter;
-import net.nashihara.naroureader.databinding.FragmentBookmarkRecycerViewBinding;
+import net.nashihara.naroureader.databinding.FragmentSimpleRecycerViewBinding;
 import net.nashihara.naroureader.entities.Novel4Realm;
 import net.nashihara.naroureader.listeners.OnFragmentReplaceListener;
 import net.nashihara.naroureader.listeners.OnItemClickListener;
@@ -27,9 +27,10 @@ public class DownloadedRecyclerViewFragment extends Fragment {
     private static final String TAG = DownloadedRecyclerViewFragment.class.getSimpleName();
 
     private RecyclerView mRecyclerView;
+    private SimpleRecyclerViewAdapter adapter;
     private OnFragmentReplaceListener mListener;
     private Context mContext;
-    private FragmentBookmarkRecycerViewBinding binding;
+    private FragmentSimpleRecycerViewBinding binding;
     private ArrayList<Novel4Realm> novels = new ArrayList<>();
 
     public DownloadedRecyclerViewFragment() {}
@@ -45,42 +46,36 @@ public class DownloadedRecyclerViewFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
+
+            Realm realm = RealmUtils.getRealm(mContext);
+            RealmResults<Novel4Realm> results = realm.where(Novel4Realm.class).equalTo("isDownload", true).findAll();
+
+            for (Novel4Realm novel4Realm : results) {
+                novels.add(novel4Realm);
+            }
+
+            adapter = new SimpleRecyclerViewAdapter(mContext);
+            adapter.setOnItemClickListener(new OnItemClickListener() {
+                @Override
+                public void onItemClick(View view, int position) {
+                    final Novel4Realm novel = novels.get(position);
+
+                    mListener.onFragmentReplaceAction(NovelTableRecyclerViewFragment.newInstance(novel.getNcode()), novel.getTitle(), null);
+                }
+            });
+
+            adapter.clearData();
+            adapter.addDataOf(novels);
         }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_bookmark_recycer_view, container, false);
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_simple_recycer_view, container, false);
 
-        // TODO: RecyclerView
         mRecyclerView = binding.recycler;
-        final LinearLayoutManager manager = new LinearLayoutManager(mContext) {
-            @Override
-            public boolean canScrollVertically() {
-                return false;
-            }
-        };
-        manager.setAutoMeasureEnabled(true);
-        mRecyclerView.setLayoutManager(manager);
-        SimpleRecyclerViewAdapter adapter = new SimpleRecyclerViewAdapter(mContext);
-        adapter.setOnItemClickListener(new OnItemClickListener() {
-            @Override
-            public void onItemClick(View view, int position) {
-                final Novel4Realm novel = novels.get(position);
-
-                mListener.onFragmentReplaceAction(NovelTableRecyclerViewFragment.newInstance(novel.getNcode()), novel.getTitle(), null);
-            }
-        });
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));
         mRecyclerView.setAdapter(adapter);
-
-        Realm realm = RealmUtils.getRealm(mContext);
-        RealmResults<Novel4Realm> results = realm.where(Novel4Realm.class).equalTo("isDownload", true).findAll();
-
-        for (Novel4Realm novel4Realm : results) {
-            novels.add(novel4Realm);
-        }
-
-        adapter.addDataOf(novels);
 
         binding.progressBar.setVisibility(View.GONE);
         binding.recycler.setVisibility(View.VISIBLE);
