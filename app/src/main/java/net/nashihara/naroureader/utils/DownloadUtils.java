@@ -96,7 +96,6 @@ public abstract class DownloadUtils {
         }).subscribeOn(Schedulers.io()).subscribe(new Subscriber<List<NovelBody>>() {
             @Override
             public void onCompleted() {
-                Log.d(TAG, "onCompleted: downloadTable");
                 downloadBody(novel.getAllNumberOfNovel());
             }
 
@@ -130,7 +129,6 @@ public abstract class DownloadUtils {
         }).subscribe(new Subscriber<NovelBody>() {
             @Override
             public void onCompleted() {
-                Log.d(TAG, "onCompleted: downloadBody");
                 updateIsDownload();
                 onDownloadSuccess(downloadDialog, novel);
             }
@@ -144,8 +142,6 @@ public abstract class DownloadUtils {
 
             @Override
             public void onNext(NovelBody novelBody) {
-                Log.d(TAG, "onNext: ncode -> " + novelBody.getNcode());
-                Log.d(TAG, "onNext: page -> " + novelBody.getPage());
                 realm.beginTransaction();
                 NovelBody4Realm body4Realm = realm.createObject(NovelBody4Realm.class);
                 body4Realm.setNcode(novelBody.getNcode());
@@ -159,18 +155,12 @@ public abstract class DownloadUtils {
     }
 
     private void updateIsDownload() {
-        Log.d(TAG, "updateIsDownload: start");
-
-        Log.d(TAG, "updateIsDownload: ncode -> " + novel.getNcode());
-
         realm = RealmUtils.getRealm(mContext);
         Novel4Realm novel4Realm = realm.where(Novel4Realm.class).equalTo("ncode", novel.getNcode().toLowerCase()).findFirst();
         realm.beginTransaction();
         novel4Realm.setDownload(true);
         realm.commitTransaction();
         realm.close();
-
-        Log.d(TAG, "updateIsDownload: finish");
     }
 
     private void storeTable(List<NovelBody> novelBodies) {

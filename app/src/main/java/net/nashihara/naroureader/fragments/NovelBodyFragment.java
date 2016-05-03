@@ -191,49 +191,39 @@ public class NovelBodyFragment extends Fragment implements GestureDetector.OnGes
         RealmResults<Novel4Realm> results = query.findAll();
 
         if (body.equals("")) {
-            Log.d(TAG, "onActivityCreated: body equals \"\"");
             if (results.size() == 0) {
-                Log.d(TAG, "onActivityCreated: results.size == 0");
                 Novel4Realm tmpNovel = mListener.getNovel4RealmInstance();
                 updateNovelBody(page);
             }
             else {
-                Log.d(TAG, "onActivityCreated: results.size != 0");
                 Novel4Realm novel4Realm = results.get(0);
                 RealmResults<NovelBody4Realm> targetBody = getNovelBody(ncode, page);
 
                 if (targetBody.size() > 0) {
-                    Log.d(TAG, "onActivityCreated: getNovelBody true");
                     binding.body.setText(targetBody.get(0).getBody());
                     binding.title.setText(targetBody.get(0).getTitle());
                     visibleBody();
                 }
                 else {
-                    Log.d(TAG, "onActivityCreated: getNovelBody false");
                     updateNovelBody(page);
                 }
             }
         }
         else {
-            Log.d(TAG, "onActivityCreated: body not equals \"\"");
             if (results.size() == 0) {
-                Log.d(TAG, "onActivityCreated: results.size == 0");
                 if (pref.getBoolean(getString(R.string.auto_download), false)) {
                     addNovelBody(page, title, body);
                 }
             } else {
-                Log.d(TAG, "onActivityCreated: results.size != 0");
                 Novel4Realm novel4Realm = results.get(0);
                 RealmResults<NovelBody4Realm> targetBody = getNovelBody(ncode, page);
 
                 if (targetBody.size() > 0) {
-                    Log.d(TAG, "onActivityCreated: getNovelBody true");
                     if (pref.getBoolean(getString(R.string.auto_sync), false)) {
                         addNovelBody(page, title, body);
                     }
                 }
                 else {
-                    Log.d(TAG, "onActivityCreated: getNovelBody false");
                     if (pref.getBoolean(getString(R.string.auto_download), false)) {
                         addNovelBody(page, title, body);
                     }
@@ -307,14 +297,11 @@ public class NovelBodyFragment extends Fragment implements GestureDetector.OnGes
     }
 
     private RealmResults<NovelBody4Realm> getNovelBody(String ncode, int page) {
-        Log.d(TAG, "getNovelBody: ncode -> " + ncode);
-        Log.d(TAG, "getNovelBody: page -> " + page);
         RealmResults<NovelBody4Realm> ncodeResults = realm.where(NovelBody4Realm.class).equalTo("ncode", ncode).findAll();
         return ncodeResults.where().equalTo("page", page).findAll();
     }
 
     private void updateNovelBody(final int targetPage) {
-        Log.d(TAG, "updateNovelBody: ");
         Observable.create(new Observable.OnSubscribe<NovelBody>() {
             @Override
             public void call(Subscriber<? super NovelBody> subscriber) {

@@ -70,7 +70,6 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View v) {
                 int stack = manager.getBackStackEntryCount();
-                Log.d(TAG, "onClick: stack -> " + stack);
                 if (stack == 0) {
                     binding.drawer.openDrawer(START);
                 } else {
@@ -142,7 +141,6 @@ public class MainActivity extends AppCompatActivity
             DownloadUtils downloadUtils = new DownloadUtils() {
                 @Override
                 public void onDownloadSuccess(NovelDownloadDialogFragment dialog, final Novel novel) {
-                    Log.d(TAG, "onSuccess: ");
                     dialog.dismiss();
 
                     OkCancelDialogFragment okCancelDialog =

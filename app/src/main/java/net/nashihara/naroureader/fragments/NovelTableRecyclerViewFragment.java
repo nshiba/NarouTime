@@ -99,8 +99,6 @@ public class NovelTableRecyclerViewFragment extends Fragment {
             public void onItemClick(View view, int position, ItemTableRecyclerBinding binding) {
                 NovelTableRecyclerViewAdapter clickAdapter = (NovelTableRecyclerViewAdapter) mRecyclerView.getAdapter();
                 NovelBody body = clickAdapter.getList().get(position);
-                Log.d(TAG, "NovelTableRecyclerView: list size -> " + clickAdapter.getList().size());
-                Log.d(TAG, "onItemClick: position -> " + position + "\n" + body.toString());
                 mListener.onSelect(body.getNcode(), totalPage, body.getPage(), title, writer, body.getTitle());
            }
         });
@@ -165,7 +163,6 @@ public class NovelTableRecyclerViewFragment extends Fragment {
                             binding.writer.setText(novel.getWriter());
                             binding.story.setText(novel.getStory());
 
-                            Log.d(TAG, "onNext: " + novel.toString());
                             NovelTableRecyclerViewAdapter rxAdapter = (NovelTableRecyclerViewAdapter) mRecyclerView.getAdapter();
                             rxAdapter.clearData();
                             rxAdapter.addDataOf(novel.getBodies());
@@ -269,13 +266,10 @@ public class NovelTableRecyclerViewFragment extends Fragment {
     private int loadBookmark() {
         Realm realm = RealmUtils.getRealm(mContext);
 
-        Log.d(TAG, "loadBookmark: " + ncode);
-
         RealmQuery<Novel4Realm> query = realm.where(Novel4Realm.class);
         query.equalTo("ncode", ncode);
         RealmResults<Novel4Realm> results = query.findAll();
 
-        Log.d(TAG, "loadBookmark: " + results.size());
 
         if (results.size() == 0) {
             return 0;

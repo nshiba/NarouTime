@@ -386,7 +386,6 @@ public class RankingRecyclerViewFragment extends Fragment {
                                         DownloadUtils downloadUtils = new DownloadUtils() {
                                             @Override
                                             public void onDownloadSuccess(NovelDownloadDialogFragment dialog, final Novel novel) {
-                                                Log.d(TAG, "onSuccess: ");
                                                 dialog.dismiss();
 
                                                 OkCancelDialogFragment okCancelDialog =
