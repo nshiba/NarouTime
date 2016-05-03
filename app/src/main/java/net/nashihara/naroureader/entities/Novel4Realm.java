@@ -19,9 +19,6 @@ public class Novel4Realm extends RealmObject {
     }
 
     public void setNcode(String ncode) {
-        if (ncode != null) {
-            ncode = ncode.toLowerCase();
-        }
         this.ncode = ncode;
     }
 

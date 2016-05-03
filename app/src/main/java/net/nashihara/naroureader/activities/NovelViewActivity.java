@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -25,12 +24,6 @@ import net.nashihara.naroureader.fragments.NovelBodyFragment;
 import io.realm.Realm;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
-import narou4j.Narou;
-import narou4j.entities.NovelBody;
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 public class NovelViewActivity extends AppCompatActivity implements NovelBodyFragment.OnNovelBodyInteraction {
 
@@ -81,37 +74,38 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
                 onBackPressed();
             }
         });
-        Observable.create(new Observable.OnSubscribe<NovelBody>() {
-            @Override
-            public void call(Subscriber<? super NovelBody> subscriber) {
-                Narou narou = new Narou();
-                try {
-                    NovelBody body = narou.getNovelBody(ncode, page);
-                    subscriber.onNext(body);
-                } catch (Exception e) {
-                    subscriber.onError(e);
-                }
-            }
-        })
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<NovelBody>() {
-                    @Override
-                    public void onCompleted() {}
 
-                    @Override
-                    public void onError(Throwable e) {
-                        Log.e(TAG, "onError: ", e.fillInStackTrace());
-                        onLoadError();
-                    }
-
-                    @Override
-                    public void onNext(NovelBody novelBody) {
-                        manager.beginTransaction()
-                                .add(R.id.novel_container, NovelBodyFragment.newInstance(ncode, novelBody.getTitle(), novelBody.getBody(), novelBody.getPage(), totalPage))
-                                .commit();
-                    }
-                });
+        onNovelBodyLoadAction("", nowPage, bodyTitle);
+//        Observable.create(new Observable.OnSubscribe<NovelBody>() {
+//            @Override
+//            public void call(Subscriber<? super NovelBody> subscriber) {
+//                Narou narou = new Narou();
+//                try {
+//                    NovelBody body = narou.getNovelBody(ncode, page);
+//                    subscriber.onNext(body);
+//                } catch (Exception e) {
+//                    subscriber.onError(e);
+//                }
+//            }
+//        }).subscribeOn(Schedulers.io())
+//          .observeOn(AndroidSchedulers.mainThread())
+//          .subscribe(new Subscriber<NovelBody>() {
+//            @Override
+//            public void onCompleted() {}
+//
+//            @Override
+//            public void onError(Throwable e) {
+//                Log.e(TAG, "onError: ", e.fillInStackTrace());
+//                onLoadError();
+//            }
+//
+//            @Override
+//            public void onNext(NovelBody novelBody) {
+//                manager.beginTransaction()
+//                        .add(R.id.novel_container, NovelBodyFragment.newInstance(ncode, novelBody.getTitle(), novelBody.getBody(), novelBody.getPage(), totalPage))
+//                        .commit();
+//            }
+//        });
     }
 
     @Override

@@ -19,6 +19,7 @@ import net.nashihara.naroureader.databinding.FragmentNovelTableViewBinding;
 import net.nashihara.naroureader.databinding.ItemTableRecyclerBinding;
 import net.nashihara.naroureader.dialogs.OkCancelDialogFragment;
 import net.nashihara.naroureader.entities.Novel4Realm;
+import net.nashihara.naroureader.entities.NovelTable4Realm;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +40,7 @@ public class NovelTableRecyclerViewFragment extends Fragment {
     private static final String TAG = NovelTableRecyclerViewFragment.class.getSimpleName();
 
     private static final String PARAM_NCODE = "ncode";
+    private Realm realm;
 
     private ArrayList<String> bodyTitles;
     private String title;
@@ -120,8 +122,9 @@ public class NovelTableRecyclerViewFragment extends Fragment {
             }
         });
 
-        Bundle args = getArguments();
-        if (args != null) {
+        boolean isLoadTable = loadTable();
+
+        if (!isLoadTable) {
             Observable.zip(Observable.create(new Observable.OnSubscribe<Novel>() {
                 @Override
                 public void call(Subscriber<? super Novel> subscriber) {
@@ -142,49 +145,102 @@ public class NovelTableRecyclerViewFragment extends Fragment {
                     return novel;
                 }
             })
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(new Subscriber<Novel>() {
-                @Override
-                public void onCompleted() { }
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Subscriber<Novel>() {
+                        @Override
+                        public void onCompleted() { }
 
-                @Override
-                public void onError(Throwable e) {
-                    Log.e(TAG, "onError: ", e.fillInStackTrace());
-                }
-
-                @Override
-                public void onNext(Novel novel) {
-                    binding.title.setText(novel.getTitle());
-                    binding.writer.setText(novel.getWriter());
-                    binding.story.setText(novel.getStory());
-
-                    Log.d(TAG, "onNext: " + novel.toString());
-                    NovelTableRecyclerViewAdapter rxAdapter = (NovelTableRecyclerViewAdapter) mRecyclerView.getAdapter();
-                    rxAdapter.clearData();
-                    rxAdapter.addDataOf(novel.getBodies());
-
-                    binding.progressBar.setVisibility(View.GONE);
-                    mRecyclerView.setVisibility(View.VISIBLE);
-                    binding.title.setVisibility(View.VISIBLE);
-                    binding.writer.setVisibility(View.VISIBLE);
-                    binding.story.setVisibility(View.VISIBLE);
-                    setFabMargin();
-
-                    writer = novel.getWriter();
-                    title = novel.getTitle();
-                    totalPage = novel.getAllNumberOfNovel();
-                    bodyTitles = new ArrayList<>();
-                    for (NovelBody body : novel.getBodies()) {
-                        if (!body.isChapter()) {
-                            bodyTitles.add(body.getTitle());
+                        @Override
+                        public void onError(Throwable e) {
+                            Log.e(TAG, "onError: ", e.fillInStackTrace());
                         }
-                    }
-                }
-            });
+
+                        @Override
+                        public void onNext(Novel novel) {
+                            binding.title.setText(novel.getTitle());
+                            binding.writer.setText(novel.getWriter());
+                            binding.story.setText(novel.getStory());
+
+                            Log.d(TAG, "onNext: " + novel.toString());
+                            NovelTableRecyclerViewAdapter rxAdapter = (NovelTableRecyclerViewAdapter) mRecyclerView.getAdapter();
+                            rxAdapter.clearData();
+                            rxAdapter.addDataOf(novel.getBodies());
+
+                            binding.progressBar.setVisibility(View.GONE);
+                            mRecyclerView.setVisibility(View.VISIBLE);
+                            binding.title.setVisibility(View.VISIBLE);
+                            binding.writer.setVisibility(View.VISIBLE);
+                            binding.story.setVisibility(View.VISIBLE);
+
+                            writer = novel.getWriter();
+                            title = novel.getTitle();
+                            totalPage = novel.getAllNumberOfNovel();
+                            bodyTitles = new ArrayList<>();
+                            for (NovelBody body : novel.getBodies()) {
+                                if (!body.isChapter()) {
+                                    bodyTitles.add(body.getTitle());
+                                }
+                            }
+                        }
+                    });
         }
 
+        setFabMargin();
         return binding.getRoot();
+    }
+
+    private boolean loadTable() {
+        realm = RealmUtils.getRealm(mContext);
+        RealmResults<NovelTable4Realm> tableResult = realm.where(NovelTable4Realm.class).equalTo("ncode", ncode).findAll().sort("tableNumber");
+        Novel4Realm novel4Realm = realm.where(Novel4Realm.class).equalTo("ncode", ncode).findFirst();
+
+        if (novel4Realm == null) {
+            return false;
+        }
+
+        if (tableResult.size() <= 0 || !novel4Realm.isDownload()) {
+            return false;
+        }
+
+        ArrayList<NovelBody> table = new ArrayList<>();
+        for (NovelTable4Realm novelTable4Realm : tableResult) {
+            NovelBody tableItem = new NovelBody();
+            tableItem.setNcode(novelTable4Realm.getNcode());
+            tableItem.setTitle(novelTable4Realm.getTitle());
+            tableItem.setChapter(novelTable4Realm.isChapter());
+            tableItem.setPage(novelTable4Realm.getPage());
+            table.add(tableItem);
+        }
+
+        binding.title.setText(novel4Realm.getTitle());
+        binding.writer.setText(novel4Realm.getWriter());
+        binding.story.setText(novel4Realm.getStory());
+
+        NovelTableRecyclerViewAdapter rxAdapter = (NovelTableRecyclerViewAdapter) mRecyclerView.getAdapter();
+        rxAdapter.clearData();
+        rxAdapter.addDataOf(table);
+
+        binding.progressBar.setVisibility(View.GONE);
+        mRecyclerView.setVisibility(View.VISIBLE);
+        binding.title.setVisibility(View.VISIBLE);
+        binding.writer.setVisibility(View.VISIBLE);
+        binding.story.setVisibility(View.VISIBLE);
+        setFabMargin();
+
+        writer = novel4Realm.getWriter();
+        title = novel4Realm.getTitle();
+        totalPage = novel4Realm.getTotalPage();
+        bodyTitles = new ArrayList<>();
+        for (NovelBody body : table) {
+            if (!body.isChapter()) {
+                bodyTitles.add(body.getTitle());
+            }
+        }
+
+        realm.close();
+
+        return true;
     }
 
     private void setFabMargin() {

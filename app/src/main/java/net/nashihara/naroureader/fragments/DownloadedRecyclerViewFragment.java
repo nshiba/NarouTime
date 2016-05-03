@@ -15,6 +15,7 @@ import net.nashihara.naroureader.RealmUtils;
 import net.nashihara.naroureader.adapters.SimpleRecyclerViewAdapter;
 import net.nashihara.naroureader.databinding.FragmentSimpleRecycerViewBinding;
 import net.nashihara.naroureader.entities.Novel4Realm;
+import net.nashihara.naroureader.entities.NovelItem;
 import net.nashihara.naroureader.listeners.OnFragmentReplaceListener;
 import net.nashihara.naroureader.listeners.OnItemClickListener;
 
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
+import narou4j.entities.Novel;
 
 public class DownloadedRecyclerViewFragment extends Fragment {
     private static final String TAG = DownloadedRecyclerViewFragment.class.getSimpleName();
@@ -60,7 +62,16 @@ public class DownloadedRecyclerViewFragment extends Fragment {
                 public void onItemClick(View view, int position) {
                     final Novel4Realm novel = novels.get(position);
 
-                    mListener.onFragmentReplaceAction(NovelTableRecyclerViewFragment.newInstance(novel.getNcode()), novel.getTitle(), null);
+                    Novel novelDetail = new Novel();
+                    novelDetail.setNcode(novel.getNcode());
+                    novelDetail.setTitle(novel.getTitle());
+                    novelDetail.setStory(novel.getStory());
+                    novelDetail.setWriter(novel.getWriter());
+                    novelDetail.setAllNumberOfNovel(novel.getTotalPage());
+
+                    NovelItem item = new NovelItem();
+                    item.setNovelDetail(novelDetail);
+                    mListener.onFragmentReplaceAction(NovelTableRecyclerViewFragment.newInstance(novel.getNcode()), novel.getTitle(), item);
                 }
             });
 
