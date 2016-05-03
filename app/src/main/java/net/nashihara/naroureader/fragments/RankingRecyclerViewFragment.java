@@ -16,7 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import net.nashihara.naroureader.DownloadUtil;
+import net.nashihara.naroureader.DownloadUtils;
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.adapters.RankingRecyclerViewAdapter;
 import net.nashihara.naroureader.databinding.FragmentRankingRecyclerBinding;
@@ -381,7 +381,7 @@ public class RankingRecyclerViewFragment extends Fragment {
                                         break;
                                     }
                                     case 1: {
-                                        DownloadUtil downloadUtil = new DownloadUtil() {
+                                        DownloadUtils downloadUtils = new DownloadUtils() {
                                             @Override
                                             public void onDownloadSuccess(NovelDownloadDialogFragment dialog, final Novel novel) {
                                                 Log.d(TAG, "onSuccess: ");
@@ -410,7 +410,7 @@ public class RankingRecyclerViewFragment extends Fragment {
                                                 dialog.dismiss();
                                             }
                                         };
-                                        downloadUtil.novelDownlaod(item.getNovelDetail(), getFragmentManager(), mContext);
+                                        downloadUtils.novelDownlaod(item.getNovelDetail(), getFragmentManager(), mContext);
                                         break;
                                     }
                                     case 2: {
