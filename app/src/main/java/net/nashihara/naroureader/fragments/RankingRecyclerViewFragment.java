@@ -371,7 +371,7 @@ public class RankingRecyclerViewFragment extends Fragment {
                 String[] strings = new String[]
                         {"小説を読む", "ダウンロード", "ブラウザで小説ページを開く", "ブラウザで作者ページを開く"};
                 ListDailogFragment listDialog =
-                        new ListDailogFragment(item.getNovelDetail().getTitle(), strings, new DialogInterface.OnClickListener() {
+                        ListDailogFragment.newInstance(item.getNovelDetail().getTitle(), strings, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 switch (which) {

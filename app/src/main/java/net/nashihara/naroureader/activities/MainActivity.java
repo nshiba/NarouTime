@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -25,6 +26,7 @@ import com.balysv.materialmenu.MaterialMenuDrawable;
 import net.nashihara.naroureader.DownloadUtil;
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.databinding.ActivityMainBinding;
+import net.nashihara.naroureader.dialogs.ListDailogFragment;
 import net.nashihara.naroureader.dialogs.NovelDownloadDialogFragment;
 import net.nashihara.naroureader.dialogs.OkCancelDialogFragment;
 import net.nashihara.naroureader.entities.NovelItem;
@@ -201,8 +203,32 @@ public class MainActivity extends AppCompatActivity
                 break;
             }
             case R.id.nav_feedback: {
-                binding.toolbar.setTitle("フィードバック");
-                binding.navView.setCheckedItem(R.id.nav_feedback);
+                DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+
+                        Intent intent = null;
+                        switch (which) {
+                            case 0: {
+                                String url = "http://twitter.com/share?hashtags=なろうTime";
+                                intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                                break;
+                            }
+                            case 1: {
+                                intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=net.nashihara.naroureader"));
+                                break;
+                            }
+                        }
+
+                        if (intent != null) {
+                            startActivity(intent);
+                        }
+                    }
+                };
+                ListDailogFragment fragment =
+                        ListDailogFragment.newInstance("フィードバック", new String[]{"Twitter", "Google Play Store"}, onClickListener);
+                fragment.show(getSupportFragmentManager(), "list");
                 break;
             }
         }

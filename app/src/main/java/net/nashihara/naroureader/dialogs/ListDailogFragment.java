@@ -16,9 +16,35 @@ public class ListDailogFragment extends DialogFragment {
 
     public ListDailogFragment() {}
 
-    public ListDailogFragment(String title, String[] listItems, DialogInterface.OnClickListener onClickListener) {
+    public static ListDailogFragment newInstance(String title, String[] listItems, DialogInterface.OnClickListener onClickListener) {
+        ListDailogFragment fragment = new ListDailogFragment();
+        fragment.setTitle(title);
+        fragment.setListItems(listItems);
+        fragment.setOnClickListener(onClickListener);
+        return fragment;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String[] getListItems() {
+        return listItems;
+    }
+
+    public void setListItems(String[] listItems) {
         this.listItems = listItems;
+    }
+
+    public DialogInterface.OnClickListener getOnClickListener() {
+        return onClickListener;
+    }
+
+    public void setOnClickListener(DialogInterface.OnClickListener onClickListener) {
         this.onClickListener = onClickListener;
     }
 
