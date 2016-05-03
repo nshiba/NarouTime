@@ -1,7 +1,6 @@
 package net.nashihara.naroureader.fragments;
 
 import android.content.Context;
-import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -13,7 +12,6 @@ import android.view.ViewGroup;
 
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.RealmUtils;
-import net.nashihara.naroureader.activities.NovelViewActivity;
 import net.nashihara.naroureader.adapters.SimpleRecyclerViewAdapter;
 import net.nashihara.naroureader.databinding.FragmentBookmarkRecycerViewBinding;
 import net.nashihara.naroureader.entities.Novel4Realm;
@@ -25,8 +23,8 @@ import java.util.ArrayList;
 import io.realm.Realm;
 import io.realm.RealmResults;
 
-public class BookmarkRecyclerViewFragment extends Fragment {
-    private static final String TAG = BookmarkRecyclerViewFragment.class.getSimpleName();
+public class DownloadedRecyclerViewFragment extends Fragment {
+    private static final String TAG = DownloadedRecyclerViewFragment.class.getSimpleName();
 
     private RecyclerView mRecyclerView;
     private OnFragmentReplaceListener mListener;
@@ -34,10 +32,10 @@ public class BookmarkRecyclerViewFragment extends Fragment {
     private FragmentBookmarkRecycerViewBinding binding;
     private ArrayList<Novel4Realm> novels = new ArrayList<>();
 
-    public BookmarkRecyclerViewFragment() {}
+    public DownloadedRecyclerViewFragment() {}
 
-    public static BookmarkRecyclerViewFragment newInstance() {
-        BookmarkRecyclerViewFragment fragment = new BookmarkRecyclerViewFragment();
+    public static DownloadedRecyclerViewFragment newInstance() {
+        DownloadedRecyclerViewFragment fragment = new DownloadedRecyclerViewFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
@@ -70,20 +68,13 @@ public class BookmarkRecyclerViewFragment extends Fragment {
             public void onItemClick(View view, int position) {
                 final Novel4Realm novel = novels.get(position);
 
-                Intent intent = new Intent(mContext, NovelViewActivity.class);
-                intent.putExtra("ncode", novel.getNcode());
-                intent.putExtra("page", novel.getBookmark());
-                intent.putExtra("title", novel.getTitle());
-                intent.putExtra("writer", novel.getWriter());
-                intent.putExtra("totalPage", novel.getTotalPage());
-
-                startActivity(intent);
+                mListener.onFragmentReplaceAction(NovelTableRecyclerViewFragment.newInstance(novel.getNcode()), novel.getTitle(), null);
             }
         });
         mRecyclerView.setAdapter(adapter);
 
         Realm realm = RealmUtils.getRealm(mContext);
-        RealmResults<Novel4Realm> results = realm.where(Novel4Realm.class).notEqualTo("bookmark", 0).findAll();
+        RealmResults<Novel4Realm> results = realm.where(Novel4Realm.class).equalTo("isDownload", true).findAll();
 
         for (Novel4Realm novel4Realm : results) {
             novels.add(novel4Realm);
