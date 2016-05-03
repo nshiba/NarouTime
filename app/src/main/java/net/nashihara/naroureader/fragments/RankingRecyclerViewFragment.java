@@ -118,7 +118,7 @@ public class RankingRecyclerViewFragment extends Fragment {
                         }
                     }
                 };
-                CheckBoxDialogFragment checkBoxDialog = new CheckBoxDialogFragment("fliter list", filters, onMultiChoiceClickListener) {
+                CheckBoxDialogFragment checkBoxDialog = new CheckBoxDialogFragment("小説絞込み", filters, onMultiChoiceClickListener) {
                     @Override
                     public void onPositiveButton(int which) {
                         RankingRecyclerViewAdapter adapter = (RankingRecyclerViewAdapter) mRecyclerView.getAdapter();

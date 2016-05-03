@@ -108,7 +108,7 @@ public class NovelTableRecyclerViewFragment extends Fragment {
                 int bookmark = loadBookmark();
                 if (bookmark == 0) {
                     OkCancelDialogFragment dialogFragment
-                            = new OkCancelDialogFragment("Bookmark", "この小説にはしおりをはさんでいません。", new DialogInterface.OnClickListener() {
+                            = new OkCancelDialogFragment("ブックマーク", "この小説にはしおりをはさんでいません。", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {}
                     });
