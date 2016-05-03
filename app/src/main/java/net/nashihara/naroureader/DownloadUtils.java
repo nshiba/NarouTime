@@ -21,8 +21,8 @@ import rx.Observable;
 import rx.Subscriber;
 import rx.schedulers.Schedulers;
 
-public abstract class DownloadUtil {
-    private static final String TAG = DownloadUtil.class.getSimpleName();
+public abstract class DownloadUtils {
+    private static final String TAG = DownloadUtils.class.getSimpleName();
     private NovelDownloadDialogFragment downloadDialog;
     private FragmentManager manager;
     private Realm realm;

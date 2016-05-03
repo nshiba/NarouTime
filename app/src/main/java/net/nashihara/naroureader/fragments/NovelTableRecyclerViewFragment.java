@@ -2,6 +2,7 @@ package net.nashihara.naroureader.fragments;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -11,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.RealmUtils;
@@ -41,6 +43,7 @@ public class NovelTableRecyclerViewFragment extends Fragment {
 
     private static final String PARAM_NCODE = "ncode";
     private Realm realm;
+    private ViewTreeObserver.OnGlobalLayoutListener globalLayoutListener;
 
     private ArrayList<String> bodyTitles;
     private String title;
@@ -81,7 +84,6 @@ public class NovelTableRecyclerViewFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_novel_table_view, container, false);
 
-        // TODO: RecyclerView
         mRecyclerView = binding.recycler;
         final LinearLayoutManager manager = new LinearLayoutManager(mContext) {
             @Override
@@ -190,6 +192,11 @@ public class NovelTableRecyclerViewFragment extends Fragment {
         return binding.getRoot();
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
     private boolean loadTable() {
         realm = RealmUtils.getRealm(mContext);
         RealmResults<NovelTable4Realm> tableResult = realm.where(NovelTable4Realm.class).equalTo("ncode", ncode).findAll().sort("tableNumber");
@@ -226,7 +233,6 @@ public class NovelTableRecyclerViewFragment extends Fragment {
         binding.title.setVisibility(View.VISIBLE);
         binding.writer.setVisibility(View.VISIBLE);
         binding.story.setVisibility(View.VISIBLE);
-        setFabMargin();
 
         writer = novel4Realm.getWriter();
         title = novel4Realm.getTitle();
@@ -244,10 +250,19 @@ public class NovelTableRecyclerViewFragment extends Fragment {
     }
 
     private void setFabMargin() {
-        int margin = binding.fab.getHeight() /2 * -1;
-        ViewGroup.MarginLayoutParams mlp = (ViewGroup.MarginLayoutParams) binding.fab.getLayoutParams();
-        mlp.setMargins(mlp.leftMargin, margin, mlp.rightMargin, mlp.bottomMargin);
-        binding.fab.setLayoutParams(mlp);
+        globalLayoutListener = new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                int margin = binding.fab.getHeight() /2 * -1;
+                ViewGroup.MarginLayoutParams mlp = (ViewGroup.MarginLayoutParams) binding.fab.getLayoutParams();
+                mlp.setMargins(mlp.leftMargin, margin, mlp.rightMargin, mlp.bottomMargin);
+                binding.fab.setLayoutParams(mlp);
+
+                binding.topContainer.getViewTreeObserver().removeOnGlobalLayoutListener(globalLayoutListener);
+            }
+        };
+
+        binding.topContainer.getViewTreeObserver().addOnGlobalLayoutListener(globalLayoutListener);
     }
 
     private int loadBookmark() {

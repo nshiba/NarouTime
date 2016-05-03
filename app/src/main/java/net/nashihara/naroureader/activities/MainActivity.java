@@ -23,7 +23,8 @@ import android.widget.Toast;
 
 import com.balysv.materialmenu.MaterialMenuDrawable;
 
-import net.nashihara.naroureader.DownloadUtil;
+import net.nashihara.naroureader.DownloadUtils;
+import net.nashihara.naroureader.NetworkUtils;
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.databinding.ActivityMainBinding;
 import net.nashihara.naroureader.dialogs.ListDailogFragment;
@@ -62,7 +63,6 @@ public class MainActivity extends AppCompatActivity
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         manager = getSupportFragmentManager();
 
-        binding.toolbar.setTitle("ランキング");
         materialMenu = new MaterialMenuDrawable(this, Color.WHITE, MaterialMenuDrawable.Stroke.THIN);
         materialMenu.animateIconState(MaterialMenuDrawable.IconState.BURGER);
         binding.toolbar.setNavigationIcon(materialMenu);
@@ -139,7 +139,7 @@ public class MainActivity extends AppCompatActivity
                 return true;
             }
 
-            DownloadUtil downloadUtil = new DownloadUtil() {
+            DownloadUtils downloadUtils = new DownloadUtils() {
                 @Override
                 public void onDownloadSuccess(NovelDownloadDialogFragment dialog, final Novel novel) {
                     Log.d(TAG, "onSuccess: ");
@@ -162,7 +162,7 @@ public class MainActivity extends AppCompatActivity
                     dialog.dismiss();
                 }
             };
-            downloadUtil.novelDownlaod(downloadTargetNovel.getNovelDetail(), getSupportFragmentManager(), this);
+            downloadUtils.novelDownlaod(downloadTargetNovel.getNovelDetail(), getSupportFragmentManager(), this);
             return true;
         }
 
@@ -238,12 +238,23 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void initFragment() {
-        String[] types = new String[]{
-                RankingType.DAILY.toString(), RankingType.WEEKLY.toString(),
-                RankingType.MONTHLY.toString(), RankingType.QUARTET.toString(), "all"};
-        String[] titles = new String[]{"日間", "週間", "月間", "四半期", "累計"};
+        Fragment fragment;
+
+        if (NetworkUtils.isOnline(this)) {
+            String[] types = new String[]{
+                    RankingType.DAILY.toString(), RankingType.WEEKLY.toString(),
+                    RankingType.MONTHLY.toString(), RankingType.QUARTET.toString(), "all"};
+            String[] titles = new String[]{"日間", "週間", "月間", "四半期", "累計"};
+            fragment = RankingViewPagerFragment.newInstance(types, titles);
+            binding.toolbar.setTitle("ランキング");
+        }
+        else {
+            fragment = DownloadedRecyclerViewFragment.newInstance();
+            binding.toolbar.setTitle("ダウンロード済み小説");
+        }
+
         manager.beginTransaction()
-                .add(R.id.main_container, RankingViewPagerFragment.newInstance(types, titles))
+                .add(R.id.main_container, fragment)
                 .commit();
     }
 
