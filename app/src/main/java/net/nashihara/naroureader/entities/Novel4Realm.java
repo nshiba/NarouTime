@@ -15,9 +15,6 @@ public class Novel4Realm extends RealmObject {
     private boolean isDownload = false;
 
     public String getNcode() {
-        if (ncode != null) {
-            ncode = ncode.toLowerCase();
-        }
         return ncode;
     }
 

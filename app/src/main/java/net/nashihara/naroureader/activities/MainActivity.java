@@ -1,5 +1,6 @@
 package net.nashihara.naroureader.activities;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
@@ -12,15 +13,21 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.balysv.materialmenu.MaterialMenuDrawable;
 
+import net.nashihara.naroureader.DownloadUtil;
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.databinding.ActivityMainBinding;
+import net.nashihara.naroureader.dialogs.NovelDownloadDialogFragment;
+import net.nashihara.naroureader.dialogs.OkCancelDialogFragment;
+import net.nashihara.naroureader.entities.NovelItem;
 import net.nashihara.naroureader.fragments.BookmarkRecyclerViewFragment;
 import net.nashihara.naroureader.fragments.NovelTableRecyclerViewFragment;
 import net.nashihara.naroureader.fragments.RankingViewPagerFragment;
@@ -28,12 +35,13 @@ import net.nashihara.naroureader.listeners.OnFragmentReplaceListener;
 
 import java.util.Stack;
 
+import narou4j.entities.Novel;
 import narou4j.enums.RankingType;
 
 import static android.support.v4.view.GravityCompat.START;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, OnFragmentReplaceListener, NovelTableRecyclerViewFragment.OnNovelSelectionListener {
+        implements NavigationView.OnNavigationItemSelectedListener, OnFragmentReplaceListener, NovelTableRecyclerViewFragment.OnNovelSelectionListener, Toolbar.OnMenuItemClickListener {
 
     ActivityMainBinding binding;
     private String TAG = MainActivity.class.getSimpleName();
@@ -41,6 +49,9 @@ public class MainActivity extends AppCompatActivity
     private Stack<String> titleStack = new Stack<>();
 
     private MaterialMenuDrawable materialMenu;
+
+    private boolean isNovelTableView = false;
+    private NovelItem downloadTargetNovel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +75,8 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         });
+        binding.toolbar.inflateMenu(R.menu.menu_novelview);
+        binding.toolbar.setOnMenuItemClickListener(this);
 
         binding.navView.setNavigationItemSelectedListener(this);
 
@@ -74,6 +87,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
+        isNovelTableView = false;
         int stack = manager.getBackStackEntryCount();
         if (stack == 1) {
             manager.popBackStack();
@@ -112,6 +126,46 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    public boolean onMenuItemClick(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.download) {
+            if (!isNovelTableView) {
+                Toast.makeText(this, "小説目次ページを開いてから押してください", Toast.LENGTH_LONG).show();
+                return true;
+            }
+
+            DownloadUtil downloadUtil = new DownloadUtil() {
+                @Override
+                public void onDownloadSuccess(NovelDownloadDialogFragment dialog, final Novel novel) {
+                    Log.d(TAG, "onSuccess: ");
+                    dialog.dismiss();
+
+                    OkCancelDialogFragment okCancelDialog =
+                            new OkCancelDialogFragment("ダウンロード完了", "ダウンロードしました。", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            });
+                    okCancelDialog.show(getSupportFragmentManager(), "okcansel");
+                }
+
+                @Override
+                public void onDownloadError(NovelDownloadDialogFragment dialog) {
+                    Log.d(TAG, "onDownloadError: ");
+
+                    dialog.dismiss();
+                }
+            };
+            downloadUtil.novelDownlaod(downloadTargetNovel.getNovelDetail(), getSupportFragmentManager(), this);
+            return true;
+        }
+
+        return true;
+    }
+
+    @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         int id = item.getItemId();
 
@@ -125,7 +179,7 @@ public class MainActivity extends AppCompatActivity
 //                binding.toolbar.setTitle("しおり");
                 binding.navView.setCheckedItem(R.id.nav_bookmark);
                 BookmarkRecyclerViewFragment fragment = BookmarkRecyclerViewFragment.newInstance();
-                onFragmentReplaceAction(fragment, "しおり");
+                onFragmentReplaceAction(fragment, "しおり", null);
                 break;
             }
             case R.id.nav_search: {
@@ -161,9 +215,14 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onFragmentReplaceAction(Fragment fragment, String title) {
+    public void onFragmentReplaceAction(Fragment fragment, String title, NovelItem item) {
         if (fragment == null) {
             return;
+        }
+
+        if (fragment instanceof NovelTableRecyclerViewFragment) {
+            isNovelTableView = true;
+            downloadTargetNovel = item;
         }
 
         titleStack.push((String) binding.toolbar.getTitle());

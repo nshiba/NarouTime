@@ -33,6 +33,8 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 public class NovelViewActivity extends AppCompatActivity implements NovelBodyFragment.OnNovelBodyInteraction {
+
+
     private final static String TAG = NovelViewActivity.class.getSimpleName();
     ActivityNovelViewBinding binding;
     private FragmentManager manager;

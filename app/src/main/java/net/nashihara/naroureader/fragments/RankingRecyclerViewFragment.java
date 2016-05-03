@@ -358,7 +358,7 @@ public class RankingRecyclerViewFragment extends Fragment {
                 }
                 else {
                     NovelItem item = ((RankingRecyclerViewAdapter) mRecyclerView.getAdapter()).getList().get(position);
-                    mReplaceListener.onFragmentReplaceAction(NovelTableRecyclerViewFragment.newInstance(item.getNovelDetail().getNcode()), item.getNovelDetail().getTitle());
+                    mReplaceListener.onFragmentReplaceAction(NovelTableRecyclerViewFragment.newInstance(item.getNovelDetail().getNcode()), item.getNovelDetail().getTitle(), item);
                 }
             }
 
@@ -377,7 +377,7 @@ public class RankingRecyclerViewFragment extends Fragment {
                                 switch (which) {
                                     case 0: {
                                         NovelItem item = ((RankingRecyclerViewAdapter) mRecyclerView.getAdapter()).getList().get(position);
-                                        mReplaceListener.onFragmentReplaceAction(NovelTableRecyclerViewFragment.newInstance(item.getNovelDetail().getNcode()), item.getNovelDetail().getTitle());
+                                        mReplaceListener.onFragmentReplaceAction(NovelTableRecyclerViewFragment.newInstance(item.getNovelDetail().getNcode()), item.getNovelDetail().getTitle(), item);
                                         break;
                                     }
                                     case 1: {
@@ -391,10 +391,12 @@ public class RankingRecyclerViewFragment extends Fragment {
                                                         new OkCancelDialogFragment("ダウンロード完了", "ダウンロードした小説を開きますか？", new DialogInterface.OnClickListener() {
                                                             @Override
                                                             public void onClick(DialogInterface dialog, int which) {
+                                                                dialog.dismiss();
                                                                 if (OkCancelDialogFragment.OK == which) {
-                                                                    dialog.dismiss();
+                                                                    NovelItem novelItem = new NovelItem();
+                                                                    novelItem.setNovelDetail(novel);
                                                                     mReplaceListener.onFragmentReplaceAction(
-                                                                            NovelTableRecyclerViewFragment.newInstance(novel.getNcode()), novel.getTitle());
+                                                                            NovelTableRecyclerViewFragment.newInstance(novel.getNcode()), novelItem.getNovelDetail().getTitle(), novelItem);
                                                                 }
                                                             }
                                                         });
