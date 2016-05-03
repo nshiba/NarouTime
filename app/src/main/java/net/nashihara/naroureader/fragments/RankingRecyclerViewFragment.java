@@ -118,21 +118,23 @@ public class RankingRecyclerViewFragment extends Fragment {
                         }
                     }
                 };
-                CheckBoxDialogFragment checkBoxDialog = new CheckBoxDialogFragment("小説絞込み", filters, onMultiChoiceClickListener) {
+                CheckBoxDialogFragment checkBoxDialog = CheckBoxDialogFragment
+                        .newInstance("小説絞込み", filters, onMultiChoiceClickListener, new CheckBoxDialogFragment.OnDialogButtonClickListener() {
                     @Override
                     public void onPositiveButton(int which) {
                         RankingRecyclerViewAdapter adapter = (RankingRecyclerViewAdapter) mRecyclerView.getAdapter();
                         adapter.getList().clear();
-                       adapter.getList().addAll(filterList);
+                        adapter.getList().addAll(filterList);
                     }
 
                     @Override
                     public void onNeutralButton(int which) {
+
                         RankingRecyclerViewAdapter adapter = (RankingRecyclerViewAdapter) mRecyclerView.getAdapter();
                         adapter.getList().clear();
                         adapter.getList().addAll(allItems);
                     }
-                };
+                });
                 checkBoxDialog.show(getFragmentManager(), "multiple");
             }
         });
@@ -389,7 +391,7 @@ public class RankingRecyclerViewFragment extends Fragment {
                                                 dialog.dismiss();
 
                                                 OkCancelDialogFragment okCancelDialog =
-                                                        new OkCancelDialogFragment("ダウンロード完了", "ダウンロードした小説を開きますか？", new DialogInterface.OnClickListener() {
+                                                        OkCancelDialogFragment.newInstance("ダウンロード完了", "ダウンロードした小説を開きますか？", new DialogInterface.OnClickListener() {
                                                             @Override
                                                             public void onClick(DialogInterface dialog, int which) {
                                                                 dialog.dismiss();

@@ -15,9 +15,25 @@ public class OkCancelDialogFragment extends DialogFragment {
     private String message = "";
     private DialogInterface.OnClickListener onClickListener = null;
 
-    public OkCancelDialogFragment(String title, String message, DialogInterface.OnClickListener onClickListener) {
+    public OkCancelDialogFragment() {}
+
+    public static OkCancelDialogFragment newInstance(String title, String message, DialogInterface.OnClickListener onClickListener) {
+        OkCancelDialogFragment fragment = new OkCancelDialogFragment();
+        fragment.setTitle(title);
+        fragment.setMessage(message);
+        fragment.setOnClickListener(onClickListener);
+        return fragment;
+    }
+
+    public void setTitle(String title) {
         this.title = title;
+    }
+
+    public void setMessage(String message) {
         this.message = message;
+    }
+
+    public void setOnClickListener(DialogInterface.OnClickListener onClickListener) {
         this.onClickListener = onClickListener;
     }
 
