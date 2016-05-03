@@ -6,20 +6,6 @@
         android:layout_height="match_parent"
         tools:context="net.nashihara.naroureader.fragments.NovelBodyFragment">
 
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <ProgressBar
-                android:id="@+id/progress_bar"
-                style="?android:progressBarStyle"
-                android:visibility="visible"
-                android:layout_gravity="center"
-                android:layout_width="@dimen/progress_size"
-                android:layout_height="@dimen/progress_size" />
-
-        </FrameLayout>
-
         <ScrollView
             android:scrollbars="vertical"
             android:layout_width="match_parent"
@@ -101,6 +87,28 @@
             android:layout_alignParentBottom="true"
             android:src="@drawable/ic_bookmark_border_white_24dp"
             app:backgroundTint="@color/colorAccent"/>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ProgressBar
+                android:id="@+id/progress_bar"
+                style="?android:progressBarStyle"
+                android:visibility="visible"
+                android:layout_gravity="center"
+                android:layout_width="@dimen/progress_size"
+                android:layout_height="@dimen/progress_size" />
+
+            <Button
+                android:id="@+id/btn_reload"
+                android:layout_gravity="center"
+                android:visibility="gone"
+                android:text="再読み込み"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        </FrameLayout>
 
     </RelativeLayout>
 </layout>

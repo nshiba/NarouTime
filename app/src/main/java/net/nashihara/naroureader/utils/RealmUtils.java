@@ -1,6 +1,8 @@
-package net.nashihara.naroureader;
+package net.nashihara.naroureader.utils;
 
 import android.content.Context;
+
+import net.nashihara.naroureader.Migration;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;

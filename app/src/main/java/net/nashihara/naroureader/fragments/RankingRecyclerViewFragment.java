@@ -16,7 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import net.nashihara.naroureader.DownloadUtils;
+import net.nashihara.naroureader.utils.DownloadUtils;
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.adapters.RankingRecyclerViewAdapter;
 import net.nashihara.naroureader.databinding.FragmentRankingRecyclerBinding;
@@ -123,7 +123,7 @@ public class RankingRecyclerViewFragment extends Fragment {
                     public void onPositiveButton(int which) {
                         RankingRecyclerViewAdapter adapter = (RankingRecyclerViewAdapter) mRecyclerView.getAdapter();
                         adapter.getList().clear();
-                        adapter.getList().addAll(filterList);
+                       adapter.getList().addAll(filterList);
                     }
 
                     @Override
@@ -208,6 +208,7 @@ public class RankingRecyclerViewFragment extends Fragment {
                     @Override
                     public void onError(Throwable e) {
                         Log.e(TAG, "onError: ", e.fillInStackTrace());
+                        onLoadError();
                     }
 
                     @Override
@@ -325,6 +326,7 @@ public class RankingRecyclerViewFragment extends Fragment {
                     @Override
                     public void onError(Throwable e) {
                         Log.e(TAG, "onError: ", e.fillInStackTrace());
+                        onLoadError();
                     }
 
                     @Override
@@ -431,6 +433,23 @@ public class RankingRecyclerViewFragment extends Fragment {
                             }
                         });
                 listDialog.show(getFragmentManager(), "list_dialog");
+            }
+        });
+    }
+
+    private void reload() {
+        getFragmentManager().beginTransaction().detach(this).attach(this).commit();
+    }
+
+    private void onLoadError() {
+        binding.progressBar.setVisibility(View.GONE);
+        binding.btnReload.setVisibility(View.VISIBLE);
+        binding.btnReload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                binding.progressBar.setVisibility(View.VISIBLE);
+                binding.btnReload.setVisibility(View.GONE);
+                reload();
             }
         });
     }

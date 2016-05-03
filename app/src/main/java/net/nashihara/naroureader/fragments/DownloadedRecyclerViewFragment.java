@@ -11,7 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import net.nashihara.naroureader.R;
-import net.nashihara.naroureader.RealmUtils;
+import net.nashihara.naroureader.utils.RealmUtils;
 import net.nashihara.naroureader.adapters.SimpleRecyclerViewAdapter;
 import net.nashihara.naroureader.databinding.FragmentSimpleRecycerViewBinding;
 import net.nashihara.naroureader.entities.Novel4Realm;

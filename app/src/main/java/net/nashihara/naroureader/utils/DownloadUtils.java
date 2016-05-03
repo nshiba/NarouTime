@@ -1,4 +1,4 @@
-package net.nashihara.naroureader;
+package net.nashihara.naroureader.utils;
 
 import android.content.Context;
 import android.content.DialogInterface;
