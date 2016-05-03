@@ -44,5 +44,4 @@ dependencies {
     compile 'io.reactivex:rxandroid:1.1.0'
     compile 'com.balysv.materialmenu:material-menu-toolbar:1.5.4'
     compile 'net.nashihara:narou4j:1.2.4'
-    compile 'com.github.kaichunlin.transition:core:0.9.5'
 }

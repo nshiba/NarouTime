@@ -27,4 +27,11 @@
             android:summary="小説を開いた時に自動でしおりをはずします" />
     </PreferenceCategory>
 
+    <PreferenceScreen android:title="オープンソースライセンス">
+        <intent
+            android:action="android.intent.action.MAIN"
+            android:targetPackage="net.nashihara.naroureader"
+            android:targetClass="net.nashihara.naroureader.activities.LicensesActivity" />
+    </PreferenceScreen>
+
 </PreferenceScreen>
