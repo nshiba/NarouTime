@@ -135,9 +135,9 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
                 realm.commitTransaction();
             }
             else {
-                realm.beginTransaction();
-
                 Novel4Realm bookmarkNovel = getNovel4RealmInstance();
+
+                realm.beginTransaction();
                 bookmarkNovel.setBookmark(nowPage);
 
                 realm.commitTransaction();
