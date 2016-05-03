@@ -16,7 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import net.nashihara.naroureader.R;
-import net.nashihara.naroureader.RealmUtils;
+import net.nashihara.naroureader.utils.RealmUtils;
 import net.nashihara.naroureader.databinding.FragmentNovelBodyBinding;
 import net.nashihara.naroureader.dialogs.OkCancelDialogFragment;
 import net.nashihara.naroureader.entities.Novel4Realm;
@@ -332,6 +332,7 @@ public class NovelBodyFragment extends Fragment implements GestureDetector.OnGes
 
                     @Override
                     public void onError(Throwable e) {
+                        onLoadError();
                         Log.e(TAG, "onError: ", e.fillInStackTrace());
                     }
 
@@ -386,6 +387,23 @@ public class NovelBodyFragment extends Fragment implements GestureDetector.OnGes
         binding.progressBar.setVisibility(View.VISIBLE);
     }
 
+    private void reload() {
+        getFragmentManager().beginTransaction().detach(this).attach(this).commit();
+    }
+
+    private void onLoadError() {
+        binding.progressBar.setVisibility(View.GONE);
+        binding.btnReload.setVisibility(View.VISIBLE);
+        binding.btnReload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                binding.progressBar.setVisibility(View.VISIBLE);
+                binding.btnReload.setVisibility(View.GONE);
+                reload();
+            }
+        });
+    }
+
     @Override
     public boolean onDown(MotionEvent e) {
         return true;
@@ -393,47 +411,39 @@ public class NovelBodyFragment extends Fragment implements GestureDetector.OnGes
 
     @Override
     public boolean onSingleTapUp(MotionEvent e) {
-        Log.d(TAG, "onSingleTapUp: ");
         return false;
     }
 
     @Override
     public void onLongPress(MotionEvent e) {
-        Log.d(TAG, "onLongPress: ");
     }
 
     @Override
     public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-        Log.d(TAG, "onScroll: ");
         return false;
     }
 
     @Override
     public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-        Log.d(TAG, "onFling: ");
         return false;
     }
 
     @Override
     public void onShowPress(MotionEvent e) {
-        Log.d(TAG, "onShowPress: ");
     }
 
     @Override
     public boolean onDoubleTap(MotionEvent e) {
-        Log.d(TAG, "onDoubleTap: ");
         return false;
     }
 
     @Override
     public boolean onDoubleTapEvent(MotionEvent e) {
-        Log.d(TAG, "onDoubleTapEvent: ");
         return false;
     }
 
     @Override
     public boolean onSingleTapConfirmed(MotionEvent e) {
-        Log.d(TAG, "onSingleTapConfirmed: ");
         isHide = pref.getBoolean(PREF_IS_HIDE, isHide);
 
         mListener.onSingleTapConfirmedAction(isHide);

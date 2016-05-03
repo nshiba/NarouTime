@@ -15,7 +15,7 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 
 import net.nashihara.naroureader.R;
-import net.nashihara.naroureader.RealmUtils;
+import net.nashihara.naroureader.utils.RealmUtils;
 import net.nashihara.naroureader.adapters.NovelTableRecyclerViewAdapter;
 import net.nashihara.naroureader.databinding.FragmentNovelTableViewBinding;
 import net.nashihara.naroureader.databinding.ItemTableRecyclerBinding;
@@ -155,6 +155,7 @@ public class NovelTableRecyclerViewFragment extends Fragment {
 
                         @Override
                         public void onError(Throwable e) {
+                            onLoadError();
                             Log.e(TAG, "onError: ", e.fillInStackTrace());
                         }
 
@@ -283,6 +284,23 @@ public class NovelTableRecyclerViewFragment extends Fragment {
             Novel4Realm novel4Realm = results.get(0);
             return novel4Realm.getBookmark();
         }
+    }
+
+    private void reload() {
+        getFragmentManager().beginTransaction().detach(this).attach(this).commit();
+    }
+
+    private void onLoadError() {
+        binding.progressBar.setVisibility(View.GONE);
+        binding.btnReload.setVisibility(View.VISIBLE);
+        binding.btnReload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                binding.progressBar.setVisibility(View.VISIBLE);
+                binding.btnReload.setVisibility(View.GONE);
+                reload();
+            }
+        });
     }
 
     public interface OnNovelSelectionListener {

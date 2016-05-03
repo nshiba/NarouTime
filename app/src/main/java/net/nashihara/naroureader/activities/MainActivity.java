@@ -23,8 +23,8 @@ import android.widget.Toast;
 
 import com.balysv.materialmenu.MaterialMenuDrawable;
 
-import net.nashihara.naroureader.DownloadUtils;
-import net.nashihara.naroureader.NetworkUtils;
+import net.nashihara.naroureader.utils.DownloadUtils;
+import net.nashihara.naroureader.utils.NetworkUtils;
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.databinding.ActivityMainBinding;
 import net.nashihara.naroureader.dialogs.ListDailogFragment;
@@ -176,6 +176,12 @@ public class MainActivity extends AppCompatActivity
         switch (id) {
             case R.id.nav_ranking: {
                 binding.navView.setCheckedItem(R.id.nav_ranking);
+                String[] types = new String[]{
+                        RankingType.DAILY.toString(), RankingType.WEEKLY.toString(),
+                        RankingType.MONTHLY.toString(), RankingType.QUARTET.toString(), "all"};
+                String[] titles = new String[]{"日間", "週間", "月間", "四半期", "累計"};
+                Fragment fragment = RankingViewPagerFragment.newInstance(types, titles);
+                onFragmentReplaceAction(fragment, "ランキング", null);
                 break;
             }
             case R.id.nav_bookmark: {

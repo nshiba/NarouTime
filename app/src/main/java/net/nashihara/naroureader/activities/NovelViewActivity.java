@@ -1,6 +1,5 @@
 package net.nashihara.naroureader.activities;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
@@ -15,9 +14,8 @@ import android.view.ViewGroup;
 import com.balysv.materialmenu.MaterialMenuDrawable;
 
 import net.nashihara.naroureader.R;
-import net.nashihara.naroureader.RealmUtils;
+import net.nashihara.naroureader.utils.RealmUtils;
 import net.nashihara.naroureader.databinding.ActivityNovelViewBinding;
-import net.nashihara.naroureader.dialogs.OkCancelDialogFragment;
 import net.nashihara.naroureader.entities.Novel4Realm;
 import net.nashihara.naroureader.fragments.NovelBodyFragment;
 
@@ -191,25 +189,5 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
             binding.appBar.setVisibility(View.GONE);
             decor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_IMMERSIVE);
         }
-    }
-
-    private void onLoadError() {
-        OkCancelDialogFragment dialogFragment =
-                new OkCancelDialogFragment("読み込みに失敗しました。", "再読み込みしますか？", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (which == OkCancelDialogFragment.OK) {
-                            Intent intent = getIntent();
-                            finish();
-                            startActivity(intent);
-                        }
-
-                        if (which == OkCancelDialogFragment.CANSEL) {
-                            finish();
-                        }
-                    }
-                });
-
-        dialogFragment.show(getSupportFragmentManager(), "okcansel");
     }
 }
