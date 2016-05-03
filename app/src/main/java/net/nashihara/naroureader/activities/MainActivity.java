@@ -144,7 +144,7 @@ public class MainActivity extends AppCompatActivity
                     dialog.dismiss();
 
                     OkCancelDialogFragment okCancelDialog =
-                            new OkCancelDialogFragment("ダウンロード完了", "ダウンロードしました。", new DialogInterface.OnClickListener() {
+                            OkCancelDialogFragment.newInstance("ダウンロード完了", "ダウンロードしました。", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     dialog.dismiss();

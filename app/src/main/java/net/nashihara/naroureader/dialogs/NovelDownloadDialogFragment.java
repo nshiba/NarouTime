@@ -14,10 +14,38 @@ public class NovelDownloadDialogFragment extends DialogFragment {
     private String title;
     private String message;
 
-    public NovelDownloadDialogFragment(int max, String title, String message) {
-        this.title = title;
-        this.message = message;
+    public NovelDownloadDialogFragment() {}
+
+    public static NovelDownloadDialogFragment newInstance(int max, String title, String message) {
+        NovelDownloadDialogFragment fragment = new NovelDownloadDialogFragment();
+        fragment.setMax(max);
+        fragment.setTitle(title);
+        fragment.setMessage(message);
+        return fragment;
+    }
+
+    public int getMax() {
+        return max;
+    }
+
+    public void setMax(int max) {
         this.max = max;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 
     @NonNull
