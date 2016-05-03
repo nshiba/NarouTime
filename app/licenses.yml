@@ -1,0 +1,76 @@
+- artifact: com.android.support:+:+
+  name: Android Support Libraries
+  copyrightHolder: The Android Open Source Project
+  license: The Apache Software License, Version 2.0
+- artifact: com.android.databinding:+:+
+  name: Android Databinding Libraries
+  copyrightHolder: The Android Open Source Project
+  license: The Apache Software License, Version 2.0
+- artifact: com.fasterxml.jackson.core:jackson-annotations:+
+  name: Jackson-annotations
+  copyrightHolder: Copyright ©2009 FasterXML, LLC
+  license: The MIT License
+  url: http://github.com/FasterXML/jackson
+- artifact: com.fasterxml.jackson.core:jackson-core:+
+  name: Jackson-core
+  copyrightHolder: Copyright ©2009 FasterXML, LLC
+  license: The MIT License
+  url: https://github.com/FasterXML/jackson-core
+- artifact: com.fasterxml.jackson.core:jackson-databind:+
+  name: jackson-databind
+  copyrightHolder: Copyright ©2009 FasterXML, LLC
+  license: The MIT License
+  url: http://github.com/FasterXML/jackson
+- artifact: org.jsoup:jsoup:+
+  name: jsoup
+  copyrightHolder: © 2009-2016, Jonathan Hedley <jonathan@hedley.net>
+  license: The MIT License
+  url: http://jsoup.org/
+- artifact: com.balysv.materialmenu:material-menu:+
+  name: Material Menu
+  copyrightHolder: Copyright 2014 Balys Valentukevicius
+  license: The Apache Software License, Version 2.0
+  url: https://github.com/balysv/material-menu
+- artifact: com.balysv.materialmenu:material-menu-toolbar:+
+  name: Material Menu Extras Toolbar
+  copyrightHolder: Copyright 2014 Balys Valentukevicius
+  license: The Apache Software License, Version 2.0
+  url: https://github.com/balysv/material-menu
+- artifact: com.squareup.okhttp3:okhttp:+
+  name: OkHttp
+  copyrightHolder: Copyright 2016 Square, Inc.
+  license: The Apache Software License, Version 2.0
+- artifact: com.squareup.okio:okio:+
+  name: Okio
+  copyrightHolder: Copyright 2016 Square, Inc.
+  license: The Apache Software License, Version 2.0
+- artifact: io.realm:realm-android-library:+
+  name: realm-android-library
+  copyrightHolder: © Realm 2014-2016, all rights reserved.
+  license: The Apache Software License, Version 2.0
+  url: http://realm.io
+- artifact: io.realm:realm-annotations:+
+  name: realm-annotations
+  copyrightHolder: © Realm 2014-2016, all rights reserved.
+  license: The Apache Software License, Version 2.0
+  url: http://realm.io
+- artifact: com.getkeepsafe.relinker:relinker:+
+  name: ReLinker
+  copyrightHolder: Copyright 2015 - 2016 KeepSafe Software Inc.
+  license: The Apache Software License, Version 2.0
+  url: https://github.com/KeepSafe/ReLinker
+- artifact: io.reactivex:rxandroid:+
+  name: RxAndroid
+  copyrightHolder: Copyright 2015 The RxAndroid authors
+  license: The Apache Software License, Version 2.0
+  url: https://github.com/ReactiveX/RxAndroid
+- artifact: io.reactivex:rxjava:+
+  name: rxjava
+  copyrightHolder: Copyright 2013 Netflix, Inc.
+  license: The Apache Software License, Version 2.0
+  url: https://github.com/ReactiveX/RxJava
+- artifact: net.nashihara:narou4j:+
+  name: narou4j
+  copyrightHolder: Copyright 2016 Naoya Shibahara
+  license: The Apache Software License, Version 2.0
+  url: https://github.com/Nshiba/narou4j
