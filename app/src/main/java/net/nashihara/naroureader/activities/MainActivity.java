@@ -94,6 +94,7 @@ public class MainActivity extends AppCompatActivity
             manager.popBackStack();
             materialMenu.animateIconState(MaterialMenuDrawable.IconState.BURGER);
             binding.toolbar.setTitle(titleStack.pop());
+            binding.navView.setCheckedItem(R.id.nav_ranking);
         } else if (stack > 1) {
             manager.popBackStack();
             binding.toolbar.setTitle(titleStack.pop());
@@ -172,12 +173,10 @@ public class MainActivity extends AppCompatActivity
 
         switch (id) {
             case R.id.nav_ranking: {
-//                binding.toolbar.setTitle("ランキング");
                 binding.navView.setCheckedItem(R.id.nav_ranking);
                 break;
             }
             case R.id.nav_bookmark: {
-//                binding.toolbar.setTitle("しおり");
                 binding.navView.setCheckedItem(R.id.nav_bookmark);
                 BookmarkRecyclerViewFragment fragment = BookmarkRecyclerViewFragment.newInstance();
                 onFragmentReplaceAction(fragment, "しおり", null);

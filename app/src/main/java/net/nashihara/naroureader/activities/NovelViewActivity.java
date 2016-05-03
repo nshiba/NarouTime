@@ -121,6 +121,7 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
         boolean autoRemoveBookmark = pref.getBoolean(getString(R.string.auto_bookmark), false);
         if (autoRemoveBookmark) {
 
+            realm = RealmUtils.getRealm(this);
             RealmQuery<Novel4Realm> query = realm.where(Novel4Realm.class);
             query.equalTo("ncode", ncode);
             RealmResults<Novel4Realm> results = query.findAll();
@@ -142,6 +143,7 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
                 realm.commitTransaction();
             }
         }
+        realm.close();
 
         finish();
 
@@ -159,6 +161,7 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
     @Override
     public Novel4Realm getNovel4RealmInstance() {
 
+        realm = RealmUtils.getRealm(this);
         realm.beginTransaction();
 
         Novel4Realm novel4Realm = realm.createObject(Novel4Realm.class);
@@ -168,6 +171,7 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
         novel4Realm.setTotalPage(totalPage);
 
         realm.commitTransaction();
+        realm.close();
         return novel4Realm;
     }
 
