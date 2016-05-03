@@ -34,7 +34,7 @@ public abstract class DownloadUtils {
         this.novel = novel;
         this.manager = manager;
 
-        OkCancelDialogFragment okCancelDialog = new OkCancelDialogFragment("小説ダウンロード", novel.getTitle() + "をダウンロードしますか？", new DialogInterface.OnClickListener() {
+        OkCancelDialogFragment okCancelDialog = OkCancelDialogFragment.newInstance("小説ダウンロード", novel.getTitle() + "をダウンロードしますか？", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if (OkCancelDialogFragment.CANSEL == which) {
@@ -69,14 +69,14 @@ public abstract class DownloadUtils {
         }
         realm.close();
 
-        downloadDialog = new NovelDownloadDialogFragment(novel.getAllNumberOfNovel(), "小説ダウンロード", novel.getTitle() + "をダウンロード中");
+        downloadDialog = NovelDownloadDialogFragment.newInstance(novel.getAllNumberOfNovel(), "小説ダウンロード", novel.getTitle() + "をダウンロード中");
         downloadDialog.show(manager, "download");
         downloadTable();
     }
 
     private void downloaded(FragmentManager manager) {
         OkCancelDialogFragment okCancelDialog =
-                new OkCancelDialogFragment("小説ダウンロード", "すでにこの小説はダウンロード済みです", new DialogInterface.OnClickListener() {
+                OkCancelDialogFragment.newInstance("小説ダウンロード", "すでにこの小説はダウンロード済みです", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();

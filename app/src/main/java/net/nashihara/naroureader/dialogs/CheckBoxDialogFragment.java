@@ -7,17 +7,39 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 
-public abstract class CheckBoxDialogFragment extends DialogFragment {
+public class CheckBoxDialogFragment extends DialogFragment {
     private static final String TAG = CheckBoxDialogFragment.class.getSimpleName();
 
     private String title = "";
     private String[] listItems = new String[]{};
     private DialogInterface.OnMultiChoiceClickListener onMultiChoiceClickListener = null;
+    private OnDialogButtonClickListener mListener;
 
-    public CheckBoxDialogFragment(String title, String[] listItems, DialogInterface.OnMultiChoiceClickListener onMultiChoiceClickListener) {
+    public CheckBoxDialogFragment() {}
+
+    public static CheckBoxDialogFragment newInstance(String title, String[] listItems, DialogInterface.OnMultiChoiceClickListener onMultiChoiceClickListener, OnDialogButtonClickListener listener) {
+        CheckBoxDialogFragment fragment = new CheckBoxDialogFragment();
+        fragment.setTitle(title);
+        fragment.setListItems(listItems);
+        fragment.setOnMultiChoiceClickListener(onMultiChoiceClickListener);
+        fragment.setmListener(listener);
+        return fragment;
+    }
+
+    public void setTitle(String title) {
         this.title = title;
+    }
+
+    public void setListItems(String[] listItems) {
         this.listItems = listItems;
+    }
+
+    public void setOnMultiChoiceClickListener(DialogInterface.OnMultiChoiceClickListener onMultiChoiceClickListener) {
         this.onMultiChoiceClickListener = onMultiChoiceClickListener;
+    }
+
+    public void setmListener(OnDialogButtonClickListener mListener) {
+        this.mListener = mListener;
     }
 
     @NonNull
@@ -29,7 +51,7 @@ public abstract class CheckBoxDialogFragment extends DialogFragment {
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        onPositiveButton(which);
+                        mListener.onPositiveButton(which);
                         dialog.dismiss();
                     }
                 })
@@ -42,12 +64,14 @@ public abstract class CheckBoxDialogFragment extends DialogFragment {
                 .setNeutralButton("reset", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        onNeutralButton(which);
+                        mListener.onNeutralButton(which);
                     }
                 })
                 .create();
     }
 
-    public abstract void onPositiveButton(int which);
-    public abstract void onNeutralButton(int which);
+    public interface OnDialogButtonClickListener{
+        public abstract void onPositiveButton(int which);
+        public abstract void onNeutralButton(int which);
+    }
 }

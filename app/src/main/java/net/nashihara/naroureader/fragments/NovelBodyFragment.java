@@ -162,7 +162,7 @@ public class NovelBodyFragment extends Fragment implements GestureDetector.OnGes
                 builder.append(title);
                 builder.append("にしおりをはさみますか？");
                 OkCancelDialogFragment dialogFragment
-                        = new OkCancelDialogFragment("しおり", builder.toString(), new DialogInterface.OnClickListener() {
+                        = OkCancelDialogFragment.newInstance("しおり", builder.toString(), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if (which == OkCancelDialogFragment.OK) {
