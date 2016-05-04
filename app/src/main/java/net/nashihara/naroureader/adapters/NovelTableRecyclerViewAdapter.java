@@ -44,6 +44,15 @@ public class NovelTableRecyclerViewAdapter extends RecyclerView.Adapter<NovelTab
     @Override
     public BindingHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         final View v = mInflater.inflate(R.layout.item_table_recycler, parent, false);
+
+//        v.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+//            @Override
+//            public void onGlobalLayout() {
+//                v.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+//                Log.d(TAG, "onGlobalLayout: height -> " + v.getHeight());
+//            }
+//        });
+
         return new BindingHolder(v, mListener);
     }
 
