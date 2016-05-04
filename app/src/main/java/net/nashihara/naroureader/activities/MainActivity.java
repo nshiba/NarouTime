@@ -215,7 +215,7 @@ public class MainActivity extends AppCompatActivity
                         Intent intent = null;
                         switch (which) {
                             case 0: {
-                                String url = "http://twitter.com/share?hashtags=なろうTime";
+                                String url = "http://twitter.com/share?screen_name=narou_time&hashtags=なろうTime";
                                 intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                                 break;
                             }
