@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -13,15 +14,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.LinearLayout;
 
 import net.nashihara.naroureader.R;
-import net.nashihara.naroureader.utils.RealmUtils;
 import net.nashihara.naroureader.adapters.NovelTableRecyclerViewAdapter;
 import net.nashihara.naroureader.databinding.FragmentNovelTableViewBinding;
 import net.nashihara.naroureader.databinding.ItemTableRecyclerBinding;
 import net.nashihara.naroureader.dialogs.OkCancelDialogFragment;
 import net.nashihara.naroureader.entities.Novel4Realm;
 import net.nashihara.naroureader.entities.NovelTable4Realm;
+import net.nashihara.naroureader.utils.RealmUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -167,6 +169,8 @@ public class NovelTableRecyclerViewFragment extends Fragment {
                             rxAdapter.clearData();
                             rxAdapter.addDataOf(novel.getBodies());
 
+                            setRecyclerViewLayoutParams();
+
                             binding.progressBar.setVisibility(View.GONE);
                             mRecyclerView.setVisibility(View.VISIBLE);
                             binding.title.setVisibility(View.VISIBLE);
@@ -193,6 +197,32 @@ public class NovelTableRecyclerViewFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void setRecyclerViewLayoutParams() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            return;
+        }
+
+        NovelTableRecyclerViewAdapter adapter = (NovelTableRecyclerViewAdapter) mRecyclerView.getAdapter();
+        ArrayList<NovelBody> bodies = adapter.getList();
+
+        int height = 0;
+        for (NovelBody body : bodies) {
+            if (body.isChapter()) {
+                height += 148;
+            }
+            else {
+                height += 135;
+            }
+        }
+
+        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) mRecyclerView.getLayoutParams();
+        Log.d(TAG, "setRecyclerViewLayoutParams: before height -> " + params.height);
+        params.height = height;
+        Log.d(TAG, "setRecyclerViewLayoutParams: after height -> " + params.height);
+        mRecyclerView.setLayoutParams(params);
+
     }
 
     private boolean loadTable() {
@@ -225,6 +255,8 @@ public class NovelTableRecyclerViewFragment extends Fragment {
         NovelTableRecyclerViewAdapter rxAdapter = (NovelTableRecyclerViewAdapter) mRecyclerView.getAdapter();
         rxAdapter.clearData();
         rxAdapter.addDataOf(table);
+
+        setRecyclerViewLayoutParams();
 
         binding.progressBar.setVisibility(View.GONE);
         mRecyclerView.setVisibility(View.VISIBLE);
