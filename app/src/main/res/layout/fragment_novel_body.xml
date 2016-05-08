@@ -25,6 +25,7 @@
                     android:textSize="@dimen/text_small"
                     android:layout_gravity="right"
                     android:layout_marginBottom="@dimen/text_margin_normal"
+                    android:textColor="@color/colorText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
 
@@ -32,6 +33,7 @@
                     android:id="@+id/title"
                     android:textSize="@dimen/text_normal"
                     android:layout_gravity="center"
+                    android:textColor="@color/colorText"
                     android:layout_marginBottom="@dimen/text_margin_normal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
@@ -54,6 +56,7 @@
                         android:layout_alignParentBottom="true"
                         android:layout_alignParentLeft="true"
                         android:text="前のページ"
+                        android:textColor="@color/colorText"
                         style="?android:borderlessButtonStyle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
@@ -67,6 +70,7 @@
                         android:id="@+id/btn_next"
                         android:layout_alignParentBottom="true"
                         android:layout_alignParentRight="true"
+                        android:textColor="@color/colorText"
                         android:text="次のページ"
                         style="?android:borderlessButtonStyle"
                         android:layout_width="wrap_content"

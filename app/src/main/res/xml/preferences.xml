@@ -15,6 +15,11 @@
             <!--android:checked="false" />-->
     <!--</PreferenceCategory>-->
 
+    <PreferenceCategory android:title="本文閲覧時の色設定" >
+        <PreferenceScreen android:title="文字色" />
+        <PreferenceScreen android:title="背景色" />
+    </PreferenceCategory>
+
     <PreferenceCategory android:title="しおり" >
         <android.support.v14.preference.SwitchPreference
             android:key="@string/auto_bookmark"

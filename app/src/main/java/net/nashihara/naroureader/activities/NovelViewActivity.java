@@ -8,22 +8,24 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.balysv.materialmenu.MaterialMenuDrawable;
 
 import net.nashihara.naroureader.R;
-import net.nashihara.naroureader.utils.RealmUtils;
 import net.nashihara.naroureader.databinding.ActivityNovelViewBinding;
 import net.nashihara.naroureader.entities.Novel4Realm;
 import net.nashihara.naroureader.fragments.NovelBodyFragment;
+import net.nashihara.naroureader.utils.RealmUtils;
 
 import io.realm.Realm;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
 
-public class NovelViewActivity extends AppCompatActivity implements NovelBodyFragment.OnNovelBodyInteraction {
+public class NovelViewActivity extends AppCompatActivity implements NovelBodyFragment.OnNovelBodyInteraction, Toolbar.OnMenuItemClickListener {
 
 
     private final static String TAG = NovelViewActivity.class.getSimpleName();
@@ -72,38 +74,9 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
                 onBackPressed();
             }
         });
-
+        binding.toolbar.inflateMenu(R.menu.menu_novelbody);
+        binding.toolbar.setOnMenuItemClickListener(this);
         onNovelBodyLoadAction("", nowPage, bodyTitle);
-//        Observable.create(new Observable.OnSubscribe<NovelBody>() {
-//            @Override
-//            public void call(Subscriber<? super NovelBody> subscriber) {
-//                Narou narou = new Narou();
-//                try {
-//                    NovelBody body = narou.getNovelBody(ncode, page);
-//                    subscriber.onNext(body);
-//                } catch (Exception e) {
-//                    subscriber.onError(e);
-//                }
-//            }
-//        }).subscribeOn(Schedulers.io())
-//          .observeOn(AndroidSchedulers.mainThread())
-//          .subscribe(new Subscriber<NovelBody>() {
-//            @Override
-//            public void onCompleted() {}
-//
-//            @Override
-//            public void onError(Throwable e) {
-//                Log.e(TAG, "onError: ", e.fillInStackTrace());
-//                onLoadError();
-//            }
-//
-//            @Override
-//            public void onNext(NovelBody novelBody) {
-//                manager.beginTransaction()
-//                        .add(R.id.novel_container, NovelBodyFragment.newInstance(ncode, novelBody.getTitle(), novelBody.getBody(), novelBody.getPage(), totalPage))
-//                        .commit();
-//            }
-//        });
     }
 
     @Override
@@ -169,7 +142,6 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
 
     @Override
     public void onSingleTapConfirmedAction(boolean isHide) {
-        View decor = this.getWindow().getDecorView();
         if (isHide) {
             if (toolBarHeight > 0) {
                 ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) binding.novelContainer.getLayoutParams();
@@ -178,7 +150,6 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
             }
 
             binding.appBar.setVisibility(View.VISIBLE);
-            decor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
         }
         else {
             toolBarHeight = binding.appBar.getHeight();
@@ -187,7 +158,21 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
             binding.novelContainer.setLayoutParams(params);
 
             binding.appBar.setVisibility(View.GONE);
-            decor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_IMMERSIVE);
         }
+    }
+
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+        int id = item.getItemId();
+
+        switch (id) {
+            case R.id.body_setting: {
+                Intent intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
+                break;
+            }
+        }
+
+        return true;
     }
 }
