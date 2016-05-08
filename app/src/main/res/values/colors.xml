@@ -17,4 +17,7 @@
     <color name="colorBackground">#ffffff</color>
     <color name="colorText">#000000</color>
 
+    <color name="novelTextColor">#ffffff</color>
+    <color name="novelBackgroundColor">#4d4d4d</color>
+
 </resources>

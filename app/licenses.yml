@@ -74,3 +74,7 @@
   copyrightHolder: Copyright 2016 Naoya Shibahara
   license: The Apache Software License, Version 2.0
   url: https://github.com/Nshiba/narou4j
+- artifact: com.pavelsikun:vintage-chroma:+
+  name: vintage-chroma
+  copyrightHolder: Copyright 2016 Pavel Sikun.
+  license: The Apache Software License, Version 2.0
