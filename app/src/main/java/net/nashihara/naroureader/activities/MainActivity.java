@@ -4,9 +4,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -23,8 +21,6 @@ import android.widget.Toast;
 
 import com.balysv.materialmenu.MaterialMenuDrawable;
 
-import net.nashihara.naroureader.utils.DownloadUtils;
-import net.nashihara.naroureader.utils.NetworkUtils;
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.databinding.ActivityMainBinding;
 import net.nashihara.naroureader.dialogs.ListDailogFragment;
@@ -36,6 +32,8 @@ import net.nashihara.naroureader.fragments.DownloadedRecyclerViewFragment;
 import net.nashihara.naroureader.fragments.NovelTableRecyclerViewFragment;
 import net.nashihara.naroureader.fragments.RankingViewPagerFragment;
 import net.nashihara.naroureader.listeners.OnFragmentReplaceListener;
+import net.nashihara.naroureader.utils.DownloadUtils;
+import net.nashihara.naroureader.utils.NetworkUtils;
 
 import java.util.Stack;
 
@@ -281,15 +279,6 @@ public class MainActivity extends AppCompatActivity
                 .addToBackStack(null)
                 .commit();
 
-    }
-
-    public Drawable getDrawableResouces(int id) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            return getDrawable(id);
-        }
-        else {
-            return ContextCompat.getDrawable(this, R.drawable.ic_menu_black_24dp);
-        }
     }
 
     @Override

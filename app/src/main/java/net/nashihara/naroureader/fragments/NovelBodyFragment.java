@@ -246,6 +246,26 @@ public class NovelBodyFragment extends Fragment implements GestureDetector.OnGes
         realm.close();
     }
 
+    @Override
+    public void onResume() {
+        int text = pref.getInt(getString(R.string.body_text), 0);
+        int background = pref.getInt(getString(R.string.body_background), 0);
+
+        if (text != 0) {
+            binding.page.setTextColor(text);
+            binding.title.setTextColor(text);
+            binding.body.setTextColor(text);
+            binding.btnNext.setTextColor(text);
+            binding.btnPrev.setTextColor(text);
+        }
+
+        if (background != 0) {
+            binding.root.setBackgroundColor(background);
+        }
+
+        super.onResume();
+    }
+
     private void addNovelBody(int page, String title, String body) {
 
         realm.beginTransaction();

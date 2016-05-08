@@ -11,5 +11,9 @@
     <string name="auto_sync">pref_auto_sync</string>
     <string name="auto_bookmark">pref_auto_bookmark</string>
     <string name="auto_remove_bookmark">pref_auto_remove_bookmark</string>
+    <string name="body_text">pref_body_text</string>
+    <string name="body_background">pref_body_background</string>
+
     <string name="download">download</string>
+    <string name="body_setting">setting</string>
 </resources>
