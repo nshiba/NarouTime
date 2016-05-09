@@ -24,6 +24,7 @@ import java.util.List;
 import narou4j.Narou;
 import narou4j.entities.Novel;
 import narou4j.entities.NovelRank;
+import narou4j.enums.NovelGenre;
 import narou4j.enums.NovelType;
 import narou4j.enums.OutputOrder;
 import narou4j.enums.SearchWordTarget;
@@ -50,6 +51,7 @@ public class SearchRecyclerViewFragment extends Fragment {
     private static final String ARG_END = "end";
     private static final String ARG_STOP = "stop";
     private static final String ARG_PICKUP = "pickup";
+    private static final String ARG_GENRE_LIST = "genre";
 
     private String ncode;
     private String search;
@@ -66,6 +68,7 @@ public class SearchRecyclerViewFragment extends Fragment {
     private boolean end;
     private boolean stop;
     private boolean pickup;
+    private ArrayList<Integer> genreList;
 
     private FragmentSearchRecyclerBinding binding;
     private Context context;
@@ -79,7 +82,7 @@ public class SearchRecyclerViewFragment extends Fragment {
     public static SearchRecyclerViewFragment newInstance(
         String ncode, int limit, int sortOrder, String search, String notSearch, boolean targetTitle,
         boolean targetStory, boolean targetKeyword, boolean targetWriter, int time,
-        int maxLength, int minLength, boolean end, boolean stop, boolean pickup) {
+        int maxLength, int minLength, boolean end, boolean stop, boolean pickup, ArrayList<Integer> genreList) {
 
         SearchRecyclerViewFragment fragment = new SearchRecyclerViewFragment();
         Bundle args = new Bundle();
@@ -98,6 +101,7 @@ public class SearchRecyclerViewFragment extends Fragment {
         args.putBoolean(ARG_END, end);
         args.putBoolean(ARG_STOP, stop);
         args.putBoolean(ARG_PICKUP, pickup);
+        args.putIntegerArrayList(ARG_GENRE_LIST, genreList);
         fragment.setArguments(args);
         return fragment;
     }
@@ -126,6 +130,7 @@ public class SearchRecyclerViewFragment extends Fragment {
         end = args.getBoolean(ARG_END);
         stop = args.getBoolean(ARG_STOP);
         pickup = args.getBoolean(ARG_PICKUP);
+        genreList = args.getIntegerArrayList(ARG_GENRE_LIST);
     }
 
     @Override
@@ -305,6 +310,12 @@ public class SearchRecyclerViewFragment extends Fragment {
 
                     if (pickup) {
                         narou.setPickup(true);
+                    }
+
+                    if (genreList.size() > 0) {
+                        for (Integer genre : genreList) {
+                            narou.setGenre(NovelGenre.valueOf(genre));
+                        }
                     }
 
                     List<Novel> novels = narou.getNovels();

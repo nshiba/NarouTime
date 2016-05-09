@@ -14,8 +14,11 @@ import android.widget.ArrayAdapter;
 
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.databinding.FragmentSearchBinding;
+import net.nashihara.naroureader.dialogs.FilterDialogFragment;
 import net.nashihara.naroureader.dialogs.OkCancelDialogFragment;
 import net.nashihara.naroureader.listeners.OnFragmentReplaceListener;
+
+import java.util.ArrayList;
 
 public class SearchFragment extends Fragment {
 
@@ -25,6 +28,9 @@ public class SearchFragment extends Fragment {
 
     private int sortItem = 0;
     private int timeItem = 0;
+
+    private boolean[] genreChecked = new boolean[16];
+    private String[] genreStrings;
 
     public SearchFragment() {
         // Required empty public constructor
@@ -64,6 +70,39 @@ public class SearchFragment extends Fragment {
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {}
+        });
+
+        // ジャンル
+        for (int i = 0; i < genreChecked.length; i++) {
+            genreChecked[i] = false;
+        }
+        genreStrings = getResources().getStringArray(R.array.genres);
+        binding.btnGenre.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FilterDialogFragment.newInstance("ジャンル選択", genreStrings, genreChecked, false,
+                        new FilterDialogFragment.OnDialogButtonClickListener()
+                        {
+                            @Override
+                            public void onPositiveButton(int which, boolean[] itemChecked, String min, String max) {
+                                StringBuilder builder = new StringBuilder();
+                                for (int i = 0; i < itemChecked.length; i++) {
+                                    if (itemChecked[i]) {
+                                        builder.append(genreStrings[i]).append(" ");
+                                    }
+                                }
+                                binding.genreText.setText(builder.toString());
+                            }
+
+                            @Override
+                            public void onNeutralButton(int which) {
+                                for (int i = 0; i < genreChecked.length; i++) {
+                                    genreChecked[i] = false;
+                                }
+                                binding.genreText.setText("\n\n指定なし\n\n");
+                            }
+                        }).show(getFragmentManager(), "filter");
+            }
         });
 
         // 読了目安時間
@@ -121,11 +160,18 @@ public class SearchFragment extends Fragment {
                     max = Integer.parseInt(maxLength);
                 }
 
+                ArrayList<Integer> genres = new ArrayList<>();
+                for (int i = 0; i < genreChecked.length; i++) {
+                    if (genreChecked[i]) {
+                        genres.add(i +1);
+                    }
+                }
+
                 SearchRecyclerViewFragment fragment = SearchRecyclerViewFragment.newInstance(
                         binding.editNcode.getText().toString(), limit, sortItem, binding.editSearch.getText().toString(),
                         binding.editNotSearch.getText().toString(), binding.keywordTitle.isChecked(),
                         binding.keywordStory.isChecked(), binding.keywordKeyword.isChecked(), binding.keywordWriter.isChecked(),
-                        timeItem, max, min, binding.end.isChecked(), binding.stop.isChecked(), binding.pickup.isChecked());
+                        timeItem, max, min, binding.end.isChecked(), binding.stop.isChecked(), binding.pickup.isChecked(), genres);
 
                 replaceListener.onFragmentReplaceAction(fragment, "検索結果", null);
             }
