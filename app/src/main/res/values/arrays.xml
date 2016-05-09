@@ -33,4 +33,23 @@
         <item>9〜10時間</item>
         <item>10時間以上</item>
     </string-array>
+
+    <string-array name="genres">
+        <item>文学</item>
+        <item>恋愛</item>
+        <item>歴史</item>
+        <item>推理</item>
+        <item>ファンタジー</item>
+        <item>SF</item>
+        <item>ホラー</item>
+        <item>コメディー</item>
+        <item>冒険</item>
+        <item>学園</item>
+        <item>戦記</item>
+        <item>童話</item>
+        <item>詩</item>
+        <item>エッセイ</item>
+        <item>その他</item>
+        <item>リプレイ</item>
+    </string-array>
 </resources>

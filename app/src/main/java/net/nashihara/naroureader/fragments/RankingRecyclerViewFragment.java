@@ -102,7 +102,7 @@ public class RankingRecyclerViewFragment extends Fragment {
                 }
 
                 FilterDialogFragment checkBoxDialog = FilterDialogFragment
-                        .newInstance("小説絞込み", filters, checked, new FilterDialogFragment.OnDialogButtonClickListener() {
+                        .newInstance("小説絞込み", filters, checked, true, new FilterDialogFragment.OnDialogButtonClickListener() {
                     @Override
                     public void onPositiveButton(int which, boolean[] itemChecked, String min, String max) {
                         Set<NovelGenre> trueSet = new HashSet<>();
@@ -123,7 +123,6 @@ public class RankingRecyclerViewFragment extends Fragment {
                                 // 完結済チェック
                                 if (itemChecked[i]) {
                                     for (int j = 0; j < allItems.size(); j++) {
-                                        Log.d(TAG, "onPositiveButton: isContinue: " + allItems.get(j).getNovelDetail().getIsNovelContinue());
                                         if (allItems.get(j).getNovelDetail().getIsNovelContinue() == 0) {
                                             filterList.add(allItems.get(j));
                                         }
