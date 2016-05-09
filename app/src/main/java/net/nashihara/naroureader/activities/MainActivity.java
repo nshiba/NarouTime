@@ -31,6 +31,7 @@ import net.nashihara.naroureader.fragments.BookmarkRecyclerViewFragment;
 import net.nashihara.naroureader.fragments.DownloadedRecyclerViewFragment;
 import net.nashihara.naroureader.fragments.NovelTableRecyclerViewFragment;
 import net.nashihara.naroureader.fragments.RankingViewPagerFragment;
+import net.nashihara.naroureader.fragments.SearchFragment;
 import net.nashihara.naroureader.listeners.OnFragmentReplaceListener;
 import net.nashihara.naroureader.utils.DownloadUtils;
 import net.nashihara.naroureader.utils.NetworkUtils;
@@ -175,7 +176,7 @@ public class MainActivity extends AppCompatActivity
                 String[] types = new String[]{
                         RankingType.DAILY.toString(), RankingType.WEEKLY.toString(),
                         RankingType.MONTHLY.toString(), RankingType.QUARTET.toString(), "all"};
-                String[] titles = new String[]{"日間", "週間", "月間", "四半期", "累計"};
+                String[] titles = new String[]{"梨間", "週間", "月間", "四半期", "累計"};
                 Fragment fragment = RankingViewPagerFragment.newInstance(types, titles);
                 onFragmentReplaceAction(fragment, "ランキング", null);
                 break;
@@ -193,11 +194,13 @@ public class MainActivity extends AppCompatActivity
                 onFragmentReplaceAction(fragment, "ダウンロード済み小説", null);
                 break;
             }
-//            case R.id.nav_search: {
-//                binding.toolbar.setTitle("検索");
-//                binding.navView.setCheckedItem(R.id.nav_search);
-//                break;
-//            }
+            case R.id.nav_search: {
+                binding.toolbar.setTitle("検索");
+                binding.navView.setCheckedItem(R.id.nav_search);
+                SearchFragment fragment = SearchFragment.newInstance().newInstance();
+                onFragmentReplaceAction(fragment, "検索", null);
+                break;
+            }
             case R.id.nav_setting: {
                 binding.navView.setCheckedItem(R.id.nav_setting);
                 Intent intent = new Intent(MainActivity.this, SettingsActivity.class);

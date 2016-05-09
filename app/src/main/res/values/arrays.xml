@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="sort_spinner">
+        <item>新着順</item>
+        <item>ブックマーク数の多い順</item>
+        <item>レビュー数の多い順</item>
+        <item>総合評価の高い順</item>
+        <item>総合評価の低い順</item>
+        <item>感想の多い順</item>
+        <item>評価者数の多い順</item>
+        <item>評価者数の少ない順</item>
+        <item>週間ユニークユーザの多い順</item>
+        <item>小説本文の文字数が多い順</item>
+        <item>小説本文の文字数が少ない順</item>
+        <item>Nコードが新しい順</item>
+        <item>古い順</item>
+    </string-array>
+
+    <string-array name="time_spinner">
+        <item>指定なし</item>
+        <item>5分以内</item>
+        <item>5〜10分</item>
+        <item>10〜30分</item>
+        <item>30分〜1時間</item>
+        <item>1〜2時間</item>
+        <item>2〜3時間</item>
+        <item>3〜4時間</item>
+        <item>4〜5時間</item>
+        <item>5〜6時間</item>
+        <item>6〜7時間</item>
+        <item>7〜8時間</item>
+        <item>8〜9時間</item>
+        <item>9〜10時間</item>
+        <item>10時間以上</item>
+    </string-array>
+</resources>
