@@ -162,7 +162,8 @@ public class NovelTableRecyclerViewFragment extends Fragment {
                         @Override
                         public void onNext(Novel novel) {
                             binding.title.setText(novel.getTitle());
-                            binding.writer.setText(novel.getWriter());
+                            binding.ncode.setText("Nコード : " + ncode);
+                            binding.writer.setText("作者 : " + novel.getWriter());
                             binding.story.setText(novel.getStory());
 
                             NovelTableRecyclerViewAdapter rxAdapter = (NovelTableRecyclerViewAdapter) mRecyclerView.getAdapter();
@@ -174,6 +175,7 @@ public class NovelTableRecyclerViewFragment extends Fragment {
                             binding.progressBar.setVisibility(View.GONE);
                             mRecyclerView.setVisibility(View.VISIBLE);
                             binding.title.setVisibility(View.VISIBLE);
+                            binding.ncode.setVisibility(View.VISIBLE);
                             binding.writer.setVisibility(View.VISIBLE);
                             binding.story.setVisibility(View.VISIBLE);
 
@@ -249,7 +251,8 @@ public class NovelTableRecyclerViewFragment extends Fragment {
         }
 
         binding.title.setText(novel4Realm.getTitle());
-        binding.writer.setText(novel4Realm.getWriter());
+        binding.ncode.setText("Nコード : " + ncode);
+        binding.writer.setText("作者 : " + novel4Realm.getWriter());
         binding.story.setText(novel4Realm.getStory());
 
         NovelTableRecyclerViewAdapter rxAdapter = (NovelTableRecyclerViewAdapter) mRecyclerView.getAdapter();
@@ -261,6 +264,7 @@ public class NovelTableRecyclerViewFragment extends Fragment {
         binding.progressBar.setVisibility(View.GONE);
         mRecyclerView.setVisibility(View.VISIBLE);
         binding.title.setVisibility(View.VISIBLE);
+        binding.ncode.setVisibility(View.VISIBLE);
         binding.writer.setVisibility(View.VISIBLE);
         binding.story.setVisibility(View.VISIBLE);
 

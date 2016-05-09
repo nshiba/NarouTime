@@ -42,6 +42,16 @@
                             android:layout_height="wrap_content" />
 
                         <TextView
+                            android:id="@+id/ncode"
+                            android:visibility="gone"
+                            android:textColor="@color/colorTextPrimary"
+                            android:textSize="@dimen/text_normal"
+                            android:layout_marginBottom="@dimen/text_margin_normal"
+                            android:layout_gravity="center"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                        <TextView
                             android:id="@+id/writer"
                             android:visibility="gone"
                             android:textColor="@color/colorTextPrimary"

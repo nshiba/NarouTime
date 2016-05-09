@@ -1,0 +1,329 @@
+<layout>
+    <ScrollView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context="net.nashihara.naroureader.fragments.SearchFragment">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_margin="@dimen/activity_vertical_margin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!-- Nコード -->
+            <TextView
+                android:text="Nコード"
+                android:textSize="@dimen/text_large"
+                android:layout_marginBottom="@dimen/text_margin_normal"
+                android:textColor="@color/colorAccent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:textSize="@dimen/text_small"
+                android:text="Nコードを指定した場合は他の条件はすべて考慮せずに検索します。"
+                android:layout_marginBottom="@dimen/text_margin_large"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <EditText
+                android:id="@+id/edit_ncode"
+                android:layout_marginLeft="@dimen/text_margin_normal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <!-- 最大取得件数 -->
+            <TextView
+                android:text="最大取得件数"
+                android:textSize="@dimen/text_large"
+                android:layout_marginTop="@dimen/text_margin_xx_large"
+                android:layout_marginBottom="@dimen/text_margin_normal"
+                android:textColor="@color/colorAccent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:textSize="@dimen/text_small"
+                android:text="最大は500件で、デフォルトでは50件です。"
+                android:layout_marginBottom="@dimen/text_margin_large"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <EditText
+                android:id="@+id/edit_limit"
+                android:layout_marginLeft="@dimen/text_margin_normal"
+                android:inputType="number"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <!-- 並び順 -->
+            <TextView
+                android:text="並び順"
+                android:textSize="@dimen/text_large"
+                android:layout_marginTop="@dimen/text_margin_xx_large"
+                android:layout_marginBottom="@dimen/text_margin_large"
+                android:textColor="@color/colorAccent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <android.support.v7.widget.AppCompatSpinner
+                android:id="@+id/sort_spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent" />
+
+            <!-- ジャンル -->
+            <TextView
+                android:text="ジャンル"
+                android:textSize="@dimen/text_large"
+                android:layout_marginTop="@dimen/text_margin_xx_large"
+                android:layout_marginBottom="@dimen/text_margin_large"
+                android:textColor="@color/colorAccent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/genre_text"
+                    android:textSize="@dimen/text_normal"
+                    android:text="\n\n指定なし\n\n"
+                    android:textColor="@color/colorText"
+                    android:layout_weight="1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <Button
+                    android:id="@+id/btn_genre"
+                    android:text="選択"
+                    android:layout_marginBottom="@dimen/text_margin_large"
+                    android:layout_gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+
+            <!-- キーワード検索 -->
+            <TextView
+                android:text="キーワード検索"
+                android:textSize="@dimen/text_large"
+                android:layout_marginBottom="@dimen/text_margin_normal"
+                android:layout_marginTop="@dimen/text_margin_xx_large"
+                android:textColor="@color/colorAccent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:textSize="@dimen/text_small"
+                android:text="スペースで区切るとAND検索ができます。"
+                android:layout_marginBottom="@dimen/text_margin_large"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/text_margin_large"
+                    android:textColor="@color/colorText"
+                    android:text="検索" />
+
+                <EditText
+                    android:id="@+id/edit_search"
+                    android:layout_marginLeft="@dimen/text_margin_normal"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/text_margin_large"
+                    android:textColor="@color/colorText"
+                    android:text="除外" />
+
+                <EditText
+                    android:id="@+id/edit_not_search"
+                    android:layout_marginLeft="@dimen/text_margin_normal"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+
+            <TextView
+                android:text="検索範囲"
+                android:textSize="@dimen/text_normal"
+                android:textColor="@color/colorAccent"
+                android:layout_marginTop="@dimen/text_margin_large"
+                android:layout_marginBottom="@dimen/text_margin_large"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <CheckBox
+                android:id="@+id/keyword_title"
+                android:text="作品名"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <CheckBox
+                android:id="@+id/keyword_story"
+                android:text="あらすじ"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <CheckBox
+                android:id="@+id/keyword_keyword"
+                android:text="キーワード"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <CheckBox
+                android:id="@+id/keyword_writer"
+                android:text="作者名"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <!-- 読了目安時間 -->
+            <TextView
+                android:textSize="@dimen/text_large"
+                android:text="読了時間"
+                android:layout_marginBottom="@dimen/text_margin_normal"
+                android:layout_marginTop="@dimen/text_margin_xx_large"
+                android:textColor="@color/colorAccent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:textSize="@dimen/text_small"
+                android:text="読了時間と文字数は同時に指定できません。同時に指定した場合には読了時間が優先されます。"
+                android:layout_marginBottom="@dimen/text_margin_large"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:textSize="@dimen/text_normal"
+                    android:text="読了目安時間"
+                    android:textColor="@color/colorText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <android.support.v7.widget.AppCompatSpinner
+                    android:id="@+id/time_spinner"
+                    android:layout_marginLeft="@dimen/text_margin_large"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+
+            <!-- 文字数 -->
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:text="最大文字数"
+                    android:textSize="@dimen/text_normal"
+                    android:textColor="@color/colorText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <EditText
+                    android:id="@+id/max_length"
+                    android:layout_marginLeft="@dimen/text_margin_large"
+                    android:inputType="number"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:text="最小文字数"
+                    android:textSize="@dimen/text_normal"
+                    android:textColor="@color/colorText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <EditText
+                    android:id="@+id/min_length"
+                    android:layout_marginLeft="@dimen/text_margin_large"
+                    android:inputType="number"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+
+            <!-- その他 -->
+            <TextView
+                android:text="その他"
+                android:textSize="@dimen/text_large"
+                android:textColor="@color/colorAccent"
+                android:layout_marginBottom="@dimen/text_margin_large"
+                android:layout_marginTop="@dimen/text_margin_xx_large"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <CheckBox
+                android:id="@+id/end"
+                android:text="完結済みのみ取得"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <CheckBox
+                android:id="@+id/stop"
+                android:text="長期連載停止中作品を除外する"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <CheckBox
+                android:id="@+id/pickup"
+                android:text="ピックアップ作品のみを取得"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/btn_search"
+                android:background="?attr/selectableItemBackground"
+                android:paddingTop="@dimen/text_margin_large"
+                android:paddingBottom="@dimen/text_margin_large"
+                android:paddingLeft="@dimen/text_margin_xxx_large"
+                android:paddingRight="@dimen/text_margin_xxx_large"
+                android:layout_marginBottom="@dimen/text_margin_x_large"
+                android:layout_gravity="right"
+                android:text="検索"
+                android:textSize="@dimen/text_large"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+    </ScrollView>
+</layout>

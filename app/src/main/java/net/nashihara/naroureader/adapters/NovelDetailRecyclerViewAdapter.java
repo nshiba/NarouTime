@@ -15,26 +15,25 @@ import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.databinding.ItemRankingRecyclerBinding;
 import net.nashihara.naroureader.entities.NovelItem;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 import narou4j.entities.Novel;
 import narou4j.entities.NovelRank;
 import narou4j.enums.NovelGenre;
 
-public class RankingRecyclerViewAdapter extends RecyclerView.Adapter<RankingRecyclerViewAdapter.BindingHolder> {
-    private static final String TAG = RankingRecyclerViewAdapter.class.getSimpleName();
+public class NovelDetailRecyclerViewAdapter extends RecyclerView.Adapter<NovelDetailRecyclerViewAdapter.BindingHolder> {
+    private static final String TAG = NovelDetailRecyclerViewAdapter.class.getSimpleName();
 
     private LayoutInflater mInflater;
     private SortedList<NovelItem> mSortedList;
     private OnItemClickListener mListener;
     private RecyclerView mRecyclerView;
+    private boolean isSearch;
 
-    public RankingRecyclerViewAdapter(Context context) {
+    public NovelDetailRecyclerViewAdapter(Context context, boolean isSearch) {
         this.mInflater = LayoutInflater.from(context);
-        mSortedList = new SortedList<>(NovelItem.class, new SortedListCallback(this));
+        this.isSearch = isSearch;
+        mSortedList = new SortedList<>(NovelItem.class, new SortedListCallback(this, isSearch));
     }
 
     @Override
@@ -62,92 +61,15 @@ public class RankingRecyclerViewAdapter extends RecyclerView.Adapter<RankingRecy
 
             NovelItem novelItem = mSortedList.get(position);
             Novel novel = novelItem.getNovelDetail();
-            NovelRank rank = novelItem.getRank();
-            NovelRank prevRank = novelItem.getPrevRank();
 
-            if (rank.getRankingType() == null) {
-                binding.ranking.setText(String.valueOf(position +1) + "位");
+            if (isSearch) {
+                setView4Search(binding, novel);
             }
             else {
-                binding.ranking.setText(rank.getRank() + "位");
-                if (prevRank != null) {
-                    binding.rankNew.setVisibility(View.GONE);
-                    binding.rankDiffKigou.setVisibility(View.VISIBLE);
-                    switch (rank.getRankingType()) {
-                        case DAILY: {
-                            binding.prevRankText.setText("前日：" + String.valueOf(prevRank.getRank()) + "位");
-                            break;
-                        }
-                        case WEEKLY: {
-                            binding.prevRankText.setText("前週：" + String.valueOf(prevRank.getRank()) + "位");
-                            break;
-                        }
-                        case MONTHLY: {
-                            binding.prevRankText.setText("前月：" + String.valueOf(prevRank.getRank()) + "位");
-                            break;
-                        }
-                        case QUARTET: {
-                            binding.prevRankText.setText("前月：" + String.valueOf(prevRank.getRank()) + "位");
-                            break;
-                        }
-                    }
-                    if (rank.getRank() < prevRank.getRank()) {
-//                    binding.prevRankText.setText("前回のランキングから" + String.valueOf(diff) + "位上昇しました！");
-                        binding.rankDiffKigou.setImageResource(R.drawable.ic_up);
-                    }
-                    else if (rank.getRank() > prevRank.getRank()) {
-//                    binding.prevRankText.setText("前回のランキングから" + String.valueOf(diff) + "位下降しました...");
-                        binding.rankDiffKigou.setImageResource(R.drawable.ic_down);
-                    }
-                    else if (rank.getRank() == prevRank.getRank()) {
-//                    binding.prevRankText.setText("前回のランキングと同じだよ");
-                        binding.rankDiffKigou.setImageResource(R.drawable.ic_sonomama);
-                    }
-                }
-                else {
-                    binding.prevRankText.setText("前回：ー");
-                    binding.rankDiffKigou.setVisibility(View.GONE);
-                    binding.rankNew.setVisibility(View.VISIBLE);
-                    binding.rankNew.setTextColor(Color.RED);
-                }
+                NovelRank rank = novelItem.getRank();
+                NovelRank prevRank = novelItem.getPrevRank();
+                setView4Ranking(binding, novel, rank, prevRank, position);
             }
-
-            binding.title.setText(novel.getTitle());
-            binding.rankingPoint.setText(int2String(novelItem.getRank().getPt()) + "pt");
-            binding.writer.setText(novel.getWriter());
-            binding.genre.setText(int2Genre(novel.getGenre()));
-            binding.allStory.setText(novel.getStory());
-            binding.allStory.setVisibility(View.GONE);
-            binding.keyword.setText("キーワード：" + novel.getKeyword());
-            binding.keyword.setVisibility(View.GONE);
-            binding.btnExpand.setAlpha(0.7f);
-
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            SimpleDateFormat format2 = new SimpleDateFormat("yyyy/MM/dd HH:mm");
-            String dateString = "";
-            try {
-                Date date = format.parse(novel.getLastUploadDate());
-                dateString = format2.format(date);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-//            if (dateString.equals("")) {
-//                binding.lastup.setText(novel.getLastUploadDate());
-//            } else {
-//                binding.lastup.setText(dateString);
-//            }
-
-            if (novel.getIsNovelContinue() == 1) {
-                Resources res = mRecyclerView.getResources();
-                binding.isContinue.setTextColor(res.getColor(android.support.v7.appcompat.R.color.secondary_text_default_material_light));
-                binding.isContinue.setText("連載中");
-            } else {
-                Resources res = mRecyclerView.getResources();
-                binding.isContinue.setTextColor(res.getColor(R.color.colorAccent));
-                binding.isContinue.setText("完結済");
-            }
-            binding.page.setText("全" + String.valueOf(novel.getAllNumberOfNovel()) + "部分");
-            binding.length.setText(int2String(novel.getNumberOfChar()) + " 文字");
         }
     }
 
@@ -157,6 +79,109 @@ public class RankingRecyclerViewAdapter extends RecyclerView.Adapter<RankingRecy
             return 0;
         }
         return mSortedList.size();
+    }
+
+    private void setView4Search(ItemRankingRecyclerBinding binding, Novel novel) {
+        binding.ranking.setVisibility(View.GONE);
+        binding.rankNew.setVisibility(View.GONE);
+        binding.rankDiffKigou.setVisibility(View.GONE);
+        binding.prevRankText.setVisibility(View.GONE);
+        binding.rankNew.setVisibility(View.GONE);
+        binding.rankingPoint.setVisibility(View.GONE);
+
+        binding.title.setText(novel.getTitle());
+        binding.ncode.setText(novel.getNcode());
+        binding.writer.setText(novel.getWriter());
+        binding.genre.setText(int2Genre(novel.getGenre()));
+        binding.allStory.setText(novel.getStory());
+        binding.allStory.setVisibility(View.GONE);
+        binding.keyword.setText("キーワード：" + novel.getKeyword());
+        binding.keyword.setVisibility(View.GONE);
+        binding.btnExpand.setAlpha(0.7f);
+
+        if (novel.getIsNovelContinue() == 1) {
+            Resources res = mRecyclerView.getResources();
+            binding.isContinue.setTextColor(res.getColor(android.support.v7.appcompat.R.color.secondary_text_default_material_light));
+            binding.isContinue.setText("連載中");
+        } else {
+            Resources res = mRecyclerView.getResources();
+            binding.isContinue.setTextColor(res.getColor(R.color.colorAccent));
+            binding.isContinue.setText("完結済");
+        }
+        binding.page.setText("全" + String.valueOf(novel.getAllNumberOfNovel()) + "部分");
+        binding.length.setText(int2String(novel.getNumberOfChar()) + " 文字");
+    }
+
+    private void setView4Ranking(ItemRankingRecyclerBinding binding, Novel novel, NovelRank rank, NovelRank prevRank, int position) {
+        if (rank.getRankingType() == null) {
+            binding.ranking.setText(String.valueOf(position +1) + "位");
+        }
+        else {
+            binding.ranking.setText(rank.getRank() + "位");
+            if (prevRank != null) {
+                binding.rankNew.setVisibility(View.GONE);
+                binding.rankDiffKigou.setVisibility(View.VISIBLE);
+                switch (rank.getRankingType()) {
+                    case DAILY: {
+                        binding.prevRankText.setText("前日：" + String.valueOf(prevRank.getRank()) + "位");
+                        break;
+                    }
+                    case WEEKLY: {
+                        binding.prevRankText.setText("前週：" + String.valueOf(prevRank.getRank()) + "位");
+                        break;
+                    }
+                    case MONTHLY: {
+                        binding.prevRankText.setText("前月：" + String.valueOf(prevRank.getRank()) + "位");
+                        break;
+                    }
+                    case QUARTET: {
+                        binding.prevRankText.setText("前月：" + String.valueOf(prevRank.getRank()) + "位");
+                        break;
+                    }
+                }
+                if (rank.getRank() < prevRank.getRank()) {
+//                    binding.prevRankText.setText("前回のランキングから" + String.valueOf(diff) + "位上昇しました！");
+                    binding.rankDiffKigou.setImageResource(R.drawable.ic_up);
+                }
+                else if (rank.getRank() > prevRank.getRank()) {
+//                    binding.prevRankText.setText("前回のランキングから" + String.valueOf(diff) + "位下降しました...");
+                    binding.rankDiffKigou.setImageResource(R.drawable.ic_down);
+                }
+                else if (rank.getRank() == prevRank.getRank()) {
+//                    binding.prevRankText.setText("前回のランキングと同じだよ");
+                    binding.rankDiffKigou.setImageResource(R.drawable.ic_sonomama);
+                }
+            }
+            else {
+                binding.prevRankText.setText("前回：ー");
+                binding.rankDiffKigou.setVisibility(View.GONE);
+                binding.rankNew.setVisibility(View.VISIBLE);
+                binding.rankNew.setTextColor(Color.RED);
+            }
+        }
+
+        binding.title.setText(novel.getTitle());
+        binding.rankingPoint.setText(int2String(rank.getPt()) + "pt");
+        binding.ncode.setText(novel.getNcode());
+        binding.writer.setText(novel.getWriter());
+        binding.genre.setText(int2Genre(novel.getGenre()));
+        binding.allStory.setText(novel.getStory());
+        binding.allStory.setVisibility(View.GONE);
+        binding.keyword.setText("キーワード：" + novel.getKeyword());
+        binding.keyword.setVisibility(View.GONE);
+        binding.btnExpand.setAlpha(0.7f);
+
+        if (novel.getIsNovelContinue() == 1) {
+            Resources res = mRecyclerView.getResources();
+            binding.isContinue.setTextColor(res.getColor(android.support.v7.appcompat.R.color.secondary_text_default_material_light));
+            binding.isContinue.setText("連載中");
+        } else {
+            Resources res = mRecyclerView.getResources();
+            binding.isContinue.setTextColor(res.getColor(R.color.colorAccent));
+            binding.isContinue.setText("完結済");
+        }
+        binding.page.setText("全" + String.valueOf(novel.getAllNumberOfNovel()) + "部分");
+        binding.length.setText(int2String(novel.getNumberOfChar()) + " 文字");
     }
 
     private String int2String(int number) {
@@ -296,10 +321,12 @@ public class RankingRecyclerViewAdapter extends RecyclerView.Adapter<RankingRecy
     }
 
     private static class SortedListCallback extends SortedList.Callback<NovelItem> {
-        private RankingRecyclerViewAdapter adapter;
+        private NovelDetailRecyclerViewAdapter adapter;
+        private boolean isSearch;
 
-        public SortedListCallback(@Nullable RankingRecyclerViewAdapter adapter) {
+        public SortedListCallback(@Nullable NovelDetailRecyclerViewAdapter adapter, @Nullable boolean isSearch) {
             this.adapter = adapter;
+            this.isSearch = isSearch;
         }
 
         @Override
