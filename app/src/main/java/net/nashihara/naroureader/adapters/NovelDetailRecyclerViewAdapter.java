@@ -90,6 +90,7 @@ public class NovelDetailRecyclerViewAdapter extends RecyclerView.Adapter<NovelDe
         binding.rankingPoint.setVisibility(View.GONE);
 
         binding.title.setText(novel.getTitle());
+        binding.ncode.setText(novel.getNcode());
         binding.writer.setText(novel.getWriter());
         binding.genre.setText(int2Genre(novel.getGenre()));
         binding.allStory.setText(novel.getStory());
@@ -161,6 +162,7 @@ public class NovelDetailRecyclerViewAdapter extends RecyclerView.Adapter<NovelDe
 
         binding.title.setText(novel.getTitle());
         binding.rankingPoint.setText(int2String(rank.getPt()) + "pt");
+        binding.ncode.setText(novel.getNcode());
         binding.writer.setText(novel.getWriter());
         binding.genre.setText(int2Genre(novel.getGenre()));
         binding.allStory.setText(novel.getStory());

@@ -101,6 +101,13 @@
                             android:layout_height="wrap_content"
                             android:layout_marginRight="@dimen/text_margin_normal"
                             android:textSize="@dimen/text_small"
+                            android:id="@+id/ncode" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="@dimen/text_margin_normal"
+                            android:textSize="@dimen/text_small"
                             android:id="@+id/writer" />
 
                         <TextView
