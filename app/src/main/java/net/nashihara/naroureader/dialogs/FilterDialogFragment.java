@@ -18,18 +18,20 @@ public class FilterDialogFragment extends DialogFragment {
     private String title = "";
     private String[] listItems = new String[]{};
     private boolean[] checked = new boolean[]{};
+    private boolean isLength;
     private DialogInterface.OnMultiChoiceClickListener onMultiChoiceClickListener = null;
     private OnDialogButtonClickListener mListener;
     FragmentFilterDialogBinding binding;
 
     public FilterDialogFragment() {}
 
-    public static FilterDialogFragment newInstance(String title, String[] listItems, boolean[] checked, OnDialogButtonClickListener listener) {
+    public static FilterDialogFragment newInstance(String title, String[] listItems, boolean[] checked, boolean isLength, OnDialogButtonClickListener listener) {
         FilterDialogFragment fragment = new FilterDialogFragment();
         fragment.setTitle(title);
         fragment.setListItems(listItems);
         fragment.setChecked(checked);
         fragment.setmListener(listener);
+        fragment.setLength(isLength);
         return fragment;
     }
 
@@ -49,6 +51,10 @@ public class FilterDialogFragment extends DialogFragment {
         this.mListener = mListener;
     }
 
+    public void setLength(boolean length) {
+        isLength = length;
+    }
+
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -62,18 +68,9 @@ public class FilterDialogFragment extends DialogFragment {
             }
         };
 
-        return new AlertDialog.Builder(getActivity())
-                .setTitle(title)
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle(title)
                 .setMultiChoiceItems(listItems, checked, onMultiChoiceClickListener)
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        String max = binding.maxLength.getText().toString();
-                        String min = binding.minLength.getText().toString();
-                        mListener.onPositiveButton(which, checked, min, max);
-                        dialog.dismiss();
-                    }
-                })
                 .setNegativeButton("cansel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -85,9 +82,29 @@ public class FilterDialogFragment extends DialogFragment {
                     public void onClick(DialogInterface dialog, int which) {
                         mListener.onNeutralButton(which);
                     }
-                })
-                .setView(binding.getRoot())
-                .create();
+                });
+        if (isLength) {
+            builder.setView(binding.getRoot())
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            String max = binding.maxLength.getText().toString();
+                            String min = binding.minLength.getText().toString();
+                            mListener.onPositiveButton(which, checked, min, max);
+                            dialog.dismiss();
+                        }
+                    });
+        }
+        else {
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    mListener.onPositiveButton(which, checked, "", "");
+                    dialog.dismiss();
+                }
+            });
+        }
+        return builder.create();
     }
 
     public interface OnDialogButtonClickListener{
