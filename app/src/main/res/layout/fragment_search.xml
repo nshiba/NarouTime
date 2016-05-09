@@ -34,6 +34,30 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
+            <!-- 最大取得件数 -->
+            <TextView
+                android:text="最大取得件数"
+                android:textSize="@dimen/text_large"
+                android:layout_marginTop="@dimen/text_margin_xx_large"
+                android:layout_marginBottom="@dimen/text_margin_normal"
+                android:textColor="@color/colorAccent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:textSize="@dimen/text_small"
+                android:text="最大は500件で、デフォルトでは50件です。"
+                android:layout_marginBottom="@dimen/text_margin_large"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <EditText
+                android:id="@+id/edit_limit"
+                android:layout_marginLeft="@dimen/text_margin_normal"
+                android:inputType="number"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
             <!-- 並び順 -->
             <TextView
                 android:text="並び順"
@@ -243,6 +267,12 @@
             <CheckBox
                 android:id="@+id/stop"
                 android:text="長期連載停止中作品を除外する"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <CheckBox
+                android:id="@+id/pickup"
+                android:text="ピックアップ作品のみを取得"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 

@@ -2,7 +2,6 @@ package net.nashihara.naroureader.fragments;
 
 import android.content.Context;
 import android.databinding.DataBindingUtil;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -37,6 +36,7 @@ public class SearchRecyclerViewFragment extends Fragment {
     private static final String TAG = SearchRecyclerViewFragment.class.getSimpleName();
 
     private static final String ARG_NCODE = "ncode";
+    private static final String ARG_LIMIT = "limit";
     private static final String ARG_SORT_ORDER = "sort";
     private static final String ARG_SEARCH = "search";
     private static final String ARG_NOT_SEARCH = "not_search";
@@ -49,10 +49,12 @@ public class SearchRecyclerViewFragment extends Fragment {
     private static final String ARG_MIN_LENGTH = "min";
     private static final String ARG_END = "end";
     private static final String ARG_STOP = "stop";
+    private static final String ARG_PICKUP = "pickup";
 
     private String ncode;
     private String search;
     private String notSearch;
+    private int limit;
     private int sortOrder;
     private int time;
     private int maxLength;
@@ -63,11 +65,11 @@ public class SearchRecyclerViewFragment extends Fragment {
     private boolean targetWriter;
     private boolean end;
     private boolean stop;
+    private boolean pickup;
 
     private FragmentSearchRecyclerBinding binding;
     private Context context;
     private RecyclerView recyclerView;
-    private OnFragmentInteractionListener mListener;
     private OnFragmentReplaceListener replaceListener;
 
     private ArrayList<NovelItem> allItems;
@@ -75,15 +77,16 @@ public class SearchRecyclerViewFragment extends Fragment {
     public SearchRecyclerViewFragment() {}
 
     public static SearchRecyclerViewFragment newInstance(
-        String ncode, int sortOrder, String search, String notSearch, boolean targetTitle,
+        String ncode, int limit, int sortOrder, String search, String notSearch, boolean targetTitle,
         boolean targetStory, boolean targetKeyword, boolean targetWriter, int time,
-        int maxLength, int minLength, boolean end, boolean stop) {
+        int maxLength, int minLength, boolean end, boolean stop, boolean pickup) {
 
         SearchRecyclerViewFragment fragment = new SearchRecyclerViewFragment();
         Bundle args = new Bundle();
         args.putString(ARG_NCODE, ncode);
         args.putString(ARG_SEARCH, search);
         args.putString(ARG_NOT_SEARCH, notSearch);
+        args.putInt(ARG_LIMIT, limit);
         args.putInt(ARG_SORT_ORDER, sortOrder);
         args.putInt(ARG_TIME, time);
         args.putInt(ARG_MAX_LENGTH, maxLength);
@@ -94,6 +97,7 @@ public class SearchRecyclerViewFragment extends Fragment {
         args.putBoolean(ARG_TARGET_WRITER, targetWriter);
         args.putBoolean(ARG_END, end);
         args.putBoolean(ARG_STOP, stop);
+        args.putBoolean(ARG_PICKUP, pickup);
         fragment.setArguments(args);
         return fragment;
     }
@@ -110,6 +114,7 @@ public class SearchRecyclerViewFragment extends Fragment {
         ncode = args.getString(ARG_NCODE);
         search = args.getString(ARG_SEARCH);
         notSearch = args.getString(ARG_NOT_SEARCH);
+        limit = args.getInt(ARG_LIMIT);
         sortOrder = args.getInt(ARG_SORT_ORDER);
         time = args.getInt(ARG_TIME);
         maxLength = args.getInt(ARG_MAX_LENGTH);
@@ -120,6 +125,7 @@ public class SearchRecyclerViewFragment extends Fragment {
         targetWriter = args.getBoolean(ARG_TARGET_WRITER);
         end = args.getBoolean(ARG_END);
         stop = args.getBoolean(ARG_STOP);
+        pickup = args.getBoolean(ARG_PICKUP);
     }
 
     @Override
@@ -167,7 +173,6 @@ public class SearchRecyclerViewFragment extends Fragment {
                     novelItems.add(item);
                 }
 
-                Log.d(TAG, "onNext: novelItems size ->" + novelItems.size());
                 NovelDetailRecyclerViewAdapter adapter = (NovelDetailRecyclerViewAdapter) recyclerView.getAdapter();
                 adapter.clearData();
                 adapter.addDataOf(novelItems);
@@ -208,12 +213,6 @@ public class SearchRecyclerViewFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-//        if (context instanceof OnFragmentInteractionListener) {
-//            mListener = (OnFragmentInteractionListener) context;
-//        } else {
-//            throw new RuntimeException(context.toString()
-//                    + " must implement OnFragmentInteractionListener");
-//        }
         this.replaceListener = (OnFragmentReplaceListener) context;
         this.context = context;
     }
@@ -221,7 +220,6 @@ public class SearchRecyclerViewFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
     }
 
     private void reload() {
@@ -264,6 +262,13 @@ public class SearchRecyclerViewFragment extends Fragment {
                         narou.setSearchWord(search);
                     }
 
+                    if (limit == 0) {
+                        narou.setLim(50);
+                    }
+                    else {
+                        narou.setLim(limit);
+                    }
+
                     setSortOrder(narou, sortOrder);
                     setTime(narou, time);
 
@@ -298,25 +303,14 @@ public class SearchRecyclerViewFragment extends Fragment {
                         narou.setExcludeStop(true);
                     }
 
+                    if (pickup) {
+                        narou.setPickup(true);
+                    }
+
                     List<Novel> novels = narou.getNovels();
-                    Log.d(TAG, "call: novels size -> " + novels.size());
                     novels.remove(0);
                     subscriber.onNext(novels);
                 }
-
-                Log.d(TAG, "onCreate: ncode -> " + ncode);
-                Log.d(TAG, "onCreate: search -> " + search);
-                Log.d(TAG, "onCreate: notSearch -> " + notSearch);
-                Log.d(TAG, "onCreate: sortOrder -> " + sortOrder);
-                Log.d(TAG, "onCreate: time -> " + time);
-                Log.d(TAG, "onCreate: maxLength -> " + maxLength);
-                Log.d(TAG, "onCreate: minLength -> " + minLength);
-                Log.d(TAG, "onCreate: targetTitle -> " + targetTitle);
-                Log.d(TAG, "onCreate: targetStory -> " + targetStory);
-                Log.d(TAG, "onCreate: targetKeyword -> " + targetKeyword);
-                Log.d(TAG, "onCreate: targetWriter -> " + targetWriter);
-                Log.d(TAG, "onCreate: end -> " + end);
-                Log.d(TAG, "onCreate: stop -> " + stop);
 
                 subscriber.onCompleted();
             }
@@ -436,9 +430,5 @@ public class SearchRecyclerViewFragment extends Fragment {
                 break;
             }
         }
-    }
-
-    public interface OnFragmentInteractionListener {
-        void onFragmentInteraction(Uri uri);
     }
 }

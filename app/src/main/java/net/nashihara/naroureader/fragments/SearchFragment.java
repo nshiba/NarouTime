@@ -1,6 +1,7 @@
 package net.nashihara.naroureader.fragments;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import android.widget.ArrayAdapter;
 
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.databinding.FragmentSearchBinding;
+import net.nashihara.naroureader.dialogs.OkCancelDialogFragment;
 import net.nashihara.naroureader.listeners.OnFragmentReplaceListener;
 
 public class SearchFragment extends Fragment {
@@ -81,7 +83,25 @@ public class SearchFragment extends Fragment {
         binding.btnSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                int maxLength, int minLength, boolean end, boolean stop) {
+                int limit;
+                String limitStr = binding.editLimit.getText().toString();
+                if (limitStr.equals("")) {
+                    limit = 0;
+                }
+                else {
+                    limit = Integer.parseInt(limitStr);
+                }
+
+                if (limit > 500) {
+                    OkCancelDialogFragment.newInstance("エラー", "最大取得件数は500件です。", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                            reload();
+                        }
+                    }).show(getFragmentManager(), "okcancel");
+                    return;
+                }
 
                 int min, max;
                 String minLength = binding.minLength.getText().toString();
@@ -102,10 +122,10 @@ public class SearchFragment extends Fragment {
                 }
 
                 SearchRecyclerViewFragment fragment = SearchRecyclerViewFragment.newInstance(
-                        binding.editNcode.getText().toString(), sortItem, binding.editSearch.getText().toString(),
+                        binding.editNcode.getText().toString(), limit, sortItem, binding.editSearch.getText().toString(),
                         binding.editNotSearch.getText().toString(), binding.keywordTitle.isChecked(),
                         binding.keywordStory.isChecked(), binding.keywordKeyword.isChecked(), binding.keywordWriter.isChecked(),
-                        timeItem, max, min, binding.end.isChecked(), binding.stop.isChecked());
+                        timeItem, max, min, binding.end.isChecked(), binding.stop.isChecked(), binding.pickup.isChecked());
 
                 replaceListener.onFragmentReplaceAction(fragment, "検索結果", null);
             }
@@ -124,6 +144,10 @@ public class SearchFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
+    }
+
+    private void reload() {
+        getFragmentManager().beginTransaction().detach(this).attach(this).commit();
     }
 
     public interface OnFragmentInteractionListener {
