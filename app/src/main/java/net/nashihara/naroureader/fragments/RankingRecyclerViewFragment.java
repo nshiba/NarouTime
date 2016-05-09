@@ -17,7 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import net.nashihara.naroureader.R;
-import net.nashihara.naroureader.adapters.RankingRecyclerViewAdapter;
+import net.nashihara.naroureader.adapters.NovelDetailRecyclerViewAdapter;
 import net.nashihara.naroureader.databinding.FragmentRankingRecyclerBinding;
 import net.nashihara.naroureader.databinding.ItemRankingRecyclerBinding;
 import net.nashihara.naroureader.dialogs.FilterDialogFragment;
@@ -165,7 +165,7 @@ public class RankingRecyclerViewFragment extends Fragment {
                             resultList.add(target);
                         }
 
-                        RankingRecyclerViewAdapter adapter = (RankingRecyclerViewAdapter) mRecyclerView.getAdapter();
+                        NovelDetailRecyclerViewAdapter adapter = (NovelDetailRecyclerViewAdapter) mRecyclerView.getAdapter();
                         adapter.getList().clear();
                         adapter.getList().addAll(resultList);
                     }
@@ -173,7 +173,7 @@ public class RankingRecyclerViewFragment extends Fragment {
                             @Override
                     public void onNeutralButton(int which) {
 
-                        RankingRecyclerViewAdapter adapter = (RankingRecyclerViewAdapter) mRecyclerView.getAdapter();
+                        NovelDetailRecyclerViewAdapter adapter = (NovelDetailRecyclerViewAdapter) mRecyclerView.getAdapter();
                         adapter.getList().clear();
                         adapter.getList().addAll(allItems);
                     }
@@ -186,7 +186,7 @@ public class RankingRecyclerViewFragment extends Fragment {
         mRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));
 //        mRecyclerView.addItemDecoration(new DividerItemDecoration(mContext));
 
-        RankingRecyclerViewAdapter adapter = new RankingRecyclerViewAdapter(mContext);
+        NovelDetailRecyclerViewAdapter adapter = new NovelDetailRecyclerViewAdapter(mContext, false);
         mRecyclerView.setAdapter(adapter);
 
         Bundle args = getArguments();
@@ -382,14 +382,14 @@ public class RankingRecyclerViewFragment extends Fragment {
     }
 
     public void onMyNext(List<NovelItem> novelItems) {
-        RankingRecyclerViewAdapter adapter = (RankingRecyclerViewAdapter) mRecyclerView.getAdapter();
+        NovelDetailRecyclerViewAdapter adapter = (NovelDetailRecyclerViewAdapter) mRecyclerView.getAdapter();
         adapter.clearData();
         adapter.addDataOf(novelItems);
         allItems = new ArrayList<>(novelItems);
         binding.progressBar.setVisibility(View.GONE);
         mRecyclerView.setVisibility(View.VISIBLE);
 
-        adapter.setOnItemClickListener(new RankingRecyclerViewAdapter.OnItemClickListener() {
+        adapter.setOnItemClickListener(new NovelDetailRecyclerViewAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position, ItemRankingRecyclerBinding binding) {
                 if (view.getId() == R.id.btn_expand) {
@@ -404,7 +404,7 @@ public class RankingRecyclerViewFragment extends Fragment {
                     }
                 }
                 else {
-                    NovelItem item = ((RankingRecyclerViewAdapter) mRecyclerView.getAdapter()).getList().get(position);
+                    NovelItem item = ((NovelDetailRecyclerViewAdapter) mRecyclerView.getAdapter()).getList().get(position);
                     mReplaceListener.onFragmentReplaceAction(NovelTableRecyclerViewFragment.newInstance(item.getNovelDetail().getNcode()), item.getNovelDetail().getTitle(), item);
                 }
             }
@@ -412,7 +412,7 @@ public class RankingRecyclerViewFragment extends Fragment {
             @Override
             public void onItemLongClick(View view, final int position, ItemRankingRecyclerBinding binding) {
 
-                RankingRecyclerViewAdapter adapter = (RankingRecyclerViewAdapter) mRecyclerView.getAdapter();
+                NovelDetailRecyclerViewAdapter adapter = (NovelDetailRecyclerViewAdapter) mRecyclerView.getAdapter();
 
                 final NovelItem item = adapter.getList().get(position);
                 String[] strings = new String[]
@@ -423,7 +423,7 @@ public class RankingRecyclerViewFragment extends Fragment {
                             public void onClick(DialogInterface dialog, int which) {
                                 switch (which) {
                                     case 0: {
-                                        NovelItem item = ((RankingRecyclerViewAdapter) mRecyclerView.getAdapter()).getList().get(position);
+                                        NovelItem item = ((NovelDetailRecyclerViewAdapter) mRecyclerView.getAdapter()).getList().get(position);
                                         mReplaceListener.onFragmentReplaceAction(NovelTableRecyclerViewFragment.newInstance(item.getNovelDetail().getNcode()), item.getNovelDetail().getTitle(), item);
                                         break;
                                     }
