@@ -32,6 +32,7 @@ import net.nashihara.naroureader.fragments.DownloadedRecyclerViewFragment;
 import net.nashihara.naroureader.fragments.NovelTableRecyclerViewFragment;
 import net.nashihara.naroureader.fragments.RankingViewPagerFragment;
 import net.nashihara.naroureader.fragments.SearchFragment;
+import net.nashihara.naroureader.fragments.SearchRecyclerViewFragment;
 import net.nashihara.naroureader.listeners.OnFragmentReplaceListener;
 import net.nashihara.naroureader.utils.DownloadUtils;
 import net.nashihara.naroureader.utils.NetworkUtils;
@@ -69,7 +70,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View v) {
                 int stack = manager.getBackStackEntryCount();
-                if (stack == 0) {
+                if (materialMenu.getIconState() == MaterialMenuDrawable.IconState.BURGER) {
                     binding.drawer.openDrawer(START);
                 } else {
                     onBackPressed();
@@ -172,33 +173,43 @@ public class MainActivity extends AppCompatActivity
 
         switch (id) {
             case R.id.nav_ranking: {
+                binding.toolbar.setTitle("ランキング");
                 binding.navView.setCheckedItem(R.id.nav_ranking);
                 String[] types = new String[]{
                         RankingType.DAILY.toString(), RankingType.WEEKLY.toString(),
                         RankingType.MONTHLY.toString(), RankingType.QUARTET.toString(), "all"};
-                String[] titles = new String[]{"梨間", "週間", "月間", "四半期", "累計"};
+                String[] titles = new String[]{"日間", "週間", "月間", "四半期", "累計"};
                 Fragment fragment = RankingViewPagerFragment.newInstance(types, titles);
-                onFragmentReplaceAction(fragment, "ランキング", null);
+                manager.beginTransaction()
+                        .replace(R.id.main_container, fragment)
+                        .commit();
                 break;
             }
             case R.id.nav_bookmark: {
+                binding.toolbar.setTitle("しおり");
                 binding.navView.setCheckedItem(R.id.nav_bookmark);
                 BookmarkRecyclerViewFragment fragment = BookmarkRecyclerViewFragment.newInstance();
-                onFragmentReplaceAction(fragment, "しおり", null);
+                manager.beginTransaction()
+                        .replace(R.id.main_container, fragment)
+                        .commit();
                 break;
             }
             case R.id.nav_download: {
                 binding.toolbar.setTitle("ダウンロード済み小説");
                 binding.navView.setCheckedItem(R.id.nav_download);
                 DownloadedRecyclerViewFragment fragment = DownloadedRecyclerViewFragment.newInstance();
-                onFragmentReplaceAction(fragment, "ダウンロード済み小説", null);
+                manager.beginTransaction()
+                        .replace(R.id.main_container, fragment)
+                        .commit();
                 break;
             }
             case R.id.nav_search: {
                 binding.toolbar.setTitle("検索");
                 binding.navView.setCheckedItem(R.id.nav_search);
                 SearchFragment fragment = SearchFragment.newInstance().newInstance();
-                onFragmentReplaceAction(fragment, "検索", null);
+                manager.beginTransaction()
+                        .replace(R.id.main_container, fragment)
+                        .commit();
                 break;
             }
             case R.id.nav_setting: {
@@ -272,11 +283,14 @@ public class MainActivity extends AppCompatActivity
         if (fragment instanceof NovelTableRecyclerViewFragment) {
             isNovelTableView = true;
             downloadTargetNovel = item;
+            materialMenu.animateIconState(MaterialMenuDrawable.IconState.ARROW);
+        }
+        if (fragment instanceof SearchRecyclerViewFragment) {
+            materialMenu.animateIconState(MaterialMenuDrawable.IconState.ARROW);
         }
 
         titleStack.push((String) binding.toolbar.getTitle());
         binding.toolbar.setTitle(title);
-        materialMenu.animateIconState(MaterialMenuDrawable.IconState.ARROW);
         manager.beginTransaction()
                 .replace(R.id.main_container, fragment)
                 .addToBackStack(null)
