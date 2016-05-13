@@ -1,4 +1,4 @@
-package net.nashihara.naroureader;
+package net.nashihara.naroureader.utils;
 
 import io.realm.DynamicRealm;
 import io.realm.RealmMigration;
