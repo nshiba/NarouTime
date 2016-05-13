@@ -1,7 +1,6 @@
 package net.nashihara.naroureader.fragments;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
@@ -16,11 +15,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import net.nashihara.naroureader.R;
-import net.nashihara.naroureader.utils.RealmUtils;
 import net.nashihara.naroureader.databinding.FragmentNovelBodyBinding;
-import net.nashihara.naroureader.dialogs.OkCancelDialogFragment;
 import net.nashihara.naroureader.entities.Novel4Realm;
 import net.nashihara.naroureader.entities.NovelBody4Realm;
+import net.nashihara.naroureader.utils.RealmUtils;
 
 import io.realm.Realm;
 import io.realm.RealmQuery;
@@ -101,28 +99,6 @@ public class NovelBodyFragment extends Fragment implements GestureDetector.OnGes
             }
         });
 
-        boolean autoRemoveBookmark = pref.getBoolean(getString(R.string.auto_remove_bookmark), false);
-        if (autoRemoveBookmark) {
-            RealmQuery<Novel4Realm> query = realm.where(Novel4Realm.class);
-            query.equalTo("ncode", ncode);
-            RealmResults<Novel4Realm> results = query.findAll();
-
-            if (results.size() != 0) {
-                realm.beginTransaction();
-
-                Novel4Realm novel4Realm = results.get(0);
-                int bookmarkPage = novel4Realm.getBookmark();
-
-                if (bookmarkPage == page) {
-                    novel4Realm.setBookmark(0);
-                    realm.commitTransaction();
-                }
-                else {
-                    realm.cancelTransaction();
-                }
-            }
-        }
-
         binding.page.setText(String.valueOf(page) + "/" + String.valueOf(totalPage));
         binding.btnNext.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -154,25 +130,14 @@ public class NovelBodyFragment extends Fragment implements GestureDetector.OnGes
             visibleBody();
         }
 
-        binding.fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                title = (String) binding.title.getText();
-                StringBuilder builder = new StringBuilder();
-                builder.append(title);
-                builder.append("にしおりをはさみますか？");
-                OkCancelDialogFragment dialogFragment
-                        = OkCancelDialogFragment.newInstance("しおり", builder.toString(), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (which == OkCancelDialogFragment.OK) {
-                            bookmark();
-                        }
-                    }
-                });
-                dialogFragment.show(getFragmentManager(), "okcansel");
-            }
-        });
+        if (page == totalPage) {
+            binding.btnNext.setVisibility(View.GONE);
+            binding.readFinish.setVisibility(View.VISIBLE);
+        }
+        else {
+            binding.btnNext.setVisibility(View.VISIBLE);
+            binding.readFinish.setVisibility(View.GONE);
+        }
 
         return binding.getRoot();
     }
@@ -183,7 +148,7 @@ public class NovelBodyFragment extends Fragment implements GestureDetector.OnGes
 
         isHide = pref.getBoolean(PREF_IS_HIDE, isHide);
         if (isHide) {
-            binding.fab.setVisibility(View.GONE);
+//            binding.fab.setVisibility(View.GONE);
         }
 
         RealmQuery<Novel4Realm> query = realm.where(Novel4Realm.class);
@@ -454,13 +419,6 @@ public class NovelBodyFragment extends Fragment implements GestureDetector.OnGes
         isHide = pref.getBoolean(PREF_IS_HIDE, isHide);
 
         mListener.onSingleTapConfirmedAction(isHide);
-
-        if (isHide) {
-            binding.fab.setVisibility(View.VISIBLE);
-        }
-        else {
-            binding.fab.setVisibility(View.GONE);
-        }
 
         isHide = !isHide;
         pref.edit().putBoolean(PREF_IS_HIDE, isHide).apply();
