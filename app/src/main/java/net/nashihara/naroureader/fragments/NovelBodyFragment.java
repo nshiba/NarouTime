@@ -130,15 +130,6 @@ public class NovelBodyFragment extends Fragment implements GestureDetector.OnGes
             visibleBody();
         }
 
-        if (page == totalPage) {
-            binding.btnNext.setVisibility(View.GONE);
-            binding.readFinish.setVisibility(View.VISIBLE);
-        }
-        else {
-            binding.btnNext.setVisibility(View.VISIBLE);
-            binding.readFinish.setVisibility(View.GONE);
-        }
-
         return binding.getRoot();
     }
 
@@ -261,26 +252,6 @@ public class NovelBodyFragment extends Fragment implements GestureDetector.OnGes
         return results;
     }
 
-    public void bookmark() {
-        RealmResults<Novel4Realm> results = getRealmResult();
-
-        if (results.size() != 0) {
-            realm.beginTransaction();
-
-            Novel4Realm novel4Realm = results.get(0);
-            novel4Realm.setBookmark(page);
-            novel4Realm.setTotalPage(totalPage);
-
-            realm.commitTransaction();
-        }
-        else {
-            Novel4Realm novel4Realm = mListener.getNovel4RealmInstance();
-            realm.beginTransaction();
-            novel4Realm.setBookmark(page);
-            realm.commitTransaction();
-        }
-    }
-
     private RealmResults<NovelBody4Realm> getNovelBody(String ncode, int page) {
         RealmResults<NovelBody4Realm> ncodeResults = realm.where(NovelBody4Realm.class).equalTo("ncode", ncode).findAll();
         return ncodeResults.where().equalTo("page", page).findAll();
@@ -342,9 +313,17 @@ public class NovelBodyFragment extends Fragment implements GestureDetector.OnGes
     private void visibleBody() {
         binding.body.setVisibility(View.VISIBLE);
         binding.title.setVisibility(View.VISIBLE);
-        binding.btnNext.setVisibility(View.VISIBLE);
         binding.btnPrev.setVisibility(View.VISIBLE);
         binding.page.setVisibility(View.VISIBLE);
+
+        if (page == totalPage) {
+            binding.btnNext.setVisibility(View.GONE);
+            binding.readFinish.setVisibility(View.VISIBLE);
+        }
+        else {
+            binding.btnNext.setVisibility(View.VISIBLE);
+            binding.readFinish.setVisibility(View.GONE);
+        }
 
         binding.progressBar.setVisibility(View.GONE);
     }
@@ -355,6 +334,7 @@ public class NovelBodyFragment extends Fragment implements GestureDetector.OnGes
         binding.btnNext.setVisibility(View.GONE);
         binding.btnPrev.setVisibility(View.GONE);
         binding.page.setVisibility(View.GONE);
+        binding.readFinish.setVisibility(View.GONE);
 
         binding.progressBar.setVisibility(View.VISIBLE);
     }
