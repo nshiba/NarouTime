@@ -158,7 +158,14 @@ public class SearchRecyclerViewFragment extends Fragment {
             @Override
             public void onNext(List<Novel> novels) {
                 if (novels == null) {
+                    Log.d(TAG, "onNext: novels are null");
+                    binding.noResultNovel.setVisibility(View.VISIBLE);
                     return;
+                }
+
+                if (novels.size() == 0) {
+                    Log.d(TAG, "onNext: novels size is zero");
+                    binding.noResultNovel.setVisibility(View.VISIBLE);
                 }
 
                 List<NovelItem> novelItems = new ArrayList<>();
