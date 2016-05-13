@@ -45,8 +45,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
 
-                <LinearLayout
-                    android:orientation="horizontal"
+                <RelativeLayout
                     android:layout_marginTop="@dimen/text_margin_normal"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
@@ -76,21 +75,22 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
 
-                </LinearLayout>
+                    <TextView
+                        android:id="@+id/read_finish"
+                        android:paddingBottom="@dimen/text_margin_x_large"
+                        android:textColor="@color/colorText"
+                        android:text="この小説を読み終わりました"
+                        android:textSize="@dimen/text_normal"
+                        android:visibility="gone"
+                        android:layout_alignParentBottom="true"
+                        android:layout_alignParentEnd="true"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                </RelativeLayout>
 
             </LinearLayout>
         </ScrollView>
-
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:layout_marginRight="16dp"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentBottom="true"
-            android:src="@drawable/ic_bookmark_border_white_24dp"
-            app:backgroundTint="@color/colorAccent"/>
 
         <FrameLayout
             android:layout_width="match_parent"

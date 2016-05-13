@@ -1,5 +1,6 @@
 package net.nashihara.naroureader.activities;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
@@ -9,6 +10,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +18,9 @@ import android.view.ViewGroup;
 import com.balysv.materialmenu.MaterialMenuDrawable;
 
 import net.nashihara.naroureader.R;
+import net.nashihara.naroureader.adapters.NovelBodyFragmentViewPagerAdapter;
 import net.nashihara.naroureader.databinding.ActivityNovelViewBinding;
+import net.nashihara.naroureader.dialogs.OkCancelDialogFragment;
 import net.nashihara.naroureader.entities.Novel4Realm;
 import net.nashihara.naroureader.fragments.NovelBodyFragment;
 import net.nashihara.naroureader.utils.RealmUtils;
@@ -56,7 +60,7 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
         Intent intent = getIntent();
         ncode = intent.getStringExtra("ncode");
         final int page = intent.getIntExtra("page", 1);
-        nowPage = page;
+        nowPage = page -1;
 
         title = intent.getStringExtra("title");
         writer = intent.getStringExtra("writer");
@@ -76,39 +80,47 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
         });
         binding.toolbar.inflateMenu(R.menu.menu_novelbody);
         binding.toolbar.setOnMenuItemClickListener(this);
-        onNovelBodyLoadAction("", nowPage, bodyTitle);
+
+        NovelBodyFragmentViewPagerAdapter adapter
+                = new NovelBodyFragmentViewPagerAdapter(getSupportFragmentManager(), ncode, title, totalPage);
+        binding.viewPager.setAdapter(adapter);
+        binding.viewPager.setCurrentItem(nowPage);
+
+        binding.fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                title = (String) binding.toolbar.getTitle();
+                StringBuilder builder = new StringBuilder();
+                builder.append(title);
+                builder.append("にしおりをはさみますか？");
+                OkCancelDialogFragment dialogFragment
+                        = OkCancelDialogFragment.newInstance("しおり", builder.toString(), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (which == OkCancelDialogFragment.OK) {
+                            bookmark(nowPage);
+                        }
+                    }
+                });
+                dialogFragment.show(getSupportFragmentManager(), "okcansel");
+            }
+        });
+
+        boolean autoRemoveBookmark = pref.getBoolean(getString(R.string.auto_remove_bookmark), false);
+        if (autoRemoveBookmark) {
+            removeBookmark();
+        }
     }
 
     @Override
     public void onBackPressed() {
         pref.edit().putBoolean(PREF_IS_HIDE, false).apply();
 
-        boolean autoRemoveBookmark = pref.getBoolean(getString(R.string.auto_bookmark), false);
-        if (autoRemoveBookmark) {
-
-            realm = RealmUtils.getRealm(this);
-            RealmQuery<Novel4Realm> query = realm.where(Novel4Realm.class);
-            query.equalTo("ncode", ncode);
-            RealmResults<Novel4Realm> results = query.findAll();
-
-            if (results.size() != 0) {
-                realm.beginTransaction();
-
-                Novel4Realm novel4Realm = results.get(0);
-                novel4Realm.setBookmark(nowPage);
-
-                realm.commitTransaction();
-            }
-            else {
-                Novel4Realm bookmarkNovel = getNovel4RealmInstance();
-
-                realm.beginTransaction();
-                bookmarkNovel.setBookmark(nowPage);
-
-                realm.commitTransaction();
-            }
+        boolean autoBookmark = pref.getBoolean(getString(R.string.auto_bookmark), false);
+        Log.d(TAG, "onBackPressed: auto bookmark" + autoBookmark);
+        if (autoBookmark) {
+            bookmark(binding.viewPager.getCurrentItem() +1);
         }
-        realm.close();
 
         finish();
 
@@ -117,10 +129,9 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
 
     @Override
     public void onNovelBodyLoadAction(String body, int nextPage, String bodyTitle) {
+        Log.d(TAG, "onNovelBodyLoadAction: " + nextPage);
         nowPage = nextPage -1;
-        manager.beginTransaction()
-                .replace(R.id.novel_container, NovelBodyFragment.newInstance(ncode, bodyTitle, body, nextPage, totalPage))
-                .commit();
+        binding.viewPager.setCurrentItem(nowPage);
     }
 
     @Override
@@ -144,19 +155,21 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
     public void onSingleTapConfirmedAction(boolean isHide) {
         if (isHide) {
             if (toolBarHeight > 0) {
-                ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) binding.novelContainer.getLayoutParams();
+                ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) binding.viewPager.getLayoutParams();
                 params.topMargin = toolBarHeight;
-                binding.novelContainer.setLayoutParams(params);
+                binding.viewPager.setLayoutParams(params);
             }
 
+            binding.fab.setVisibility(View.VISIBLE);
             binding.appBar.setVisibility(View.VISIBLE);
         }
         else {
             toolBarHeight = binding.appBar.getHeight();
-            ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) binding.novelContainer.getLayoutParams();
+            ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) binding.viewPager.getLayoutParams();
             params.topMargin = 0;
-            binding.novelContainer.setLayoutParams(params);
+            binding.viewPager.setLayoutParams(params);
 
+            binding.fab.setVisibility(View.GONE);
             binding.appBar.setVisibility(View.GONE);
         }
     }
@@ -174,5 +187,53 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
         }
 
         return true;
+    }
+
+    private RealmResults<Novel4Realm> getRealmResult() {
+        RealmQuery<Novel4Realm> query = realm.where(Novel4Realm.class);
+        query.equalTo("ncode", ncode);
+        RealmResults<Novel4Realm> results = query.findAll();
+        return results;
+    }
+
+    public void bookmark(int page) {
+        RealmResults<Novel4Realm> results = getRealmResult();
+
+        if (results.size() != 0) {
+            realm.beginTransaction();
+
+            Novel4Realm novel4Realm = results.get(0);
+            novel4Realm.setBookmark(page);
+            novel4Realm.setTotalPage(totalPage);
+
+            realm.commitTransaction();
+        }
+        else {
+            Novel4Realm novel4Realm = getNovel4RealmInstance();
+            realm.beginTransaction();
+            novel4Realm.setBookmark(page);
+            realm.commitTransaction();
+        }
+    }
+
+    public void removeBookmark() {
+        RealmQuery<Novel4Realm> query = realm.where(Novel4Realm.class);
+        query.equalTo("ncode", ncode);
+        RealmResults<Novel4Realm> results = query.findAll();
+
+        if (results.size() != 0) {
+            realm.beginTransaction();
+
+            Novel4Realm novel4Realm = results.get(0);
+            int bookmarkPage = novel4Realm.getBookmark();
+
+            if (bookmarkPage > 0) {
+                novel4Realm.setBookmark(0);
+                realm.commitTransaction();
+            }
+            else {
+                realm.cancelTransaction();
+            }
+        }
     }
 }
