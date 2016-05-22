@@ -52,4 +52,16 @@
         <item>その他</item>
         <item>リプレイ</item>
     </string-array>
+
+    <string-array name="volume_entities">
+        <item>なし</item>
+        <item>上ボタンでページを送り、下ボタンでページを戻す。</item>
+        <item>上ボタンでページを戻し、下ボタンでページを送る。</item>
+    </string-array>
+
+    <string-array name="volume_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
 </resources>

@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,7 +46,6 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
     private String writer;
 
     private int toolBarHeight = 0;
-    private int nowPage;
     private SharedPreferences pref;
     private static final String PREF_IS_HIDE = "is_hide";
 
@@ -60,7 +60,6 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
         Intent intent = getIntent();
         ncode = intent.getStringExtra("ncode");
         final int page = intent.getIntExtra("page", 1);
-        nowPage = page -1;
 
         title = intent.getStringExtra("title");
         writer = intent.getStringExtra("writer");
@@ -84,7 +83,7 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
         NovelBodyFragmentViewPagerAdapter adapter
                 = new NovelBodyFragmentViewPagerAdapter(getSupportFragmentManager(), ncode, title, totalPage);
         binding.viewPager.setAdapter(adapter);
-        binding.viewPager.setCurrentItem(nowPage);
+        binding.viewPager.setCurrentItem(page -1);
 
         binding.fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -98,7 +97,7 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if (which == OkCancelDialogFragment.OK) {
-                            bookmark(nowPage);
+                            bookmark(binding.viewPager.getCurrentItem() +1);
                         }
                     }
                 });
@@ -128,10 +127,36 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
     }
 
     @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        int volume_type = Integer.parseInt(pref.getString(getString(R.string.hardware_btn_volume), "0"));
+
+        if (event.getAction() != KeyEvent.ACTION_DOWN || volume_type == 0) {
+            return super.dispatchKeyEvent(event);
+        }
+
+        int diff;
+        if (volume_type == 1) {
+            diff = 1;
+        }
+        else {
+            diff = -1;
+        }
+
+        int nowPage = binding.viewPager.getCurrentItem();
+        if (event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_UP) {
+            binding.viewPager.setCurrentItem(nowPage + diff);
+        }
+        if (event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_DOWN) {
+            binding.viewPager.setCurrentItem(nowPage - diff);
+        }
+
+        return true;
+    }
+
+    @Override
     public void onNovelBodyLoadAction(String body, int nextPage, String bodyTitle) {
         Log.d(TAG, "onNovelBodyLoadAction: " + nextPage);
-        nowPage = nextPage -1;
-        binding.viewPager.setCurrentItem(nowPage);
+        binding.viewPager.setCurrentItem(nextPage -1);
     }
 
     @Override
