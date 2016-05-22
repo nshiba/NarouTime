@@ -32,6 +32,14 @@
             android:summary="小説を開いた時に自動でしおりをはずします" />
     </PreferenceCategory>
 
+    <ListPreference
+        android:key="@string/hardware_btn_volume"
+        android:title="ボリュームボタンの動作"
+        android:summary="本文閲覧時にボリュームボタンを押した時の動作を指定します"
+        android:entries="@array/volume_entities"
+        android:entryValues="@array/volume_values"
+        android:dialogTitle="ボリュームボタンの動作" />
+
     <PreferenceScreen android:title="オープンソースライセンス">
         <intent
             android:action="android.intent.action.MAIN"
