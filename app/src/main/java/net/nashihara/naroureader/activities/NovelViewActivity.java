@@ -128,29 +128,41 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
+        Log.d(TAG, "dispatchKeyEvent: ");
+
         int volume_type = Integer.parseInt(pref.getString(getString(R.string.hardware_btn_volume), "0"));
 
-        if (event.getAction() != KeyEvent.ACTION_DOWN || volume_type == 0) {
+        if (volume_type == 0) {
             return super.dispatchKeyEvent(event);
         }
 
-        int diff;
-        if (volume_type == 1) {
-            diff = 1;
+        if (event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_UP ||
+            event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_DOWN) {
+
+            if (event.getAction() != KeyEvent.ACTION_DOWN) {
+                return super.dispatchKeyEvent(event);
+            }
+
+            int diff;
+            if (volume_type == 1) {
+                diff = 1;
+            }
+            else {
+                diff = -1;
+            }
+
+            int nowPage = binding.viewPager.getCurrentItem();
+            if (event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_UP) {
+                binding.viewPager.setCurrentItem(nowPage + diff);
+            }
+            if (event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_DOWN) {
+                binding.viewPager.setCurrentItem(nowPage - diff);
+            }
+            return true;
         }
         else {
-            diff = -1;
+            return super.dispatchKeyEvent(event);
         }
-
-        int nowPage = binding.viewPager.getCurrentItem();
-        if (event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_UP) {
-            binding.viewPager.setCurrentItem(nowPage + diff);
-        }
-        if (event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_DOWN) {
-            binding.viewPager.setCurrentItem(nowPage - diff);
-        }
-
-        return true;
     }
 
     @Override
