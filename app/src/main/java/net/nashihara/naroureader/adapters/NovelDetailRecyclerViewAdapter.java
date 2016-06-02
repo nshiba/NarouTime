@@ -220,53 +220,68 @@ public class NovelDetailRecyclerViewAdapter extends RecyclerView.Adapter<NovelDe
 
     private String int2Genre(NovelGenre target) {
         switch (target) {
-            case LITERATURE: {
-                return "文学";
+            case LOVE_DIFF_WORLD: {
+                return "異世界[恋愛]";
             }
-            case LOVE: {
-                return "恋愛";
+            case LOVE_REAL_WORLD: {
+                return "現実世界[恋愛]";
             }
-            case HISTORY: {
-                return "歴史";
+            case FANTASY_HIGH: {
+                return "ハイファンタジー[ファンタジー]";
             }
-            case DETECTIVE: {
-                return "推理";
+            case FANTASY_LOW: {
+                return "ローファンタジー[ファンタジー]";
             }
-            case FANTASY: {
-                return "ファンタジー";
+            case LITERAL_PURE: {
+                return "純文学[文芸]";
             }
-            case SF: {
-                return "SF";
+            case LITERAL_DRAMA: {
+                return "ヒューマンドラマ[文芸]";
             }
-            case HORROR: {
-                return "ホラー";
+            case LITERAL_HISTORY: {
+                return "歴史[文芸]";
             }
-            case COMEDY: {
-                return "コメディー";
+            case LITERAL_DETECTIVE: {
+                return "推理[文芸]";
             }
-            case ADVENTURE: {
-                return "冒険";
+            case LITERAL_HORROR: {
+                return "ホラー[文芸]";
             }
-            case ACADEMY: {
-                return "学園";
+            case LITERAL_ACTION: {
+                return "アクション[文芸]";
             }
-            case MILITARY_HISTORY: {
-                return "戦記";
+            case LITERAL_COMEDY: {
+                return "コメディー[文芸]";
             }
-            case FAIRYTALE: {
-                return "童話";
+            case SF_VR: {
+                return "VRゲーム[SF]";
             }
-            case POEM: {
-                return "詩";
+            case SF_SPACE: {
+                return "宇宙[SF]";
             }
-            case ESSAY: {
-                return "エッセイ";
+            case SF_SCIENCE: {
+                return "空想科学[SF]";
             }
-            case REPLAY: {
-                return "リプレイ";
+            case SF_PANIC: {
+                return "パニック[SF]";
+            }
+            case OTHER_FAIRYTALE: {
+                return "童話[その他]";
+            }
+            case OTHER_POEM: {
+                return "詩[その他]";
+            }
+            case OTHER_ESSAY: {
+                return "エッセイ[その他]";
+            }
+            case OTHER_REPLAY: {
+                return "リプレイ[その他]";
             }
             case OTHER: {
-                return "その他";
+                return "その他[その他]";
+            }
+            case NONGENRE: {
+                return "ノンジャンル[ノンジャンル]";
             }
             default: {
                 return "no such a genre";
