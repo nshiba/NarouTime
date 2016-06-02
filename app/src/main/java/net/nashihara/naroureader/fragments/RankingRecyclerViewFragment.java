@@ -29,6 +29,7 @@ import net.nashihara.naroureader.listeners.OnFragmentReplaceListener;
 import net.nashihara.naroureader.utils.DownloadUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -90,19 +91,22 @@ public class RankingRecyclerViewFragment extends Fragment {
         binding.fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String[] filters = new String[]{
-                        "完結済み", "文学", "恋愛", "歴史", "推理", "ファンタジー",
-                        "SF", "ホラー", "コメディー", "冒険", "学園",
-                        "戦記", "童話", "詩", "エッセイ", "リプレイ", "その他"
-                };
-                boolean[] checked = new boolean[filters.length];
+
+                ArrayList<String> filters =
+                        new ArrayList<>(Arrays.asList(getResources().getStringArray(R.array.genres)));
+                filters.add(0, "完結済み");
+
+                final NovelGenre[] filterIds =NovelGenre.values();
+
+
+                boolean[] checked = new boolean[filters.size()];
                 checked[0] = false;
                 for (int i = 1; i < checked.length; i++) {
                     checked[i] = true;
                 }
 
                 FilterDialogFragment checkBoxDialog = FilterDialogFragment
-                        .newInstance("小説絞込み", filters, checked, true, new FilterDialogFragment.OnDialogButtonClickListener() {
+                        .newInstance("小説絞込み", filters.toArray(new String[0]), checked, true, new FilterDialogFragment.OnDialogButtonClickListener() {
                     @Override
                     public void onPositiveButton(int which, boolean[] itemChecked, String min, String max) {
                         Set<NovelGenre> trueSet = new HashSet<>();
@@ -136,9 +140,8 @@ public class RankingRecyclerViewFragment extends Fragment {
                             }
 
                             // ジャンルチェック
-                            NovelGenre checkedGenre = NovelGenre.valueOf(i);
                             if (itemChecked[i]) {
-                                trueSet.add(checkedGenre);
+                                trueSet.add(filterIds[i -1]);
                             }
                         }
 

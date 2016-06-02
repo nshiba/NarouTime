@@ -20,6 +20,8 @@ import net.nashihara.naroureader.listeners.OnFragmentReplaceListener;
 
 import java.util.ArrayList;
 
+import narou4j.enums.NovelGenre;
+
 public class SearchFragment extends Fragment {
 
     private FragmentSearchBinding binding;
@@ -29,7 +31,7 @@ public class SearchFragment extends Fragment {
     private int sortItem = 0;
     private int timeItem = 0;
 
-    private boolean[] genreChecked = new boolean[16];
+    private boolean[] genreChecked;
     private String[] genreStrings;
 
     public SearchFragment() {
@@ -72,17 +74,17 @@ public class SearchFragment extends Fragment {
             public void onNothingSelected(AdapterView<?> parent) {}
         });
 
+        genreStrings = getResources().getStringArray(R.array.genres);
+        genreChecked = new boolean[genreStrings.length];
         // ジャンル
         for (int i = 0; i < genreChecked.length; i++) {
             genreChecked[i] = false;
         }
-        genreStrings = getResources().getStringArray(R.array.genres);
         binding.btnGenre.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 FilterDialogFragment.newInstance("ジャンル選択", genreStrings, genreChecked, false,
-                        new FilterDialogFragment.OnDialogButtonClickListener()
-                        {
+                        new FilterDialogFragment.OnDialogButtonClickListener() {
                             @Override
                             public void onPositiveButton(int which, boolean[] itemChecked, String min, String max) {
                                 StringBuilder builder = new StringBuilder();
@@ -160,10 +162,11 @@ public class SearchFragment extends Fragment {
                     max = Integer.parseInt(maxLength);
                 }
 
+                NovelGenre[] genreIds = NovelGenre.values();
                 ArrayList<Integer> genres = new ArrayList<>();
                 for (int i = 0; i < genreChecked.length; i++) {
                     if (genreChecked[i]) {
-                        genres.add(i +1);
+                        genres.add(genreIds[i].getId());
                     }
                 }
 

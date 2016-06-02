@@ -35,21 +35,38 @@
     </string-array>
 
     <string-array name="genres">
-        <item>文学</item>
-        <item>恋愛</item>
-        <item>歴史</item>
-        <item>推理</item>
-        <item>ファンタジー</item>
-        <item>SF</item>
-        <item>ホラー</item>
-        <item>コメディー</item>
-        <item>冒険</item>
-        <item>学園</item>
-        <item>戦記</item>
-        <item>童話</item>
-        <item>詩</item>
-        <item>エッセイ</item>
-        <item>その他</item>
-        <item>リプレイ</item>
+        <item>異世界[恋愛]</item>
+        <item>現実世界[恋愛]</item>
+        <item>ハイファンタジー[ファンタジー]</item>
+        <item>ローファンタジー[ファンタジー]</item>
+        <item>純文学[文学]</item>
+        <item>ヒューマンドラマ[文学]</item>
+        <item>歴史[文学]</item>
+        <item>推理[文学]</item>
+        <item>ホラー[文学]</item>
+        <item>アクション[文学]</item>
+        <item>コメディ[文学]</item>
+        <item>VRゲーム [SF]</item>
+        <item>宇宙 [SF]</item>
+        <item>空想科学 [SF]</item>
+        <item>パニック [SF]</item>
+        <item>童話 [その他]</item>
+        <item>詩 [その他]</item>
+        <item>エッセイ [その他]</item>
+        <item>リプレイ [その他]</item>
+        <item>その他 [その他]</item>
+        <item>ノンジャンル [ノンジャンル]</item>
+    </string-array>
+
+    <string-array name="volume_entities">
+        <item>なし</item>
+        <item>上ボタンでページを送り、下ボタンでページを戻す。</item>
+        <item>上ボタンでページを戻し、下ボタンでページを送る。</item>
+    </string-array>
+
+    <string-array name="volume_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
     </string-array>
 </resources>
