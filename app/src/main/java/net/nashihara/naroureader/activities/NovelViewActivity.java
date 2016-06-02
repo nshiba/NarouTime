@@ -3,6 +3,7 @@ package net.nashihara.naroureader.activities;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.TypedArray;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -79,6 +80,11 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
         });
         binding.toolbar.inflateMenu(R.menu.menu_novelbody);
         binding.toolbar.setOnMenuItemClickListener(this);
+
+        final TypedArray styledAttributes = this.getTheme().obtainStyledAttributes(
+            new int[] { R.attr.actionBarSize });
+        toolBarHeight = (int) styledAttributes.getDimension(0, 0);
+        styledAttributes.recycle();
 
         NovelBodyFragmentViewPagerAdapter adapter
                 = new NovelBodyFragmentViewPagerAdapter(getSupportFragmentManager(), ncode, title, totalPage);
@@ -192,19 +198,15 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
 
     @Override
     public void onSingleTapConfirmedAction(boolean isHide) {
+        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) binding.viewPager.getLayoutParams();
         if (isHide) {
-            if (toolBarHeight > 0) {
-                ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) binding.viewPager.getLayoutParams();
-                params.topMargin = toolBarHeight;
-                binding.viewPager.setLayoutParams(params);
-            }
+            params.topMargin = toolBarHeight;
+            binding.viewPager.setLayoutParams(params);
 
             binding.fab.setVisibility(View.VISIBLE);
             binding.appBar.setVisibility(View.VISIBLE);
         }
         else {
-            toolBarHeight = binding.appBar.getHeight();
-            ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) binding.viewPager.getLayoutParams();
             params.topMargin = 0;
             binding.viewPager.setLayoutParams(params);
 
