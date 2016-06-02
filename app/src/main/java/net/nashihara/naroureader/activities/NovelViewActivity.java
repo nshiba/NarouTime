@@ -3,6 +3,7 @@ package net.nashihara.naroureader.activities;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.TypedArray;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -80,6 +81,11 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
         binding.toolbar.inflateMenu(R.menu.menu_novelbody);
         binding.toolbar.setOnMenuItemClickListener(this);
 
+        final TypedArray styledAttributes = this.getTheme().obtainStyledAttributes(
+            new int[] { R.attr.actionBarSize });
+        toolBarHeight = (int) styledAttributes.getDimension(0, 0);
+        styledAttributes.recycle();
+
         NovelBodyFragmentViewPagerAdapter adapter
                 = new NovelBodyFragmentViewPagerAdapter(getSupportFragmentManager(), ncode, title, totalPage);
         binding.viewPager.setAdapter(adapter);
@@ -128,29 +134,41 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
+        Log.d(TAG, "dispatchKeyEvent: ");
+
         int volume_type = Integer.parseInt(pref.getString(getString(R.string.hardware_btn_volume), "0"));
 
-        if (event.getAction() != KeyEvent.ACTION_DOWN || volume_type == 0) {
+        if (volume_type == 0) {
             return super.dispatchKeyEvent(event);
         }
 
-        int diff;
-        if (volume_type == 1) {
-            diff = 1;
+        if (event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_UP ||
+            event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_DOWN) {
+
+            if (event.getAction() != KeyEvent.ACTION_DOWN) {
+                return super.dispatchKeyEvent(event);
+            }
+
+            int diff;
+            if (volume_type == 1) {
+                diff = 1;
+            }
+            else {
+                diff = -1;
+            }
+
+            int nowPage = binding.viewPager.getCurrentItem();
+            if (event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_UP) {
+                binding.viewPager.setCurrentItem(nowPage + diff);
+            }
+            if (event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_DOWN) {
+                binding.viewPager.setCurrentItem(nowPage - diff);
+            }
+            return true;
         }
         else {
-            diff = -1;
+            return super.dispatchKeyEvent(event);
         }
-
-        int nowPage = binding.viewPager.getCurrentItem();
-        if (event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_UP) {
-            binding.viewPager.setCurrentItem(nowPage + diff);
-        }
-        if (event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_DOWN) {
-            binding.viewPager.setCurrentItem(nowPage - diff);
-        }
-
-        return true;
     }
 
     @Override
@@ -161,8 +179,10 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
 
     @Override
     public Novel4Realm getNovel4RealmInstance() {
+        if (realm.isClosed()) {
+            realm = RealmUtils.getRealm(this);
+        }
 
-        realm = RealmUtils.getRealm(this);
         realm.beginTransaction();
 
         Novel4Realm novel4Realm = realm.createObject(Novel4Realm.class);
@@ -178,19 +198,15 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
 
     @Override
     public void onSingleTapConfirmedAction(boolean isHide) {
+        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) binding.viewPager.getLayoutParams();
         if (isHide) {
-            if (toolBarHeight > 0) {
-                ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) binding.viewPager.getLayoutParams();
-                params.topMargin = toolBarHeight;
-                binding.viewPager.setLayoutParams(params);
-            }
+            params.topMargin = toolBarHeight;
+            binding.viewPager.setLayoutParams(params);
 
             binding.fab.setVisibility(View.VISIBLE);
             binding.appBar.setVisibility(View.VISIBLE);
         }
         else {
-            toolBarHeight = binding.appBar.getHeight();
-            ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) binding.viewPager.getLayoutParams();
             params.topMargin = 0;
             binding.viewPager.setLayoutParams(params);
 
@@ -215,6 +231,10 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
     }
 
     private RealmResults<Novel4Realm> getRealmResult() {
+        if (realm.isClosed()) {
+            realm = RealmUtils.getRealm(this);
+        }
+
         RealmQuery<Novel4Realm> query = realm.where(Novel4Realm.class);
         query.equalTo("ncode", ncode);
         RealmResults<Novel4Realm> results = query.findAll();
@@ -242,9 +262,7 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
     }
 
     public void removeBookmark() {
-        RealmQuery<Novel4Realm> query = realm.where(Novel4Realm.class);
-        query.equalTo("ncode", ncode);
-        RealmResults<Novel4Realm> results = query.findAll();
+        RealmResults<Novel4Realm> results = getRealmResult();
 
         if (results.size() != 0) {
             realm.beginTransaction();

@@ -137,10 +137,7 @@ public class NovelBodyFragment extends Fragment implements GestureDetector.OnGes
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        isHide = pref.getBoolean(PREF_IS_HIDE, isHide);
-        if (isHide) {
-//            binding.fab.setVisibility(View.GONE);
-        }
+//        binding.scrollView.smoothScrollTo(binding.scrollView.getScrollX(), binding.scrollView.getScrollY() + 50);
 
         RealmQuery<Novel4Realm> query = realm.where(Novel4Realm.class);
         query.equalTo("ncode", ncode);
@@ -148,11 +145,9 @@ public class NovelBodyFragment extends Fragment implements GestureDetector.OnGes
 
         if (body.equals("")) {
             if (results.size() == 0) {
-                Novel4Realm tmpNovel = mListener.getNovel4RealmInstance();
                 updateNovelBody(page);
             }
             else {
-                Novel4Realm novel4Realm = results.get(0);
                 RealmResults<NovelBody4Realm> targetBody = getNovelBody(ncode, page);
 
                 if (targetBody.size() > 0) {
@@ -243,13 +238,6 @@ public class NovelBodyFragment extends Fragment implements GestureDetector.OnGes
 
         realm.commitTransaction();
 
-    }
-
-    private RealmResults<Novel4Realm> getRealmResult() {
-        RealmQuery<Novel4Realm> query = realm.where(Novel4Realm.class);
-        query.equalTo("ncode", ncode);
-        RealmResults<Novel4Realm> results = query.findAll();
-        return results;
     }
 
     private RealmResults<NovelBody4Realm> getNovelBody(String ncode, int page) {
