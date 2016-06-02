@@ -7,7 +7,12 @@
         tools:context="net.nashihara.naroureader.fragments.NovelBodyFragment">
 
         <ScrollView
+            android:id="@+id/scrollView"
             android:scrollbars="vertical"
+            android:scrollbarSize="3dp"
+            android:scrollbarThumbVertical="@drawable/scroll_bar_vertical"
+            android:fadingEdgeLength="@dimen/activity_vertical_margin"
+            android:requiresFadingEdge="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
