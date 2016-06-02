@@ -161,8 +161,10 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
 
     @Override
     public Novel4Realm getNovel4RealmInstance() {
+        if (realm.isClosed()) {
+            realm = RealmUtils.getRealm(this);
+        }
 
-        realm = RealmUtils.getRealm(this);
         realm.beginTransaction();
 
         Novel4Realm novel4Realm = realm.createObject(Novel4Realm.class);
@@ -215,6 +217,10 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
     }
 
     private RealmResults<Novel4Realm> getRealmResult() {
+        if (realm.isClosed()) {
+            realm = RealmUtils.getRealm(this);
+        }
+
         RealmQuery<Novel4Realm> query = realm.where(Novel4Realm.class);
         query.equalTo("ncode", ncode);
         RealmResults<Novel4Realm> results = query.findAll();
@@ -242,9 +248,7 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
     }
 
     public void removeBookmark() {
-        RealmQuery<Novel4Realm> query = realm.where(Novel4Realm.class);
-        query.equalTo("ncode", ncode);
-        RealmResults<Novel4Realm> results = query.findAll();
+        RealmResults<Novel4Realm> results = getRealmResult();
 
         if (results.size() != 0) {
             realm.beginTransaction();
