@@ -3,7 +3,6 @@ package net.nashihara.naroureader.activities;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.TypedArray;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -15,7 +14,6 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 
 import com.balysv.materialmenu.MaterialMenuDrawable;
 
@@ -46,7 +44,6 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
     private String ncode;
     private String writer;
 
-    private int toolBarHeight = 0;
     private SharedPreferences pref;
     private static final String PREF_IS_HIDE = "is_hide";
 
@@ -80,11 +77,6 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
         });
         binding.toolbar.inflateMenu(R.menu.menu_novelbody);
         binding.toolbar.setOnMenuItemClickListener(this);
-
-        final TypedArray styledAttributes = this.getTheme().obtainStyledAttributes(
-            new int[] { R.attr.actionBarSize });
-        toolBarHeight = (int) styledAttributes.getDimension(0, 0);
-        styledAttributes.recycle();
 
         NovelBodyFragmentViewPagerAdapter adapter
                 = new NovelBodyFragmentViewPagerAdapter(getSupportFragmentManager(), ncode, title, totalPage);
@@ -194,25 +186,6 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
         realm.commitTransaction();
         realm.close();
         return novel4Realm;
-    }
-
-    @Override
-    public void onSingleTapConfirmedAction(boolean isHide) {
-        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) binding.viewPager.getLayoutParams();
-        if (isHide) {
-            params.topMargin = toolBarHeight;
-            binding.viewPager.setLayoutParams(params);
-
-            binding.fab.setVisibility(View.VISIBLE);
-            binding.appBar.setVisibility(View.VISIBLE);
-        }
-        else {
-            params.topMargin = 0;
-            binding.viewPager.setLayoutParams(params);
-
-            binding.fab.setVisibility(View.GONE);
-            binding.appBar.setVisibility(View.GONE);
-        }
     }
 
     @Override

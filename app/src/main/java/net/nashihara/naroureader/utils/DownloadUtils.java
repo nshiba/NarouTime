@@ -5,6 +5,8 @@ import android.content.DialogInterface;
 import android.support.v4.app.FragmentManager;
 import android.util.Log;
 
+import com.google.firebase.crash.FirebaseCrash;
+
 import net.nashihara.naroureader.dialogs.NovelDownloadDialogFragment;
 import net.nashihara.naroureader.dialogs.OkCancelDialogFragment;
 import net.nashihara.naroureader.entities.Novel4Realm;
@@ -102,6 +104,7 @@ public abstract class DownloadUtils {
             @Override
             public void onError(Throwable e) {
                 Log.e(TAG, "onError: ", e.fillInStackTrace());
+                FirebaseCrash.report(e);
                 onDownloadError(downloadDialog);
             }
 
@@ -136,6 +139,7 @@ public abstract class DownloadUtils {
             @Override
             public void onError(Throwable e) {
                 Log.e(TAG, "onError: ", e.fillInStackTrace());
+                FirebaseCrash.report(e);
                 onDownloadError(downloadDialog);
                 realm.close();
             }
