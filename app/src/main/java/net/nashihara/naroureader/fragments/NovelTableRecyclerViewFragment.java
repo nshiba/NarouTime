@@ -16,6 +16,8 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.LinearLayout;
 
+import com.google.firebase.crash.FirebaseCrash;
+
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.adapters.NovelTableRecyclerViewAdapter;
 import net.nashihara.naroureader.databinding.FragmentNovelTableViewBinding;
@@ -157,6 +159,7 @@ public class NovelTableRecyclerViewFragment extends Fragment {
                         public void onError(Throwable e) {
                             onLoadError();
                             Log.e(TAG, "onError: ", e.fillInStackTrace());
+                            FirebaseCrash.report(e);
                         }
 
                         @Override
