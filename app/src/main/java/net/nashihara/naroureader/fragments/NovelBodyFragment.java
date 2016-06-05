@@ -12,6 +12,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.firebase.crash.FirebaseCrash;
+
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.databinding.FragmentNovelBodyBinding;
 import net.nashihara.naroureader.entities.Novel4Realm;
@@ -251,6 +253,7 @@ public class NovelBodyFragment extends Fragment{
                     public void onError(Throwable e) {
                         onLoadError();
                         Log.e(TAG, "onError: ", e.fillInStackTrace());
+                        FirebaseCrash.report(e);
                     }
 
                     @Override

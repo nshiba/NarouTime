@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "97690382897",
+    "firebase_url": "https://naroutime.firebaseio.com",
+    "project_id": "naroutime",
+    "storage_bucket": "naroutime.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:97690382897:android:9e591875f95fd5aa",
+        "android_client_info": {
+          "package_name": "net.nashihara.naroureader"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "97690382897-vo91noaepf7t0tt23hqljgmlhv06mlgj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBbmNstcvRNHeTOcf9HVlJRYNiLzzNnSIk"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

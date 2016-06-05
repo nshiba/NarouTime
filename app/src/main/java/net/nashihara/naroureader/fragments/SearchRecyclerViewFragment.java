@@ -11,6 +11,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.firebase.crash.FirebaseCrash;
+
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.adapters.NovelDetailRecyclerViewAdapter;
 import net.nashihara.naroureader.databinding.FragmentSearchRecyclerBinding;
@@ -152,6 +154,7 @@ public class SearchRecyclerViewFragment extends Fragment {
             @Override
             public void onError(Throwable e) {
                 Log.e(TAG, "onError: ", e.fillInStackTrace());
+                FirebaseCrash.report(e);
                 onLoadError();
             }
 
