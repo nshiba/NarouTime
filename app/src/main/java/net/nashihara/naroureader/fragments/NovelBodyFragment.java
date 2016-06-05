@@ -8,9 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
-import android.view.GestureDetector;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -30,7 +28,7 @@ import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
-public class NovelBodyFragment extends Fragment implements GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener {
+public class NovelBodyFragment extends Fragment{
     private static final String TAG = NovelBodyFragment.class.getSimpleName();
     private static final String ARG_NCODE = "ncode";
     private static final String ARG_TITLE = "title";
@@ -42,7 +40,6 @@ public class NovelBodyFragment extends Fragment implements GestureDetector.OnGes
 
     private SharedPreferences pref;
     private Realm realm;
-    private boolean isHide = false;
 
     private int page;
     private int totalPage;
@@ -55,7 +52,6 @@ public class NovelBodyFragment extends Fragment implements GestureDetector.OnGes
     private Context mContext;
     private OnNovelBodyInteraction mListener;
     private FragmentNovelBodyBinding binding;
-    private GestureDetector gestureDetector;
 
     public NovelBodyFragment() {}
 
@@ -76,7 +72,6 @@ public class NovelBodyFragment extends Fragment implements GestureDetector.OnGes
         super.onCreate(savedInstanceState);
         pref = PreferenceManager.getDefaultSharedPreferences(mContext);
         realm = RealmUtils.getRealm(mContext);
-        gestureDetector = new GestureDetector(mContext, this);
 
         Bundle args = getArguments();
         if (args != null) {
@@ -91,13 +86,6 @@ public class NovelBodyFragment extends Fragment implements GestureDetector.OnGes
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_novel_body, container, false);
-
-        binding.body.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                return gestureDetector.onTouchEvent(event);
-            }
-        });
 
         binding.page.setText(String.valueOf(page) + "/" + String.valueOf(totalPage));
         binding.btnNext.setOnClickListener(new View.OnClickListener() {
@@ -136,8 +124,6 @@ public class NovelBodyFragment extends Fragment implements GestureDetector.OnGes
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-//        binding.scrollView.smoothScrollTo(binding.scrollView.getScrollX(), binding.scrollView.getScrollY() + 50);
 
         RealmQuery<Novel4Realm> query = realm.where(Novel4Realm.class);
         query.equalTo("ncode", ncode);
@@ -344,58 +330,8 @@ public class NovelBodyFragment extends Fragment implements GestureDetector.OnGes
         });
     }
 
-    @Override
-    public boolean onDown(MotionEvent e) {
-        return true;
-    }
-
-    @Override
-    public boolean onSingleTapUp(MotionEvent e) {
-        return false;
-    }
-
-    @Override
-    public void onLongPress(MotionEvent e) {
-    }
-
-    @Override
-    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-        return false;
-    }
-
-    @Override
-    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-        return false;
-    }
-
-    @Override
-    public void onShowPress(MotionEvent e) {
-    }
-
-    @Override
-    public boolean onDoubleTap(MotionEvent e) {
-        return false;
-    }
-
-    @Override
-    public boolean onDoubleTapEvent(MotionEvent e) {
-        return false;
-    }
-
-    @Override
-    public boolean onSingleTapConfirmed(MotionEvent e) {
-        isHide = pref.getBoolean(PREF_IS_HIDE, isHide);
-
-        mListener.onSingleTapConfirmedAction(isHide);
-
-        isHide = !isHide;
-        pref.edit().putBoolean(PREF_IS_HIDE, isHide).apply();
-        return false;
-    }
-
     public interface OnNovelBodyInteraction {
         public void onNovelBodyLoadAction(String body, int nextPage, String bodyTitle);
         public Novel4Realm getNovel4RealmInstance();
-        public void onSingleTapConfirmedAction(boolean isHide);
     }
 }

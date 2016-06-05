@@ -1,12 +1,14 @@
-<layout xmlns:app="http://schemas.android.com/apk/res-auto">
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout>
+    <RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/root"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context="net.nashihara.naroureader.fragments.NovelBodyFragment">
 
-        <ScrollView
+        <android.support.v4.widget.NestedScrollView
             android:id="@+id/scrollView"
             android:scrollbars="vertical"
             android:scrollbarSize="3dp"
@@ -95,7 +97,7 @@
                 </RelativeLayout>
 
             </LinearLayout>
-        </ScrollView>
+        </android.support.v4.widget.NestedScrollView>
 
         <FrameLayout
             android:layout_width="match_parent"
