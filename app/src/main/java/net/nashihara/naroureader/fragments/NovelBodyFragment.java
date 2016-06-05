@@ -137,8 +137,6 @@ public class NovelBodyFragment extends Fragment implements GestureDetector.OnGes
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-//        binding.scrollView.smoothScrollTo(binding.scrollView.getScrollX(), binding.scrollView.getScrollY() + 50);
-
         RealmQuery<Novel4Realm> query = realm.where(Novel4Realm.class);
         query.equalTo("ncode", ncode);
         RealmResults<Novel4Realm> results = query.findAll();
