@@ -78,13 +78,9 @@ public abstract class DownloadUtils {
     }
 
     private void downloaded(FragmentManager manager) {
-        OkCancelDialogFragment okCancelDialog =
-                OkCancelDialogFragment.newInstance("小説ダウンロード", "すでにこの小説はダウンロード済みです", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
+        OkCancelDialogFragment okCancelDialog = OkCancelDialogFragment.newInstance(
+            "小説ダウンロード", "すでにこの小説はダウンロード済みです", (dialog, which) -> dialog.dismiss());
+
         okCancelDialog.show(manager, "okcancel");
     }
 

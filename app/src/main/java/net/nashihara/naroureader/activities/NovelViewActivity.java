@@ -1,6 +1,5 @@
 package net.nashihara.naroureader.activities;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
@@ -13,17 +12,16 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.balysv.materialmenu.MaterialMenuDrawable;
 
 import net.nashihara.naroureader.R;
-import net.nashihara.naroureader.views.adapters.NovelBodyFragmentViewPagerAdapter;
 import net.nashihara.naroureader.databinding.ActivityNovelViewBinding;
-import net.nashihara.naroureader.views.widgets.OkCancelDialogFragment;
-import net.nashihara.naroureader.models.entities.Novel4Realm;
 import net.nashihara.naroureader.fragments.NovelBodyFragment;
+import net.nashihara.naroureader.models.entities.Novel4Realm;
 import net.nashihara.naroureader.utils.RealmUtils;
+import net.nashihara.naroureader.views.adapters.NovelBodyFragmentViewPagerAdapter;
+import net.nashihara.naroureader.views.widgets.OkCancelDialogFragment;
 
 import io.realm.Realm;
 import io.realm.RealmQuery;
@@ -69,38 +67,27 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
         materialMenu.animateIconState(MaterialMenuDrawable.IconState.X);
         binding.toolbar.setTitle(title);
         binding.toolbar.setNavigationIcon(materialMenu);
-        binding.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
+        binding.toolbar.setNavigationOnClickListener(v -> onBackPressed());
         binding.toolbar.inflateMenu(R.menu.menu_novelbody);
         binding.toolbar.setOnMenuItemClickListener(this);
 
         NovelBodyFragmentViewPagerAdapter adapter
-                = new NovelBodyFragmentViewPagerAdapter(getSupportFragmentManager(), ncode, title, totalPage);
+            = new NovelBodyFragmentViewPagerAdapter(getSupportFragmentManager(), ncode, title, totalPage);
         binding.viewPager.setAdapter(adapter);
         binding.viewPager.setCurrentItem(page -1);
 
-        binding.fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                title = (String) binding.toolbar.getTitle();
-                StringBuilder builder = new StringBuilder();
-                builder.append(title);
-                builder.append("にしおりをはさみますか？");
-                OkCancelDialogFragment dialogFragment
-                        = OkCancelDialogFragment.newInstance("しおり", builder.toString(), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (which == OkCancelDialogFragment.OK) {
-                            bookmark(binding.viewPager.getCurrentItem() +1);
-                        }
-                    }
-                });
-                dialogFragment.show(getSupportFragmentManager(), "okcansel");
-            }
+        binding.fab.setOnClickListener(v -> {
+            title = (String) binding.toolbar.getTitle();
+            StringBuilder builder = new StringBuilder();
+            builder.append(title);
+            builder.append("にしおりをはさみますか？");
+            OkCancelDialogFragment dialogFragment
+                = OkCancelDialogFragment.newInstance("しおり", builder.toString(), (dialog, which) -> {
+                if (which == OkCancelDialogFragment.OK) {
+                    bookmark(binding.viewPager.getCurrentItem() +1);
+                }
+            });
+            dialogFragment.show(getSupportFragmentManager(), "okcansel");
         });
 
         boolean autoRemoveBookmark = pref.getBoolean(getString(R.string.auto_remove_bookmark), false);

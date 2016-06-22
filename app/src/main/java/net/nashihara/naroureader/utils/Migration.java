@@ -105,11 +105,11 @@ public class Migration implements RealmMigration {
             // add new realm object
             // Create a new class
             RealmObjectSchema novelTable = schema.create("Pet")
-                    .addField("tableNumber", int.class)
-                    .addField("ncode", String.class)
-                    .addField("page", int.class)
-                    .addField("title", String.class)
-                    .addField("isChapter", boolean.class);
+                .addField("tableNumber", int.class)
+                .addField("ncode", String.class)
+                .addField("page", int.class)
+                .addField("title", String.class)
+                .addField("isChapter", boolean.class);
 
 //                    .addField("name", String.class, FieldAttribute.REQUIRED)
 //                    .addField("type", String.class, FieldAttribute.REQUIRED);

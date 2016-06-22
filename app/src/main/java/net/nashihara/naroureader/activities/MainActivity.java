@@ -16,26 +16,25 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
 
 import com.balysv.materialmenu.MaterialMenuDrawable;
 
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.databinding.ActivityMainBinding;
-import net.nashihara.naroureader.views.widgets.ListDailogFragment;
-import net.nashihara.naroureader.views.widgets.NovelDownloadDialogFragment;
-import net.nashihara.naroureader.views.widgets.OkCancelDialogFragment;
-import net.nashihara.naroureader.models.entities.NovelItem;
 import net.nashihara.naroureader.fragments.BookmarkRecyclerViewFragment;
 import net.nashihara.naroureader.fragments.DownloadedRecyclerViewFragment;
 import net.nashihara.naroureader.fragments.NovelTableRecyclerViewFragment;
 import net.nashihara.naroureader.fragments.RankingViewPagerFragment;
 import net.nashihara.naroureader.fragments.SearchFragment;
 import net.nashihara.naroureader.fragments.SearchRecyclerViewFragment;
-import net.nashihara.naroureader.utils.OnFragmentReplaceListener;
+import net.nashihara.naroureader.models.entities.NovelItem;
 import net.nashihara.naroureader.utils.DownloadUtils;
 import net.nashihara.naroureader.utils.NetworkUtils;
+import net.nashihara.naroureader.utils.OnFragmentReplaceListener;
+import net.nashihara.naroureader.views.widgets.ListDailogFragment;
+import net.nashihara.naroureader.views.widgets.NovelDownloadDialogFragment;
+import net.nashihara.naroureader.views.widgets.OkCancelDialogFragment;
 
 import java.util.Stack;
 
@@ -45,7 +44,7 @@ import narou4j.enums.RankingType;
 import static android.support.v4.view.GravityCompat.START;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, OnFragmentReplaceListener, NovelTableRecyclerViewFragment.OnNovelSelectionListener, Toolbar.OnMenuItemClickListener {
+    implements NavigationView.OnNavigationItemSelectedListener, OnFragmentReplaceListener, NovelTableRecyclerViewFragment.OnNovelSelectionListener, Toolbar.OnMenuItemClickListener {
 
     ActivityMainBinding binding;
     private String TAG = MainActivity.class.getSimpleName();
@@ -66,15 +65,11 @@ public class MainActivity extends AppCompatActivity
         materialMenu = new MaterialMenuDrawable(this, Color.WHITE, MaterialMenuDrawable.Stroke.THIN);
         materialMenu.animateIconState(MaterialMenuDrawable.IconState.BURGER);
         binding.toolbar.setNavigationIcon(materialMenu);
-        binding.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int stack = manager.getBackStackEntryCount();
-                if (materialMenu.getIconState() == MaterialMenuDrawable.IconState.BURGER) {
-                    binding.drawer.openDrawer(START);
-                } else {
-                    onBackPressed();
-                }
+        binding.toolbar.setNavigationOnClickListener(v -> {
+            if (materialMenu.getIconState() == MaterialMenuDrawable.IconState.BURGER) {
+                binding.drawer.openDrawer(START);
+            } else {
+                onBackPressed();
             }
         });
         binding.toolbar.inflateMenu(R.menu.menu_novelview);
@@ -144,12 +139,12 @@ public class MainActivity extends AppCompatActivity
                     dialog.dismiss();
 
                     OkCancelDialogFragment okCancelDialog =
-                            OkCancelDialogFragment.newInstance("ダウンロード完了", "ダウンロードしました。", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                }
-                            });
+                        OkCancelDialogFragment.newInstance("ダウンロード完了", "ダウンロードしました。", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
                     okCancelDialog.show(getSupportFragmentManager(), "okcansel");
                 }
 
@@ -176,13 +171,13 @@ public class MainActivity extends AppCompatActivity
                 binding.toolbar.setTitle("ランキング");
                 binding.navView.setCheckedItem(R.id.nav_ranking);
                 String[] types = new String[]{
-                        RankingType.DAILY.toString(), RankingType.WEEKLY.toString(),
-                        RankingType.MONTHLY.toString(), RankingType.QUARTET.toString(), "all"};
+                    RankingType.DAILY.toString(), RankingType.WEEKLY.toString(),
+                    RankingType.MONTHLY.toString(), RankingType.QUARTET.toString(), "all"};
                 String[] titles = new String[]{"日間", "週間", "月間", "四半期", "累計"};
                 Fragment fragment = RankingViewPagerFragment.newInstance(types, titles);
                 manager.beginTransaction()
-                        .replace(R.id.main_container, fragment)
-                        .commit();
+                    .replace(R.id.main_container, fragment)
+                    .commit();
                 break;
             }
             case R.id.nav_bookmark: {
@@ -190,8 +185,8 @@ public class MainActivity extends AppCompatActivity
                 binding.navView.setCheckedItem(R.id.nav_bookmark);
                 BookmarkRecyclerViewFragment fragment = BookmarkRecyclerViewFragment.newInstance();
                 manager.beginTransaction()
-                        .replace(R.id.main_container, fragment)
-                        .commit();
+                    .replace(R.id.main_container, fragment)
+                    .commit();
                 break;
             }
             case R.id.nav_download: {
@@ -199,8 +194,8 @@ public class MainActivity extends AppCompatActivity
                 binding.navView.setCheckedItem(R.id.nav_download);
                 DownloadedRecyclerViewFragment fragment = DownloadedRecyclerViewFragment.newInstance();
                 manager.beginTransaction()
-                        .replace(R.id.main_container, fragment)
-                        .commit();
+                    .replace(R.id.main_container, fragment)
+                    .commit();
                 break;
             }
             case R.id.nav_search: {
@@ -208,8 +203,8 @@ public class MainActivity extends AppCompatActivity
                 binding.navView.setCheckedItem(R.id.nav_search);
                 SearchFragment fragment = SearchFragment.newInstance().newInstance();
                 manager.beginTransaction()
-                        .replace(R.id.main_container, fragment)
-                        .commit();
+                    .replace(R.id.main_container, fragment)
+                    .commit();
                 break;
             }
             case R.id.nav_setting: {
@@ -219,31 +214,28 @@ public class MainActivity extends AppCompatActivity
                 break;
             }
             case R.id.nav_feedback: {
-                DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
+                DialogInterface.OnClickListener onClickListener = (dialog, which) -> {
+                    dialog.dismiss();
 
-                        Intent intent = null;
-                        switch (which) {
-                            case 0: {
-                                String url = "http://twitter.com/share?screen_name=narou_time&hashtags=なろうTime";
-                                intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                                break;
-                            }
-                            case 1: {
-                                intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=net.nashihara.naroureader"));
-                                break;
-                            }
+                    Intent intent = null;
+                    switch (which) {
+                        case 0: {
+                            String url = "http://twitter.com/share?screen_name=narou_time&hashtags=なろうTime";
+                            intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                            break;
                         }
+                        case 1: {
+                            intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=net.nashihara.naroureader"));
+                            break;
+                        }
+                    }
 
-                        if (intent != null) {
-                            startActivity(intent);
-                        }
+                    if (intent != null) {
+                        startActivity(intent);
                     }
                 };
                 ListDailogFragment fragment =
-                        ListDailogFragment.newInstance("フィードバック", new String[]{"Twitter", "Google Play Store"}, onClickListener);
+                    ListDailogFragment.newInstance("フィードバック", new String[]{"Twitter", "Google Play Store"}, onClickListener);
                 fragment.show(getSupportFragmentManager(), "list");
                 break;
             }
@@ -258,8 +250,8 @@ public class MainActivity extends AppCompatActivity
 
         if (NetworkUtils.isOnline(this)) {
             String[] types = new String[]{
-                    RankingType.DAILY.toString(), RankingType.WEEKLY.toString(),
-                    RankingType.MONTHLY.toString(), RankingType.QUARTET.toString(), "all"};
+                RankingType.DAILY.toString(), RankingType.WEEKLY.toString(),
+                RankingType.MONTHLY.toString(), RankingType.QUARTET.toString(), "all"};
             String[] titles = new String[]{"日間", "週間", "月間", "四半期", "累計"};
             fragment = RankingViewPagerFragment.newInstance(types, titles);
             binding.toolbar.setTitle("ランキング");
@@ -270,8 +262,8 @@ public class MainActivity extends AppCompatActivity
         }
 
         manager.beginTransaction()
-                .add(R.id.main_container, fragment)
-                .commit();
+            .add(R.id.main_container, fragment)
+            .commit();
     }
 
     @Override
@@ -292,9 +284,9 @@ public class MainActivity extends AppCompatActivity
         titleStack.push((String) binding.toolbar.getTitle());
         binding.toolbar.setTitle(title);
         manager.beginTransaction()
-                .replace(R.id.main_container, fragment)
-                .addToBackStack(null)
-                .commit();
+            .replace(R.id.main_container, fragment)
+            .addToBackStack(null)
+            .commit();
 
     }
 

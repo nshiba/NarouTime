@@ -245,13 +245,10 @@ public class SearchRecyclerViewFragment extends Fragment {
     private void onLoadError() {
         binding.progressBar.setVisibility(View.GONE);
         binding.btnReload.setVisibility(View.VISIBLE);
-        binding.btnReload.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                binding.progressBar.setVisibility(View.VISIBLE);
-                binding.btnReload.setVisibility(View.GONE);
-                reload();
-            }
+        binding.btnReload.setOnClickListener(v -> {
+            binding.progressBar.setVisibility(View.VISIBLE);
+            binding.btnReload.setVisibility(View.GONE);
+            reload();
         });
     }
 

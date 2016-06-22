@@ -3,7 +3,6 @@ package net.nashihara.naroureader.activities;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
 
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.databinding.ActivityLicensesBinding;
@@ -17,12 +16,7 @@ public class LicensesActivity extends AppCompatActivity {
 
         binding.toolbar.setTitle("オープンソースライセンス");
         binding.toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
-        binding.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
+        binding.toolbar.setNavigationOnClickListener(v -> onBackPressed());
         binding.webView.loadUrl("file:///android_asset/licenses.html");
     }
 

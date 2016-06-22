@@ -52,8 +52,8 @@ public class ListDailogFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         return new AlertDialog.Builder(getActivity())
-                .setTitle(title)
-                .setItems(listItems, onClickListener)
-                .create();
+            .setTitle(title)
+            .setItems(listItems, onClickListener)
+            .create();
     }
 }

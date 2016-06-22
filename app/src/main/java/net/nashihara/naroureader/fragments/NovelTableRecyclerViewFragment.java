@@ -1,7 +1,6 @@
 package net.nashihara.naroureader.fragments;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Build;
@@ -19,13 +18,12 @@ import android.widget.LinearLayout;
 import com.google.firebase.crash.FirebaseCrash;
 
 import net.nashihara.naroureader.R;
-import net.nashihara.naroureader.views.adapters.NovelTableRecyclerViewAdapter;
 import net.nashihara.naroureader.databinding.FragmentNovelTableViewBinding;
-import net.nashihara.naroureader.databinding.ItemTableRecyclerBinding;
-import net.nashihara.naroureader.views.widgets.OkCancelDialogFragment;
 import net.nashihara.naroureader.models.entities.Novel4Realm;
 import net.nashihara.naroureader.models.entities.NovelTable4Realm;
 import net.nashihara.naroureader.utils.RealmUtils;
+import net.nashihara.naroureader.views.adapters.NovelTableRecyclerViewAdapter;
+import net.nashihara.naroureader.views.widgets.OkCancelDialogFragment;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -40,7 +38,6 @@ import narou4j.entities.NovelBody;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 
 public class NovelTableRecyclerViewFragment extends Fragment {
@@ -99,31 +96,22 @@ public class NovelTableRecyclerViewFragment extends Fragment {
         manager.setAutoMeasureEnabled(true);
         mRecyclerView.setLayoutManager(manager);
         NovelTableRecyclerViewAdapter adapter = new NovelTableRecyclerViewAdapter(mContext);
-        adapter.setOnItemClickListener(new NovelTableRecyclerViewAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(View view, int position, ItemTableRecyclerBinding binding) {
-                NovelTableRecyclerViewAdapter clickAdapter = (NovelTableRecyclerViewAdapter) mRecyclerView.getAdapter();
-                NovelBody body = clickAdapter.getList().get(position);
-                mListener.onSelect(body.getNcode(), totalPage, body.getPage(), title, writer, body.getTitle());
-           }
+        adapter.setOnItemClickListener((view, position, binding1) -> {
+            NovelTableRecyclerViewAdapter clickAdapter = (NovelTableRecyclerViewAdapter) mRecyclerView.getAdapter();
+            NovelBody body = clickAdapter.getList().get(position);
+            mListener.onSelect(body.getNcode(), totalPage, body.getPage(), title, writer, body.getTitle());
         });
         mRecyclerView.setAdapter(adapter);
 
-        binding.fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int bookmark = loadBookmark();
-                if (bookmark == 0) {
-                    OkCancelDialogFragment dialogFragment
-                            = OkCancelDialogFragment.newInstance("ブックマーク", "この小説にはしおりをはさんでいません。", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {}
-                    });
-                    dialogFragment.show(getFragmentManager(), "okcansel");
-                }
-                else {
-                    mListener.onSelect(ncode, totalPage, bookmark, title, writer, bodyTitles.get(bookmark -1));
-                }
+        binding.fab.setOnClickListener(v -> {
+            int bookmark = loadBookmark();
+            if (bookmark == 0) {
+                OkCancelDialogFragment dialogFragment
+                    = OkCancelDialogFragment.newInstance("ブックマーク", "この小説にはしおりをはさんでいません。", (dialog, which) -> {});
+                dialogFragment.show(getFragmentManager(), "okcansel");
+            }
+            else {
+                mListener.onSelect(ncode, totalPage, bookmark, title, writer, bodyTitles.get(bookmark -1));
             }
         });
 
@@ -150,57 +138,54 @@ public class NovelTableRecyclerViewFragment extends Fragment {
                         subscriber.onError(e);
                     }
                 }
-            }), new Func2<Novel, List<NovelBody>, Novel>() {
-                @Override
-                public Novel call(Novel novel, List<NovelBody> novelBodies) {
-                    novel.setBodies(novelBodies);
-                    return novel;
-                }
+            }), (novel, novelBodies) -> {
+                novel.setBodies(novelBodies);
+                return novel;
             })
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Subscriber<Novel>() {
-                        @Override
-                        public void onCompleted() { }
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Novel>() {
+                    @Override
+                    public void onCompleted() { }
 
-                        @Override
-                        public void onError(Throwable e) {
-                            onLoadError();
-                            Log.e(TAG, "onError: ", e.fillInStackTrace());
-                            FirebaseCrash.report(e);
-                        }
+                    @Override
+                    public void onError(Throwable e) {
+                        onLoadError();
+                        Log.e(TAG, "onError: ", e.fillInStackTrace());
+                        FirebaseCrash.report(e);
+                    }
 
-                        @Override
-                        public void onNext(Novel novel) {
-                            binding.title.setText(novel.getTitle());
-                            binding.ncode.setText("Nコード : " + ncode);
-                            binding.writer.setText("作者 : " + novel.getWriter());
-                            binding.story.setText(novel.getStory());
+                    @Override
+                    public void onNext(Novel novel) {
+                        binding.title.setText(novel.getTitle());
+                        binding.ncode.setText("Nコード : " + ncode);
+                        binding.writer.setText("作者 : " + novel.getWriter());
+                        binding.story.setText(novel.getStory());
 
-                            NovelTableRecyclerViewAdapter rxAdapter = (NovelTableRecyclerViewAdapter) mRecyclerView.getAdapter();
-                            rxAdapter.clearData();
-                            rxAdapter.addDataOf(novel.getBodies());
+                        NovelTableRecyclerViewAdapter rxAdapter = (NovelTableRecyclerViewAdapter) mRecyclerView.getAdapter();
+                        rxAdapter.clearData();
+                        rxAdapter.addDataOf(novel.getBodies());
 
-                            setRecyclerViewLayoutParams();
+                        setRecyclerViewLayoutParams();
 
-                            binding.progressBar.setVisibility(View.GONE);
-                            mRecyclerView.setVisibility(View.VISIBLE);
-                            binding.title.setVisibility(View.VISIBLE);
-                            binding.ncode.setVisibility(View.VISIBLE);
-                            binding.writer.setVisibility(View.VISIBLE);
-                            binding.story.setVisibility(View.VISIBLE);
+                        binding.progressBar.setVisibility(View.GONE);
+                        mRecyclerView.setVisibility(View.VISIBLE);
+                        binding.title.setVisibility(View.VISIBLE);
+                        binding.ncode.setVisibility(View.VISIBLE);
+                        binding.writer.setVisibility(View.VISIBLE);
+                        binding.story.setVisibility(View.VISIBLE);
 
-                            writer = novel.getWriter();
-                            title = novel.getTitle();
-                            totalPage = novel.getAllNumberOfNovel();
-                            bodyTitles = new ArrayList<>();
-                            for (NovelBody body : novel.getBodies()) {
-                                if (!body.isChapter()) {
-                                    bodyTitles.add(body.getTitle());
-                                }
+                        writer = novel.getWriter();
+                        title = novel.getTitle();
+                        totalPage = novel.getAllNumberOfNovel();
+                        bodyTitles = new ArrayList<>();
+                        for (NovelBody body : novel.getBodies()) {
+                            if (!body.isChapter()) {
+                                bodyTitles.add(body.getTitle());
                             }
                         }
-                    });
+                    }
+                });
         }
 
         setFabMargin();
@@ -295,16 +280,13 @@ public class NovelTableRecyclerViewFragment extends Fragment {
     }
 
     private void setFabMargin() {
-        globalLayoutListener = new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                int margin = binding.fab.getHeight() /2 * -1;
-                ViewGroup.MarginLayoutParams mlp = (ViewGroup.MarginLayoutParams) binding.fab.getLayoutParams();
-                mlp.setMargins(mlp.leftMargin, margin, mlp.rightMargin, mlp.bottomMargin);
-                binding.fab.setLayoutParams(mlp);
+        globalLayoutListener = () -> {
+            int margin = binding.fab.getHeight() /2 * -1;
+            ViewGroup.MarginLayoutParams mlp = (ViewGroup.MarginLayoutParams) binding.fab.getLayoutParams();
+            mlp.setMargins(mlp.leftMargin, margin, mlp.rightMargin, mlp.bottomMargin);
+            binding.fab.setLayoutParams(mlp);
 
-                binding.topContainer.getViewTreeObserver().removeOnGlobalLayoutListener(globalLayoutListener);
-            }
+            binding.topContainer.getViewTreeObserver().removeOnGlobalLayoutListener(globalLayoutListener);
         };
 
         binding.topContainer.getViewTreeObserver().addOnGlobalLayoutListener(globalLayoutListener);
@@ -334,13 +316,10 @@ public class NovelTableRecyclerViewFragment extends Fragment {
     private void onLoadError() {
         binding.progressBar.setVisibility(View.GONE);
         binding.btnReload.setVisibility(View.VISIBLE);
-        binding.btnReload.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                binding.progressBar.setVisibility(View.VISIBLE);
-                binding.btnReload.setVisibility(View.GONE);
-                reload();
-            }
+        binding.btnReload.setOnClickListener(v -> {
+            binding.progressBar.setVisibility(View.VISIBLE);
+            binding.btnReload.setVisibility(View.GONE);
+            reload();
         });
     }
 

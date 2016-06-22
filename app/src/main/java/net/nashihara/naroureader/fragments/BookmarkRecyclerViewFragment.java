@@ -12,13 +12,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import net.nashihara.naroureader.R;
-import net.nashihara.naroureader.utils.RealmUtils;
 import net.nashihara.naroureader.activities.NovelViewActivity;
-import net.nashihara.naroureader.views.adapters.SimpleRecyclerViewAdapter;
 import net.nashihara.naroureader.databinding.FragmentSimpleRecycerViewBinding;
 import net.nashihara.naroureader.models.entities.Novel4Realm;
 import net.nashihara.naroureader.utils.OnFragmentReplaceListener;
-import net.nashihara.naroureader.utils.OnItemClickListener;
+import net.nashihara.naroureader.utils.RealmUtils;
+import net.nashihara.naroureader.views.adapters.SimpleRecyclerViewAdapter;
 
 import java.util.ArrayList;
 
@@ -47,34 +46,33 @@ public class BookmarkRecyclerViewFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            adapter = new SimpleRecyclerViewAdapter(mContext);
-            adapter.setOnItemClickListener(new OnItemClickListener() {
-                @Override
-                public void onItemClick(View view, int position) {
-                    final Novel4Realm novel = novels.get(position);
-
-                    Intent intent = new Intent(mContext, NovelViewActivity.class);
-                    intent.putExtra("ncode", novel.getNcode());
-                    intent.putExtra("page", novel.getBookmark());
-                    intent.putExtra("title", novel.getTitle());
-                    intent.putExtra("writer", novel.getWriter());
-                    intent.putExtra("totalPage", novel.getTotalPage());
-
-                    startActivity(intent);
-                }
-            });
-
-            Realm realm = RealmUtils.getRealm(mContext);
-            RealmResults<Novel4Realm> results = realm.where(Novel4Realm.class).notEqualTo("bookmark", 0).findAll();
-
-            for (Novel4Realm novel4Realm : results) {
-                novels.add(novel4Realm);
-            }
-
-            adapter.clearData();
-            adapter.addDataOf(novels);
+        if (getArguments() == null) {
+            return;
         }
+
+        adapter = new SimpleRecyclerViewAdapter(mContext);
+        adapter.setOnItemClickListener((view, position) -> {
+            final Novel4Realm novel = novels.get(position);
+
+            Intent intent = new Intent(mContext, NovelViewActivity.class);
+            intent.putExtra("ncode", novel.getNcode());
+            intent.putExtra("page", novel.getBookmark());
+            intent.putExtra("title", novel.getTitle());
+            intent.putExtra("writer", novel.getWriter());
+            intent.putExtra("totalPage", novel.getTotalPage());
+
+            startActivity(intent);
+        });
+
+        Realm realm = RealmUtils.getRealm(mContext);
+        RealmResults<Novel4Realm> results = realm.where(Novel4Realm.class).notEqualTo("bookmark", 0).findAll();
+
+        for (Novel4Realm novel4Realm : results) {
+            novels.add(novel4Realm);
+        }
+
+        adapter.clearData();
+        adapter.addDataOf(novels);
     }
 
     @Override
@@ -100,7 +98,7 @@ public class BookmarkRecyclerViewFragment extends Fragment {
             mListener = (OnFragmentReplaceListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement context instanceof OnFragmentReplaceListener");
+                + " must implement context instanceof OnFragmentReplaceListener");
         }
     }
 
