@@ -7,11 +7,11 @@ import android.util.Log;
 
 import com.google.firebase.crash.FirebaseCrash;
 
-import net.nashihara.naroureader.dialogs.NovelDownloadDialogFragment;
-import net.nashihara.naroureader.dialogs.OkCancelDialogFragment;
-import net.nashihara.naroureader.entities.Novel4Realm;
-import net.nashihara.naroureader.entities.NovelBody4Realm;
-import net.nashihara.naroureader.entities.NovelTable4Realm;
+import net.nashihara.naroureader.views.widgets.NovelDownloadDialogFragment;
+import net.nashihara.naroureader.views.widgets.OkCancelDialogFragment;
+import net.nashihara.naroureader.models.entities.Novel4Realm;
+import net.nashihara.naroureader.models.entities.NovelBody4Realm;
+import net.nashihara.naroureader.models.entities.NovelTable4Realm;
 
 import java.io.IOException;
 import java.util.List;
@@ -78,13 +78,9 @@ public abstract class DownloadUtils {
     }
 
     private void downloaded(FragmentManager manager) {
-        OkCancelDialogFragment okCancelDialog =
-                OkCancelDialogFragment.newInstance("小説ダウンロード", "すでにこの小説はダウンロード済みです", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
+        OkCancelDialogFragment okCancelDialog = OkCancelDialogFragment.newInstance(
+            "小説ダウンロード", "すでにこの小説はダウンロード済みです", (dialog, which) -> dialog.dismiss());
+
         okCancelDialog.show(manager, "okcancel");
     }
 

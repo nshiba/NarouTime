@@ -11,13 +11,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import net.nashihara.naroureader.R;
-import net.nashihara.naroureader.utils.RealmUtils;
-import net.nashihara.naroureader.adapters.SimpleRecyclerViewAdapter;
 import net.nashihara.naroureader.databinding.FragmentSimpleRecycerViewBinding;
-import net.nashihara.naroureader.entities.Novel4Realm;
-import net.nashihara.naroureader.entities.NovelItem;
-import net.nashihara.naroureader.listeners.OnFragmentReplaceListener;
-import net.nashihara.naroureader.listeners.OnItemClickListener;
+import net.nashihara.naroureader.models.entities.Novel4Realm;
+import net.nashihara.naroureader.models.entities.NovelItem;
+import net.nashihara.naroureader.utils.OnFragmentReplaceListener;
+import net.nashihara.naroureader.utils.RealmUtils;
+import net.nashihara.naroureader.views.adapters.SimpleRecyclerViewAdapter;
 
 import java.util.ArrayList;
 
@@ -47,37 +46,35 @@ public class DownloadedRecyclerViewFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-
-            Realm realm = RealmUtils.getRealm(mContext);
-            RealmResults<Novel4Realm> results = realm.where(Novel4Realm.class).equalTo("isDownload", true).findAll();
-
-            for (Novel4Realm novel4Realm : results) {
-                novels.add(novel4Realm);
-            }
-
-            adapter = new SimpleRecyclerViewAdapter(mContext);
-            adapter.setOnItemClickListener(new OnItemClickListener() {
-                @Override
-                public void onItemClick(View view, int position) {
-                    final Novel4Realm novel = novels.get(position);
-
-                    Novel novelDetail = new Novel();
-                    novelDetail.setNcode(novel.getNcode());
-                    novelDetail.setTitle(novel.getTitle());
-                    novelDetail.setStory(novel.getStory());
-                    novelDetail.setWriter(novel.getWriter());
-                    novelDetail.setAllNumberOfNovel(novel.getTotalPage());
-
-                    NovelItem item = new NovelItem();
-                    item.setNovelDetail(novelDetail);
-                    mListener.onFragmentReplaceAction(NovelTableRecyclerViewFragment.newInstance(novel.getNcode()), novel.getTitle(), item);
-                }
-            });
-
-            adapter.clearData();
-            adapter.addDataOf(novels);
+        if (getArguments() == null) {
+            return;
         }
+
+        Realm realm = RealmUtils.getRealm(mContext);
+        RealmResults<Novel4Realm> results = realm.where(Novel4Realm.class).equalTo("isDownload", true).findAll();
+
+        for (Novel4Realm novel4Realm : results) {
+            novels.add(novel4Realm);
+        }
+
+        adapter = new SimpleRecyclerViewAdapter(mContext);
+        adapter.setOnItemClickListener((view, position) -> {
+            final Novel4Realm novel = novels.get(position);
+
+            Novel novelDetail = new Novel();
+            novelDetail.setNcode(novel.getNcode());
+            novelDetail.setTitle(novel.getTitle());
+            novelDetail.setStory(novel.getStory());
+            novelDetail.setWriter(novel.getWriter());
+            novelDetail.setAllNumberOfNovel(novel.getTotalPage());
+
+            NovelItem item = new NovelItem();
+            item.setNovelDetail(novelDetail);
+            mListener.onFragmentReplaceAction(NovelTableRecyclerViewFragment.newInstance(novel.getNcode()), novel.getTitle(), item);
+        });
+
+        adapter.clearData();
+        adapter.addDataOf(novels);
     }
 
     @Override
@@ -102,7 +99,7 @@ public class DownloadedRecyclerViewFragment extends Fragment {
             mListener = (OnFragmentReplaceListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement context instanceof OnFragmentReplaceListener");
+                + " must implement context instanceof OnFragmentReplaceListener");
         }
     }
 

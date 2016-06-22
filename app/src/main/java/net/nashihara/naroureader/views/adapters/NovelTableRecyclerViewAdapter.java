@@ -1,4 +1,4 @@
-package net.nashihara.naroureader.adapters;
+package net.nashihara.naroureader.views.adapters;
 
 import android.content.Context;
 import android.databinding.DataBindingUtil;
@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.databinding.ItemTableRecyclerBinding;
-import net.nashihara.naroureader.entities.NovelItem;
+import net.nashihara.naroureader.models.entities.NovelItem;
 
 import java.util.ArrayList;
 import java.util.List;

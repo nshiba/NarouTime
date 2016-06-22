@@ -1,4 +1,4 @@
-package net.nashihara.naroureader.listeners;
+package net.nashihara.naroureader.utils;
 
 import android.view.View;
 

@@ -21,9 +21,9 @@ public class RealmUtils {
 
     private static RealmConfiguration getConfig(Context context) {
         defaultConfig = new RealmConfiguration.Builder(context)
-                .schemaVersion(VERSION)
-                .migration(migration)
-                .build();
+            .schemaVersion(VERSION)
+            .migration(migration)
+            .build();
         return defaultConfig;
     }
 

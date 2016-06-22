@@ -1,4 +1,4 @@
-package net.nashihara.naroureader.adapters;
+package net.nashihara.naroureader.views.adapters;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -13,13 +13,12 @@ import android.view.ViewGroup;
 
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.databinding.ItemRankingRecyclerBinding;
-import net.nashihara.naroureader.entities.NovelItem;
+import net.nashihara.naroureader.models.entities.NovelItem;
 
 import java.util.List;
 
 import narou4j.entities.Novel;
 import narou4j.entities.NovelRank;
-import narou4j.enums.NovelGenre;
 
 public class NovelDetailRecyclerViewAdapter extends RecyclerView.Adapter<NovelDetailRecyclerViewAdapter.BindingHolder> {
     private static final String TAG = NovelDetailRecyclerViewAdapter.class.getSimpleName();
@@ -92,7 +91,7 @@ public class NovelDetailRecyclerViewAdapter extends RecyclerView.Adapter<NovelDe
         binding.title.setText(novel.getTitle());
         binding.ncode.setText(novel.getNcode());
         binding.writer.setText(novel.getWriter());
-        binding.genre.setText(int2Genre(novel.getGenre()));
+        binding.genre.setText(novel.getGenre().getText());
         binding.allStory.setText(novel.getStory());
         binding.allStory.setVisibility(View.GONE);
         binding.keyword.setText("キーワード：" + novel.getKeyword());
@@ -164,7 +163,7 @@ public class NovelDetailRecyclerViewAdapter extends RecyclerView.Adapter<NovelDe
         binding.rankingPoint.setText(int2String(rank.getPt()) + "pt");
         binding.ncode.setText(novel.getNcode());
         binding.writer.setText(novel.getWriter());
-        binding.genre.setText(int2Genre(novel.getGenre()));
+        binding.genre.setText(novel.getGenre().getText());
         binding.allStory.setText(novel.getStory());
         binding.allStory.setVisibility(View.GONE);
         binding.keyword.setText("キーワード：" + novel.getKeyword());
@@ -216,77 +215,6 @@ public class NovelDetailRecyclerViewAdapter extends RecyclerView.Adapter<NovelDe
 
     public SortedList<NovelItem> getList() {
         return this.mSortedList;
-    }
-
-    private String int2Genre(NovelGenre target) {
-        switch (target) {
-            case LOVE_DIFF_WORLD: {
-                return "異世界[恋愛]";
-            }
-            case LOVE_REAL_WORLD: {
-                return "現実世界[恋愛]";
-            }
-            case FANTASY_HIGH: {
-                return "ハイファンタジー[ファンタジー]";
-            }
-            case FANTASY_LOW: {
-                return "ローファンタジー[ファンタジー]";
-            }
-            case LITERAL_PURE: {
-                return "純文学[文芸]";
-            }
-            case LITERAL_DRAMA: {
-                return "ヒューマンドラマ[文芸]";
-            }
-            case LITERAL_HISTORY: {
-                return "歴史[文芸]";
-            }
-            case LITERAL_DETECTIVE: {
-                return "推理[文芸]";
-            }
-            case LITERAL_HORROR: {
-                return "ホラー[文芸]";
-            }
-            case LITERAL_ACTION: {
-                return "アクション[文芸]";
-            }
-            case LITERAL_COMEDY: {
-                return "コメディー[文芸]";
-            }
-            case SF_VR: {
-                return "VRゲーム[SF]";
-            }
-            case SF_SPACE: {
-                return "宇宙[SF]";
-            }
-            case SF_SCIENCE: {
-                return "空想科学[SF]";
-            }
-            case SF_PANIC: {
-                return "パニック[SF]";
-            }
-            case OTHER_FAIRYTALE: {
-                return "童話[その他]";
-            }
-            case OTHER_POEM: {
-                return "詩[その他]";
-            }
-            case OTHER_ESSAY: {
-                return "エッセイ[その他]";
-            }
-            case OTHER_REPLAY: {
-                return "リプレイ[その他]";
-            }
-            case OTHER: {
-                return "その他[その他]";
-            }
-            case NONGENRE: {
-                return "ノンジャンル[ノンジャンル]";
-            }
-            default: {
-                return "no such a genre";
-            }
-        }
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {

@@ -1,4 +1,4 @@
-package net.nashihara.naroureader.dialogs;
+package net.nashihara.naroureader.views.widgets;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -61,47 +61,30 @@ public class FilterDialogFragment extends DialogFragment {
         LayoutInflater inflater = getActivity().getLayoutInflater();
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_filter_dialog, null, false);
 
-        DialogInterface.OnMultiChoiceClickListener onMultiChoiceClickListener = new DialogInterface.OnMultiChoiceClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-                checked[which] = isChecked;
-            }
-        };
+        DialogInterface.OnMultiChoiceClickListener onMultiChoiceClickListener
+            = (dialog, which, isChecked) -> checked[which] = isChecked;
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(title)
-                .setMultiChoiceItems(listItems, checked, onMultiChoiceClickListener)
-                .setNegativeButton("cansel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                })
-                .setNeutralButton("reset", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        mListener.onNeutralButton(which);
-                    }
-                });
+            .setMultiChoiceItems(listItems, checked, onMultiChoiceClickListener)
+            .setNegativeButton("cansel", (dialog, which) -> {
+                dialog.dismiss();
+            })
+            .setNeutralButton("reset", (dialog, which) -> {
+                mListener.onNeutralButton(which);
+            });
         if (isLength) {
-            builder.setView(binding.getRoot())
-                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            String max = binding.maxLength.getText().toString();
-                            String min = binding.minLength.getText().toString();
-                            mListener.onPositiveButton(which, checked, min, max);
-                            dialog.dismiss();
-                        }
-                    });
+            builder.setView(binding.getRoot()).setPositiveButton("OK", (dialog, which) -> {
+                String max = binding.maxLength.getText().toString();
+                String min = binding.minLength.getText().toString();
+                mListener.onPositiveButton(which, checked, min, max);
+                dialog.dismiss();
+            });
         }
         else {
-            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    mListener.onPositiveButton(which, checked, "", "");
-                    dialog.dismiss();
-                }
+            builder.setPositiveButton("OK", (dialog, which) -> {
+                mListener.onPositiveButton(which, checked, "", "");
+                dialog.dismiss();
             });
         }
         return builder.create();

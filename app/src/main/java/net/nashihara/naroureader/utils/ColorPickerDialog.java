@@ -10,10 +10,10 @@ import com.pavelsikun.vintagechroma.colormode.ColorMode;
 public class ColorPickerDialog {
     public static void show(FragmentManager manager, int targetColor, OnColorSelectedListener listener) {
         new ChromaDialog.Builder()
-                .initialColor(targetColor)
-                .colorMode(ColorMode.ARGB)
-                .indicatorMode(IndicatorMode.HEX)
-                .onColorSelected(listener)
-                .create().show(manager, "ChromaDialog");
+            .initialColor(targetColor)
+            .colorMode(ColorMode.ARGB)
+            .indicatorMode(IndicatorMode.HEX)
+            .onColorSelected(listener)
+            .create().show(manager, "ChromaDialog");
     }
 }

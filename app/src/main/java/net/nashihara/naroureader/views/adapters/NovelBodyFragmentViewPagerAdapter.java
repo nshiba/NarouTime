@@ -1,4 +1,4 @@
-package net.nashihara.naroureader.adapters;
+package net.nashihara.naroureader.views.adapters;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;

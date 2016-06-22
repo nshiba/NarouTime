@@ -1,4 +1,4 @@
-package net.nashihara.naroureader.dialogs;
+package net.nashihara.naroureader.views.widgets;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -52,8 +52,8 @@ public class ListDailogFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         return new AlertDialog.Builder(getActivity())
-                .setTitle(title)
-                .setItems(listItems, onClickListener)
-                .create();
+            .setTitle(title)
+            .setItems(listItems, onClickListener)
+            .create();
     }
 }

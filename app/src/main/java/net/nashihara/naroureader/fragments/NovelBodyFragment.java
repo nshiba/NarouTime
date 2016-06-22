@@ -16,8 +16,8 @@ import com.google.firebase.crash.FirebaseCrash;
 
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.databinding.FragmentNovelBodyBinding;
-import net.nashihara.naroureader.entities.Novel4Realm;
-import net.nashihara.naroureader.entities.NovelBody4Realm;
+import net.nashihara.naroureader.models.entities.Novel4Realm;
+import net.nashihara.naroureader.models.entities.NovelBody4Realm;
 import net.nashihara.naroureader.utils.RealmUtils;
 
 import java.io.IOException;
@@ -92,25 +92,20 @@ public class NovelBodyFragment extends Fragment{
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_novel_body, container, false);
 
         binding.page.setText(String.valueOf(page) + "/" + String.valueOf(totalPage));
-        binding.btnNext.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (page >= totalPage) {
-                    return;
-                }
-                realm.close();
-                mListener.onNovelBodyLoadAction(nextBody, page+1, "");
+        binding.btnNext.setOnClickListener(v -> {
+            if (page >= totalPage) {
+                return;
             }
+            realm.close();
+            mListener.onNovelBodyLoadAction(nextBody, page+1, "");
         });
-        binding.btnPrev.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (page <= 1) {
-                    return;
-                }
-                realm.close();
-                mListener.onNovelBodyLoadAction(prevBody, page-1, "");
+
+        binding.btnPrev.setOnClickListener(v -> {
+            if (page <= 1) {
+                return;
             }
+            realm.close();
+            mListener.onNovelBodyLoadAction(prevBody, page-1, "");
         });
 
         if (body.equals("")) {
@@ -248,48 +243,48 @@ public class NovelBodyFragment extends Fragment{
                 subscriber.onCompleted();
             }
         })
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<NovelBody>() {
-                    @Override
-                    public void onCompleted() {}
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(new Subscriber<NovelBody>() {
+                @Override
+                public void onCompleted() {}
 
-                    @Override
-                    public void onError(Throwable e) {
-                        onLoadError();
-                        Log.e(TAG, "onError: ", e.fillInStackTrace());
-                        FirebaseCrash.report(e);
-                    }
+                @Override
+                public void onError(Throwable e) {
+                    onLoadError();
+                    Log.e(TAG, "onError: ", e.fillInStackTrace());
+                    FirebaseCrash.report(e);
+                }
 
-                    @Override
-                    public void onNext(NovelBody s) {
-                        if (pref.getBoolean(getString(R.string.auto_download), false)) {
-                            realm.beginTransaction();
+                @Override
+                public void onNext(NovelBody s) {
+                    if (pref.getBoolean(getString(R.string.auto_download), false)) {
+                        realm.beginTransaction();
 
-                            RealmResults<NovelBody4Realm> results = getNovelBody(ncode, targetPage);
-                            if (results.size() <= 0) {
-                                NovelBody4Realm body4Realm = realm.createObject(NovelBody4Realm.class);
-                                body4Realm.setNcode(ncode);
-                                body4Realm.setTitle(s.getTitle());
-                                body4Realm.setBody(s.getBody());
-                                body4Realm.setPage(targetPage);
-                            }
-                            else {
-                                NovelBody4Realm body4Realm = results.get(0);
-                                body4Realm.setNcode(ncode);
-                                body4Realm.setTitle(s.getTitle());
-                                body4Realm.setBody(s.getBody());
-                                body4Realm.setPage(targetPage);
-                            }
-
-                            realm.commitTransaction();
+                        RealmResults<NovelBody4Realm> results = getNovelBody(ncode, targetPage);
+                        if (results.size() <= 0) {
+                            NovelBody4Realm body4Realm = realm.createObject(NovelBody4Realm.class);
+                            body4Realm.setNcode(ncode);
+                            body4Realm.setTitle(s.getTitle());
+                            body4Realm.setBody(s.getBody());
+                            body4Realm.setPage(targetPage);
                         }
-                        binding.body.setText(s.getBody());
-                        binding.title.setText(s.getTitle());
+                        else {
+                            NovelBody4Realm body4Realm = results.get(0);
+                            body4Realm.setNcode(ncode);
+                            body4Realm.setTitle(s.getTitle());
+                            body4Realm.setBody(s.getBody());
+                            body4Realm.setPage(targetPage);
+                        }
 
-                        visibleBody();
+                        realm.commitTransaction();
                     }
-                });
+                    binding.body.setText(s.getBody());
+                    binding.title.setText(s.getTitle());
+
+                    visibleBody();
+                }
+            });
     }
 
     private void visibleBody() {
@@ -328,13 +323,10 @@ public class NovelBodyFragment extends Fragment{
     private void onLoadError() {
         binding.progressBar.setVisibility(View.GONE);
         binding.btnReload.setVisibility(View.VISIBLE);
-        binding.btnReload.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                binding.progressBar.setVisibility(View.VISIBLE);
-                binding.btnReload.setVisibility(View.GONE);
-                reload();
-            }
+        binding.btnReload.setOnClickListener(v -> {
+            binding.progressBar.setVisibility(View.VISIBLE);
+            binding.btnReload.setVisibility(View.GONE);
+            reload();
         });
     }
 

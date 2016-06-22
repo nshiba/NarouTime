@@ -4,7 +4,6 @@ import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
 
 import com.balysv.materialmenu.MaterialMenuDrawable;
 
@@ -25,12 +24,7 @@ public class SettingsActivity extends AppCompatActivity {
         materialMenu.animateIconState(MaterialMenuDrawable.IconState.X);
         binding.toolbar.setTitle("設定");
         binding.toolbar.setNavigationIcon(materialMenu);
-        binding.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        binding.toolbar.setNavigationOnClickListener(v -> finish());
 
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.settings_content, new SettingsFragment())

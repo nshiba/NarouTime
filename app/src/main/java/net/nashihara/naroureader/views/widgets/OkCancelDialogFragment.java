@@ -1,4 +1,4 @@
-package net.nashihara.naroureader.dialogs;
+package net.nashihara.naroureader.views.widgets;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -41,20 +41,14 @@ public class OkCancelDialogFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         return new AlertDialog.Builder(getActivity())
-                .setTitle(title)
-                .setMessage(message)
-                .setNegativeButton("cansel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        onClickListener.onClick(dialog, which);
-                    }
-                })
-                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        onClickListener.onClick(dialog, which);
-                    }
-                })
-                .create();
+            .setTitle(title)
+            .setMessage(message)
+            .setNegativeButton("cansel", (dialog, which) -> {
+                onClickListener.onClick(dialog, which);
+            })
+            .setPositiveButton("Ok", (dialog, which) -> {
+                onClickListener.onClick(dialog, which);
+            })
+            .create();
     }
 }
