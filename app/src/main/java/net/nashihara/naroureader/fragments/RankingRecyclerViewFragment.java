@@ -30,6 +30,7 @@ import net.nashihara.naroureader.entities.NovelItem;
 import net.nashihara.naroureader.listeners.OnFragmentReplaceListener;
 import net.nashihara.naroureader.utils.DownloadUtils;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -226,7 +227,16 @@ public class RankingRecyclerViewFragment extends Fragment {
                 Narou narou = new Narou();
                 narou.setOrder(OutputOrder.TOTAL_POINT);
                 narou.setLim(301);
-                List<Novel> novels = narou.getNovels();
+                List<Novel> novels = null;
+                try {
+                    novels = narou.getNovels();
+                } catch (IOException e) {
+                    subscriber.onError(e);
+                }
+
+                if (novels == null) {
+                    return;
+                }
 
                 novels.remove(0);
 
@@ -274,7 +284,18 @@ public class RankingRecyclerViewFragment extends Fragment {
             public void call(Subscriber<? super HashMap<String, NovelItem>> subscriber) {
                 HashMap<String, NovelItem> map = new HashMap<>();
                 Ranking ranking = new Ranking();
-                for (NovelRank rank : ranking.getRanking(type)) {
+                ArrayList<NovelRank> ranks = null;
+                try {
+                    ranks = (ArrayList<NovelRank>) ranking.getRanking(type);
+                } catch (IOException e) {
+                    subscriber.onError(e);
+                }
+
+                if (ranks == null) {
+                    return;
+                }
+
+                for (NovelRank rank : ranks) {
                     NovelItem novelItem = new NovelItem();
                     rank.setRankingType(type);
                     novelItem.setRank(rank);
@@ -313,7 +334,17 @@ public class RankingRecyclerViewFragment extends Fragment {
                                     }
                                 }
 
-                                List<NovelRank> ranks = ranking.getRanking(type, cal.getTime());
+                                List<NovelRank> ranks = null;
+                                try {
+                                    ranks = ranking.getRanking(type, cal.getTime());
+                                } catch (IOException e) {
+                                    subscriber.onError(e);
+                                }
+
+                                if (ranks == null) {
+                                    return;
+                                }
+
                                 for (NovelRank rank : ranks) {
                                     NovelItem item = map.get(rank.getNcode());
 
@@ -345,7 +376,16 @@ public class RankingRecyclerViewFragment extends Fragment {
 
                                 narou.setNCode(array);
                                 narou.setLim(300);
-                                List<Novel> novels = narou.getNovels();
+                                List<Novel> novels = null;
+                                try {
+                                    novels = narou.getNovels();
+                                } catch (IOException e) {
+                                    subscriber.onError(e);
+                                }
+
+                                if (novels == null) {
+                                    return;
+                                }
 
                                 novels.remove(0);
 

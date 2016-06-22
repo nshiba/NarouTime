@@ -20,6 +20,8 @@ import net.nashihara.naroureader.entities.Novel4Realm;
 import net.nashihara.naroureader.entities.NovelBody4Realm;
 import net.nashihara.naroureader.utils.RealmUtils;
 
+import java.io.IOException;
+
 import io.realm.Realm;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
@@ -238,8 +240,11 @@ public class NovelBodyFragment extends Fragment{
             @Override
             public void call(Subscriber<? super NovelBody> subscriber) {
                 Narou narou = new Narou();
-                NovelBody novelBody = narou.getNovelBody(ncode, targetPage);
-                subscriber.onNext(novelBody);
+                try {
+                    subscriber.onNext(narou.getNovelBody(ncode, targetPage));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 subscriber.onCompleted();
             }
         })

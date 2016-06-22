@@ -27,6 +27,7 @@ import net.nashihara.naroureader.entities.Novel4Realm;
 import net.nashihara.naroureader.entities.NovelTable4Realm;
 import net.nashihara.naroureader.utils.RealmUtils;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -133,14 +134,21 @@ public class NovelTableRecyclerViewFragment extends Fragment {
                 @Override
                 public void call(Subscriber<? super Novel> subscriber) {
                     Narou narou = new Narou();
-                    subscriber.onNext(narou.getNovel(ncode));
+                    try {
+                        subscriber.onNext(narou.getNovel(ncode));
+                    } catch (IOException e) {
+                        subscriber.onError(e);
+                    }
                 }
             }), Observable.create(new Observable.OnSubscribe<List<NovelBody>>() {
                 @Override
                 public void call(Subscriber<? super List<NovelBody>> subscriber) {
                     Narou narou = new Narou();
-                    List<NovelBody> bodies = narou.getNovelTable(ncode);
-                    subscriber.onNext(bodies);
+                    try {
+                        subscriber.onNext(narou.getNovelTable(ncode));
+                    } catch (IOException e) {
+                        subscriber.onError(e);
+                    }
                 }
             }), new Func2<Novel, List<NovelBody>, Novel>() {
                 @Override

@@ -20,6 +20,7 @@ import net.nashihara.naroureader.databinding.ItemRankingRecyclerBinding;
 import net.nashihara.naroureader.entities.NovelItem;
 import net.nashihara.naroureader.listeners.OnFragmentReplaceListener;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -261,7 +262,12 @@ public class SearchRecyclerViewFragment extends Fragment {
                 Narou narou = new Narou();
 
                 if (!ncode.equals("")) {
-                    Novel novel = narou.getNovel(ncode);
+                    Novel novel = null;
+                    try {
+                        novel = narou.getNovel(ncode);
+                    } catch (IOException e) {
+                        subscriber.onError(e);
+                    }
 
                     if (novel == null) {
                         subscriber.onNext(null);
@@ -328,7 +334,17 @@ public class SearchRecyclerViewFragment extends Fragment {
                         }
                     }
 
-                    List<Novel> novels = narou.getNovels();
+                    List<Novel> novels = null;
+                    try {
+                        novels = narou.getNovels();
+                    } catch (IOException e) {
+                        subscriber.onError(e);
+                    }
+
+                    if (novels == null) {
+                        return;
+                    }
+
                     novels.remove(0);
                     subscriber.onNext(novels);
                 }
