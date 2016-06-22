@@ -18,10 +18,10 @@ import android.view.View;
 import com.balysv.materialmenu.MaterialMenuDrawable;
 
 import net.nashihara.naroureader.R;
-import net.nashihara.naroureader.adapters.NovelBodyFragmentViewPagerAdapter;
+import net.nashihara.naroureader.views.adapters.NovelBodyFragmentViewPagerAdapter;
 import net.nashihara.naroureader.databinding.ActivityNovelViewBinding;
-import net.nashihara.naroureader.dialogs.OkCancelDialogFragment;
-import net.nashihara.naroureader.entities.Novel4Realm;
+import net.nashihara.naroureader.views.widgets.OkCancelDialogFragment;
+import net.nashihara.naroureader.models.entities.Novel4Realm;
 import net.nashihara.naroureader.fragments.NovelBodyFragment;
 import net.nashihara.naroureader.utils.RealmUtils;
 

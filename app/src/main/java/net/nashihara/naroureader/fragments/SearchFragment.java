@@ -14,9 +14,9 @@ import android.widget.ArrayAdapter;
 
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.databinding.FragmentSearchBinding;
-import net.nashihara.naroureader.dialogs.FilterDialogFragment;
-import net.nashihara.naroureader.dialogs.OkCancelDialogFragment;
-import net.nashihara.naroureader.listeners.OnFragmentReplaceListener;
+import net.nashihara.naroureader.views.widgets.FilterDialogFragment;
+import net.nashihara.naroureader.views.widgets.OkCancelDialogFragment;
+import net.nashihara.naroureader.utils.OnFragmentReplaceListener;
 
 import java.util.ArrayList;
 

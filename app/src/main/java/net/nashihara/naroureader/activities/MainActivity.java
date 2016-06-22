@@ -23,17 +23,17 @@ import com.balysv.materialmenu.MaterialMenuDrawable;
 
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.databinding.ActivityMainBinding;
-import net.nashihara.naroureader.dialogs.ListDailogFragment;
-import net.nashihara.naroureader.dialogs.NovelDownloadDialogFragment;
-import net.nashihara.naroureader.dialogs.OkCancelDialogFragment;
-import net.nashihara.naroureader.entities.NovelItem;
+import net.nashihara.naroureader.views.widgets.ListDailogFragment;
+import net.nashihara.naroureader.views.widgets.NovelDownloadDialogFragment;
+import net.nashihara.naroureader.views.widgets.OkCancelDialogFragment;
+import net.nashihara.naroureader.models.entities.NovelItem;
 import net.nashihara.naroureader.fragments.BookmarkRecyclerViewFragment;
 import net.nashihara.naroureader.fragments.DownloadedRecyclerViewFragment;
 import net.nashihara.naroureader.fragments.NovelTableRecyclerViewFragment;
 import net.nashihara.naroureader.fragments.RankingViewPagerFragment;
 import net.nashihara.naroureader.fragments.SearchFragment;
 import net.nashihara.naroureader.fragments.SearchRecyclerViewFragment;
-import net.nashihara.naroureader.listeners.OnFragmentReplaceListener;
+import net.nashihara.naroureader.utils.OnFragmentReplaceListener;
 import net.nashihara.naroureader.utils.DownloadUtils;
 import net.nashihara.naroureader.utils.NetworkUtils;
 

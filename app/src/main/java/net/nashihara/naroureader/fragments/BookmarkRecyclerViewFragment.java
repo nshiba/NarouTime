@@ -14,11 +14,11 @@ import android.view.ViewGroup;
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.utils.RealmUtils;
 import net.nashihara.naroureader.activities.NovelViewActivity;
-import net.nashihara.naroureader.adapters.SimpleRecyclerViewAdapter;
+import net.nashihara.naroureader.views.adapters.SimpleRecyclerViewAdapter;
 import net.nashihara.naroureader.databinding.FragmentSimpleRecycerViewBinding;
-import net.nashihara.naroureader.entities.Novel4Realm;
-import net.nashihara.naroureader.listeners.OnFragmentReplaceListener;
-import net.nashihara.naroureader.listeners.OnItemClickListener;
+import net.nashihara.naroureader.models.entities.Novel4Realm;
+import net.nashihara.naroureader.utils.OnFragmentReplaceListener;
+import net.nashihara.naroureader.utils.OnItemClickListener;
 
 import java.util.ArrayList;
 

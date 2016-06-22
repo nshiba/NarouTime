@@ -1,4 +1,4 @@
-package net.nashihara.naroureader.entities;
+package net.nashihara.naroureader.models.entities;
 
 import narou4j.entities.Novel;
 import narou4j.entities.NovelRank;

@@ -1,4 +1,4 @@
-package net.nashihara.naroureader.adapters;
+package net.nashihara.naroureader.views.adapters;
 
 import android.content.Context;
 import android.databinding.DataBindingUtil;
@@ -9,9 +9,9 @@ import android.view.ViewGroup;
 
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.databinding.ItemSimpleRecyclerBinding;
-import net.nashihara.naroureader.entities.Novel4Realm;
-import net.nashihara.naroureader.entities.NovelItem;
-import net.nashihara.naroureader.listeners.OnItemClickListener;
+import net.nashihara.naroureader.models.entities.Novel4Realm;
+import net.nashihara.naroureader.models.entities.NovelItem;
+import net.nashihara.naroureader.utils.OnItemClickListener;
 
 import java.util.ArrayList;
 import java.util.List;

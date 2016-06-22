@@ -19,12 +19,12 @@ import android.widget.LinearLayout;
 import com.google.firebase.crash.FirebaseCrash;
 
 import net.nashihara.naroureader.R;
-import net.nashihara.naroureader.adapters.NovelTableRecyclerViewAdapter;
+import net.nashihara.naroureader.views.adapters.NovelTableRecyclerViewAdapter;
 import net.nashihara.naroureader.databinding.FragmentNovelTableViewBinding;
 import net.nashihara.naroureader.databinding.ItemTableRecyclerBinding;
-import net.nashihara.naroureader.dialogs.OkCancelDialogFragment;
-import net.nashihara.naroureader.entities.Novel4Realm;
-import net.nashihara.naroureader.entities.NovelTable4Realm;
+import net.nashihara.naroureader.views.widgets.OkCancelDialogFragment;
+import net.nashihara.naroureader.models.entities.Novel4Realm;
+import net.nashihara.naroureader.models.entities.NovelTable4Realm;
 import net.nashihara.naroureader.utils.RealmUtils;
 
 import java.io.IOException;

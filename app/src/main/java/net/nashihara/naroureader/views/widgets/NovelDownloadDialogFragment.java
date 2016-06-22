@@ -1,4 +1,4 @@
-package net.nashihara.naroureader.dialogs;
+package net.nashihara.naroureader.views.widgets;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
