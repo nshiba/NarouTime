@@ -5,7 +5,6 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,13 +24,15 @@ import io.realm.RealmResults;
 import narou4j.entities.Novel;
 
 public class DownloadedRecyclerViewFragment extends Fragment {
-    private static final String TAG = DownloadedRecyclerViewFragment.class.getSimpleName();
 
-    private RecyclerView mRecyclerView;
     private SimpleRecyclerViewAdapter adapter;
-    private OnFragmentReplaceListener mListener;
-    private Context mContext;
+
+    private OnFragmentReplaceListener listener;
+
+    private Context context;
+
     private FragmentSimpleRecycerViewBinding binding;
+
     private ArrayList<Novel4Realm> novels = new ArrayList<>();
 
     public DownloadedRecyclerViewFragment() {}
@@ -50,40 +51,41 @@ public class DownloadedRecyclerViewFragment extends Fragment {
             return;
         }
 
-        Realm realm = RealmUtils.getRealm(mContext);
+        Realm realm = RealmUtils.getRealm(context);
         RealmResults<Novel4Realm> results = realm.where(Novel4Realm.class).equalTo("isDownload", true).findAll();
 
         for (Novel4Realm novel4Realm : results) {
             novels.add(novel4Realm);
         }
 
-        adapter = new SimpleRecyclerViewAdapter(mContext);
-        adapter.setOnItemClickListener((view, position) -> {
-            final Novel4Realm novel = novels.get(position);
-
-            Novel novelDetail = new Novel();
-            novelDetail.setNcode(novel.getNcode());
-            novelDetail.setTitle(novel.getTitle());
-            novelDetail.setStory(novel.getStory());
-            novelDetail.setWriter(novel.getWriter());
-            novelDetail.setAllNumberOfNovel(novel.getTotalPage());
-
-            NovelItem item = new NovelItem();
-            item.setNovelDetail(novelDetail);
-            mListener.onFragmentReplaceAction(NovelTableRecyclerViewFragment.newInstance(novel.getNcode()), novel.getTitle(), item);
-        });
+        adapter = new SimpleRecyclerViewAdapter(context);
+        adapter.setOnItemClickListener((view, position) -> replaceFragment(position));
 
         adapter.clearData();
         adapter.addDataOf(novels);
+    }
+
+    private void replaceFragment(int position) {
+        final Novel4Realm novel = novels.get(position);
+
+        Novel novelDetail = new Novel();
+        novelDetail.setNcode(novel.getNcode());
+        novelDetail.setTitle(novel.getTitle());
+        novelDetail.setStory(novel.getStory());
+        novelDetail.setWriter(novel.getWriter());
+        novelDetail.setAllNumberOfNovel(novel.getTotalPage());
+
+        NovelItem item = new NovelItem();
+        item.setNovelDetail(novelDetail);
+        listener.onFragmentReplaceAction(NovelTableRecyclerViewFragment.newInstance(novel.getNcode()), novel.getTitle(), item);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_simple_recycer_view, container, false);
 
-        mRecyclerView = binding.recycler;
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));
-        mRecyclerView.setAdapter(adapter);
+        binding.recycler.setLayoutManager(new LinearLayoutManager(context));
+        binding.recycler.setAdapter(adapter);
 
         binding.progressBar.setVisibility(View.GONE);
         binding.recycler.setVisibility(View.VISIBLE);
@@ -94,9 +96,9 @@ public class DownloadedRecyclerViewFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        mContext = context;
+        this.context = context;
         if (context instanceof OnFragmentReplaceListener) {
-            mListener = (OnFragmentReplaceListener) context;
+            listener = (OnFragmentReplaceListener) context;
         } else {
             throw new RuntimeException(context.toString()
                 + " must implement context instanceof OnFragmentReplaceListener");
@@ -106,6 +108,6 @@ public class DownloadedRecyclerViewFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+        listener = null;
     }
 }
