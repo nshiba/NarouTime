@@ -134,7 +134,6 @@ public class NovelBodyFragment extends Fragment implements NovelBodyView {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-
         boolean autoDownload = pref.getBoolean(getString(R.string.auto_download), false);
         boolean autoSync = pref.getBoolean(getString(R.string.auto_sync), false);
         controller.setupNovelPage(ncode, title, body, page, autoDownload, autoSync);

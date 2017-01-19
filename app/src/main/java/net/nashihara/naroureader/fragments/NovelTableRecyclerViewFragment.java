@@ -1,13 +1,12 @@
 package net.nashihara.naroureader.fragments;
 
 import android.content.Context;
-import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,32 +14,22 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.LinearLayout;
 
-import com.google.firebase.crash.FirebaseCrash;
-
 import net.nashihara.naroureader.R;
-import net.nashihara.naroureader.databinding.FragmentNovelTableViewBinding;
-import net.nashihara.naroureader.entities.Novel4Realm;
-import net.nashihara.naroureader.entities.NovelTable4Realm;
-import net.nashihara.naroureader.utils.RealmUtils;
 import net.nashihara.naroureader.adapters.NovelTableRecyclerViewAdapter;
+import net.nashihara.naroureader.controller.NovelTableRecyclerViewController;
+import net.nashihara.naroureader.databinding.FragmentNovelTableViewBinding;
+import net.nashihara.naroureader.utils.RealmUtils;
+import net.nashihara.naroureader.views.NovelTableRecyclerView;
 import net.nashihara.naroureader.widgets.OkCancelDialogFragment;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 import io.realm.Realm;
-import io.realm.RealmQuery;
-import io.realm.RealmResults;
-import narou4j.Narou;
 import narou4j.entities.Novel;
 import narou4j.entities.NovelBody;
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
-public class NovelTableRecyclerViewFragment extends Fragment {
+public class NovelTableRecyclerViewFragment extends Fragment implements NovelTableRecyclerView {
+
     private static final String TAG = NovelTableRecyclerViewFragment.class.getSimpleName();
 
     private static final String PARAM_NCODE = "ncode";
@@ -63,9 +52,9 @@ public class NovelTableRecyclerViewFragment extends Fragment {
 
     private OnNovelSelectionListener listener;
 
-    private RecyclerView recyclerView;
-
     private FragmentNovelTableViewBinding binding;
+
+    private NovelTableRecyclerViewController controller;
 
     public NovelTableRecyclerViewFragment() {}
 
@@ -90,203 +79,20 @@ public class NovelTableRecyclerViewFragment extends Fragment {
         if (getArguments() != null) {
             ncode = getArguments().getString(PARAM_NCODE);
         }
+
+        realm = RealmUtils.getRealm(context);
+        controller = new NovelTableRecyclerViewController(this, realm);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_novel_table_view, container, false);
 
-        recyclerView = binding.recycler;
-        final LinearLayoutManager manager = new LinearLayoutManager(context) {
-            @Override
-            public boolean canScrollVertically() {
-                return false;
-            }
-        };
-        manager.setAutoMeasureEnabled(true);
-        recyclerView.setLayoutManager(manager);
-        NovelTableRecyclerViewAdapter adapter = new NovelTableRecyclerViewAdapter(context);
-        adapter.setOnItemClickListener((view, position, binding1) -> {
-            NovelTableRecyclerViewAdapter clickAdapter = (NovelTableRecyclerViewAdapter) recyclerView.getAdapter();
-            NovelBody body = clickAdapter.getList().get(position);
-            listener.onSelect(body.getNcode(), totalPage, body.getPage(), title, writer, body.getTitle());
-        });
-        recyclerView.setAdapter(adapter);
-
-        binding.fab.setOnClickListener(v -> {
-            int bookmark = loadBookmark();
-            if (bookmark == 0) {
-                OkCancelDialogFragment dialogFragment
-                    = OkCancelDialogFragment.newInstance("ブックマーク", "この小説にはしおりをはさんでいません。", (dialog, which) -> {});
-                dialogFragment.show(getFragmentManager(), "okcansel");
-            }
-            else {
-                listener.onSelect(ncode, totalPage, bookmark, title, writer, bodyTitles.get(bookmark -1));
-            }
-        });
-
-        boolean isLoadTable = loadTable();
-
-        if (!isLoadTable) {
-            Observable.zip(Observable.create(new Observable.OnSubscribe<Novel>() {
-                @Override
-                public void call(Subscriber<? super Novel> subscriber) {
-                    Narou narou = new Narou();
-                    try {
-                        subscriber.onNext(narou.getNovel(ncode));
-                    } catch (IOException e) {
-                        subscriber.onError(e);
-                    }
-                }
-            }), Observable.create(new Observable.OnSubscribe<List<NovelBody>>() {
-                @Override
-                public void call(Subscriber<? super List<NovelBody>> subscriber) {
-                    Narou narou = new Narou();
-                    try {
-                        subscriber.onNext(narou.getNovelTable(ncode));
-                    } catch (IOException e) {
-                        subscriber.onError(e);
-                    }
-                }
-            }), (novel, novelBodies) -> {
-                novel.setBodies(novelBodies);
-                return novel;
-            })
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<Novel>() {
-                    @Override
-                    public void onCompleted() { }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        onLoadError();
-                        Log.e(TAG, "onError: ", e.fillInStackTrace());
-                        FirebaseCrash.report(e);
-                    }
-
-                    @Override
-                    public void onNext(Novel novel) {
-                        binding.title.setText(novel.getTitle());
-                        binding.ncode.setText("Nコード : " + ncode);
-                        binding.writer.setText("作者 : " + novel.getWriter());
-                        binding.story.setText(novel.getStory());
-
-                        NovelTableRecyclerViewAdapter rxAdapter = (NovelTableRecyclerViewAdapter) recyclerView.getAdapter();
-                        rxAdapter.clearData();
-                        rxAdapter.addDataOf(novel.getBodies());
-
-                        setRecyclerViewLayoutParams();
-
-                        binding.progressBar.setVisibility(View.GONE);
-                        recyclerView.setVisibility(View.VISIBLE);
-                        binding.title.setVisibility(View.VISIBLE);
-                        binding.ncode.setVisibility(View.VISIBLE);
-                        binding.writer.setVisibility(View.VISIBLE);
-                        binding.story.setVisibility(View.VISIBLE);
-
-                        writer = novel.getWriter();
-                        title = novel.getTitle();
-                        totalPage = novel.getAllNumberOfNovel();
-                        bodyTitles = new ArrayList<>();
-                        for (NovelBody body : novel.getBodies()) {
-                            if (!body.isChapter()) {
-                                bodyTitles.add(body.getTitle());
-                            }
-                        }
-                    }
-                });
-        }
-
+        setupRecyclerView();
         setFabMargin();
+        binding.fab.setOnClickListener(v -> controller.fetchBookmark(ncode));
+
         return binding.getRoot();
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    private void setRecyclerViewLayoutParams() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            return;
-        }
-
-        NovelTableRecyclerViewAdapter adapter = (NovelTableRecyclerViewAdapter) recyclerView.getAdapter();
-        ArrayList<NovelBody> bodies = adapter.getList();
-
-        int height = 0;
-        for (NovelBody body : bodies) {
-            if (body.isChapter()) {
-                height += 148;
-            }
-            else {
-                height += 135;
-            }
-        }
-
-        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) recyclerView.getLayoutParams();
-        Log.d(TAG, "setRecyclerViewLayoutParams: before height -> " + params.height);
-        params.height = height;
-        Log.d(TAG, "setRecyclerViewLayoutParams: after height -> " + params.height);
-        recyclerView.setLayoutParams(params);
-
-    }
-
-    private boolean loadTable() {
-        realm = RealmUtils.getRealm(context);
-        RealmResults<NovelTable4Realm> tableResult = realm.where(NovelTable4Realm.class).equalTo("ncode", ncode).findAll().sort("tableNumber");
-        Novel4Realm novel4Realm = realm.where(Novel4Realm.class).equalTo("ncode", ncode).findFirst();
-
-        if (novel4Realm == null) {
-            return false;
-        }
-
-        if (tableResult.size() <= 0 || !novel4Realm.isDownload()) {
-            return false;
-        }
-
-        ArrayList<NovelBody> table = new ArrayList<>();
-        for (NovelTable4Realm novelTable4Realm : tableResult) {
-            NovelBody tableItem = new NovelBody();
-            tableItem.setNcode(novelTable4Realm.getNcode());
-            tableItem.setTitle(novelTable4Realm.getTitle());
-            tableItem.setChapter(novelTable4Realm.isChapter());
-            tableItem.setPage(novelTable4Realm.getPage());
-            table.add(tableItem);
-        }
-
-        binding.title.setText(novel4Realm.getTitle());
-        binding.ncode.setText("Nコード : " + ncode);
-        binding.writer.setText("作者 : " + novel4Realm.getWriter());
-        binding.story.setText(novel4Realm.getStory());
-
-        NovelTableRecyclerViewAdapter rxAdapter = (NovelTableRecyclerViewAdapter) recyclerView.getAdapter();
-        rxAdapter.clearData();
-        rxAdapter.addDataOf(table);
-
-        setRecyclerViewLayoutParams();
-
-        binding.progressBar.setVisibility(View.GONE);
-        recyclerView.setVisibility(View.VISIBLE);
-        binding.title.setVisibility(View.VISIBLE);
-        binding.ncode.setVisibility(View.VISIBLE);
-        binding.writer.setVisibility(View.VISIBLE);
-        binding.story.setVisibility(View.VISIBLE);
-
-        writer = novel4Realm.getWriter();
-        title = novel4Realm.getTitle();
-        totalPage = novel4Realm.getTotalPage();
-        bodyTitles = new ArrayList<>();
-        for (NovelBody body : table) {
-            if (!body.isChapter()) {
-                bodyTitles.add(body.getTitle());
-            }
-        }
-
-        realm.close();
-
-        return true;
     }
 
     private void setFabMargin() {
@@ -302,21 +108,58 @@ public class NovelTableRecyclerViewFragment extends Fragment {
         binding.topContainer.getViewTreeObserver().addOnGlobalLayoutListener(globalLayoutListener);
     }
 
-    private int loadBookmark() {
-        Realm realm = RealmUtils.getRealm(context);
+    private void setupRecyclerView() {
+        final LinearLayoutManager manager = new LinearLayoutManager(context) {
+            @Override
+            public boolean canScrollVertically() {
+                return false;
+            }
+        };
 
-        RealmQuery<Novel4Realm> query = realm.where(Novel4Realm.class);
-        query.equalTo("ncode", ncode);
-        RealmResults<Novel4Realm> results = query.findAll();
+        manager.setAutoMeasureEnabled(true);
+        binding.recycler.setLayoutManager(manager);
+        NovelTableRecyclerViewAdapter adapter = new NovelTableRecyclerViewAdapter(context);
+        adapter.setOnItemClickListener((view, position, binding1) -> {
+            NovelTableRecyclerViewAdapter clickAdapter = (NovelTableRecyclerViewAdapter) binding.recycler.getAdapter();
+            NovelBody body = clickAdapter.getList().get(position);
+            listener.onSelect(body.getNcode(), totalPage, body.getPage(), title, writer, body.getTitle());
+        });
+        binding.recycler.setAdapter(adapter);
 
+        setRecyclerViewLayoutParams();
+    }
 
-        if (results.size() == 0) {
-            return 0;
+    // recycler view の WRAP_CONTENT が正常に動作しない対処
+    private void setRecyclerViewLayoutParams() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            return;
         }
-        else {
-            Novel4Realm novel4Realm = results.get(0);
-            return novel4Realm.getBookmark();
+
+        NovelTableRecyclerViewAdapter adapter
+            = (NovelTableRecyclerViewAdapter) binding.recycler.getAdapter();
+        ArrayList<NovelBody> bodies = adapter.getList();
+
+        int height = 0;
+        for (NovelBody body : bodies) {
+            if (body.isChapter()) {
+                height += 148;
+            }
+            else {
+                height += 135;
+            }
         }
+
+        LinearLayout.LayoutParams params =
+            (LinearLayout.LayoutParams) binding.recycler.getLayoutParams();
+        params.height = height;
+        binding.recycler.setLayoutParams(params);
+
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        controller.fetchNovel(ncode);
     }
 
     private void reload() {
@@ -331,6 +174,63 @@ public class NovelTableRecyclerViewFragment extends Fragment {
             binding.btnReload.setVisibility(View.GONE);
             reload();
         });
+    }
+
+    private void visibleNovelTable() {
+        binding.progressBar.setVisibility(View.GONE);
+        binding.recycler.setVisibility(View.VISIBLE);
+        binding.title.setVisibility(View.VISIBLE);
+        binding.ncode.setVisibility(View.VISIBLE);
+        binding.writer.setVisibility(View.VISIBLE);
+        binding.story.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void showBookmark(int bookmark) {
+        if (bookmark == 0) {
+            OkCancelDialogFragment dialogFragment
+                = OkCancelDialogFragment.newInstance("ブックマーク", "この小説にはしおりをはさんでいません。", (dialog, which) -> {});
+            dialogFragment.show(getFragmentManager(), "okcansel");
+        }
+        else {
+            listener.onSelect(ncode, totalPage, bookmark, title, writer, bodyTitles.get(bookmark -1));
+        }
+    }
+
+    @Override
+    public void showNovelTable(Novel novel) {
+        Log.i(TAG, "showNovelTable: " + novel.toString());
+
+        binding.title.setText(novel.getTitle());
+        binding.ncode.setText(String.format("Nコード : %s", novel.getNcode()));
+        binding.writer.setText(String.format("作者 : %s", novel.getWriter()));
+        binding.story.setText(novel.getStory());
+
+        NovelTableRecyclerViewAdapter rxAdapter
+            = (NovelTableRecyclerViewAdapter) binding.recycler.getAdapter();
+        rxAdapter.clearData();
+        rxAdapter.addDataOf(novel.getBodies());
+
+        setRecyclerViewLayoutParams();
+        visibleNovelTable();
+        updateNovelInfo(novel);
+    }
+
+    private void updateNovelInfo(Novel novel) {
+        writer = novel.getWriter();
+        title = novel.getTitle();
+        totalPage = novel.getAllNumberOfNovel();
+        bodyTitles = new ArrayList<>();
+        for (NovelBody body : novel.getBodies()) {
+            if (!body.isChapter()) {
+                bodyTitles.add(body.getTitle());
+            }
+        }
+    }
+
+    @Override
+    public void showError() {
+        onLoadError();
     }
 
     public interface OnNovelSelectionListener {
