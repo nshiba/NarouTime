@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.databinding.ItemTableRecyclerBinding;
-import net.nashihara.naroureader.entities.NovelItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,49 +18,43 @@ import narou4j.entities.NovelBody;
 public class NovelTableRecyclerViewAdapter extends RecyclerView.Adapter<NovelTableRecyclerViewAdapter.BindingHolder> {
     private static final String TAG = NovelTableRecyclerViewAdapter.class.getSimpleName();
 
-    private LayoutInflater mInflater;
-    private ArrayList<NovelBody> mArrayList;
-    private OnItemClickListener mListener;
-    private RecyclerView mRecyclerView;
+    private LayoutInflater inflater;
+
+    private ArrayList<NovelBody> arrayList;
+
+    private OnItemClickListener listener;
+
+    private RecyclerView recyclerView;
 
     public NovelTableRecyclerViewAdapter(Context context) {
-        this.mInflater = LayoutInflater.from(context);
-        mArrayList = new ArrayList<>();
+        this.inflater = LayoutInflater.from(context);
+        arrayList = new ArrayList<>();
     }
 
     @Override
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
-        mRecyclerView = recyclerView;
+        this.recyclerView = recyclerView;
     }
 
     @Override
     public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
         super.onDetachedFromRecyclerView(recyclerView);
-        mRecyclerView = null;
+        this.recyclerView = null;
     }
 
     @Override
     public BindingHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        final View v = mInflater.inflate(R.layout.item_table_recycler, parent, false);
-
-//        v.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-//            @Override
-//            public void onGlobalLayout() {
-//                v.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-//                Log.d(TAG, "onGlobalLayout: height -> " + v.getHeight());
-//            }
-//        });
-
-        return new BindingHolder(v, mListener);
+        final View v = inflater.inflate(R.layout.item_table_recycler, parent, false);
+        return new BindingHolder(v, listener);
     }
 
     @Override
     public void onBindViewHolder(BindingHolder holder, int position) {
-        if (mArrayList != null && mArrayList.size() > position && mArrayList.get(position) != null) {
+        if (arrayList != null && arrayList.size() > position && arrayList.get(position) != null) {
             ItemTableRecyclerBinding binding = holder.getBinding();
 
-            NovelBody body = mArrayList.get(position);
+            NovelBody body = arrayList.get(position);
             if (body.isChapter()) {
                 binding.chapter.setText(body.getTitle());
                 binding.chapter.setVisibility(View.VISIBLE);
@@ -77,32 +70,28 @@ public class NovelTableRecyclerViewAdapter extends RecyclerView.Adapter<NovelTab
 
     @Override
     public int getItemCount() {
-        if (mArrayList == null) {
+        if (arrayList == null) {
             return 0;
         }
-        return mArrayList.size();
+        return arrayList.size();
     }
 
     public void addDataOf(List<NovelBody> dataList) {
-        mArrayList.addAll(dataList);
-    }
-
-    public void removeDataOf(List<NovelItem> dataList) {
-        for (NovelItem item : dataList) {
-            mArrayList.remove(item);
-        }
+        int startPos = dataList.size();
+        arrayList.addAll(dataList);
+        notifyItemRangeInserted(startPos, dataList.size());
     }
 
     public void clearData() {
-        mArrayList.clear();
+        arrayList.clear();
     }
 
     public ArrayList<NovelBody> getList() {
-        return this.mArrayList;
+        return this.arrayList;
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {
-        this.mListener = listener;
+        this.listener = listener;
     }
 
     public interface OnItemClickListener {
