@@ -104,33 +104,38 @@ public class NovelBodyFragment extends Fragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_novel_body, container, false);
 
+        if (body.equals("")) {
+            goneBody();
+            return binding.getRoot();
+        }
+
+        setupPageButton();
+        binding.body.setText(body);
+        binding.title.setText(title);
+        visibleBody();
+
+        return binding.getRoot();
+    }
+
+    private void setupPageButton() {
         binding.page.setText(String.valueOf(page) + "/" + String.valueOf(totalPage));
         binding.btnNext.setOnClickListener(v -> {
             if (page >= totalPage) {
                 return;
             }
+
             realm.close();
-            listener.onNovelBodyLoadAction(nextBody, page+1, "");
+            listener.onNovelBodyLoadAction(nextBody, page + 1, "");
         });
 
         binding.btnPrev.setOnClickListener(v -> {
             if (page <= 1) {
                 return;
             }
+
             realm.close();
-            listener.onNovelBodyLoadAction(prevBody, page-1, "");
+            listener.onNovelBodyLoadAction(prevBody, page - 1, "");
         });
-
-        if (body.equals("")) {
-            goneBody();
-        }
-        else {
-            binding.body.setText(body);
-            binding.title.setText(title);
-            visibleBody();
-        }
-
-        return binding.getRoot();
     }
 
     @Override
