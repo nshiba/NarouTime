@@ -9,9 +9,8 @@ import android.view.ViewGroup;
 
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.databinding.ItemSimpleRecyclerBinding;
-import net.nashihara.naroureader.models.entities.Novel4Realm;
-import net.nashihara.naroureader.models.entities.NovelItem;
 import net.nashihara.naroureader.listeners.OnItemClickListener;
+import net.nashihara.naroureader.models.entities.Novel4Realm;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,13 +65,9 @@ public class SimpleRecyclerViewAdapter extends RecyclerView.Adapter<SimpleRecycl
     }
 
     public void addDataOf(List<Novel4Realm> dataList) {
+        int beforePos = mArrayList.size();
         mArrayList.addAll(dataList);
-    }
-
-    public void removeDataOf(List<NovelItem> dataList) {
-        for (NovelItem item : dataList) {
-            mArrayList.remove(item);
-        }
+        notifyItemRangeInserted(beforePos, dataList.size());
     }
 
     public void clearData() {

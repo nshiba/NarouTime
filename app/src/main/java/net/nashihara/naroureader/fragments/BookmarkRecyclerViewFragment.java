@@ -12,17 +12,15 @@ import android.view.ViewGroup;
 
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.activities.NovelViewActivity;
+import net.nashihara.naroureader.adapters.SimpleRecyclerViewAdapter;
+import net.nashihara.naroureader.controller.BookmarkRecyclerController;
 import net.nashihara.naroureader.databinding.FragmentSimpleRecycerViewBinding;
 import net.nashihara.naroureader.models.entities.Novel4Realm;
-import net.nashihara.naroureader.utils.RealmUtils;
-import net.nashihara.naroureader.adapters.SimpleRecyclerViewAdapter;
+import net.nashihara.naroureader.views.BookmarkRecyclerView;
 
 import java.util.ArrayList;
 
-import io.realm.Realm;
-import io.realm.RealmResults;
-
-public class BookmarkRecyclerViewFragment extends Fragment {
+public class BookmarkRecyclerViewFragment extends Fragment implements BookmarkRecyclerView {
 
     private SimpleRecyclerViewAdapter adapter;
 
@@ -30,7 +28,7 @@ public class BookmarkRecyclerViewFragment extends Fragment {
 
     private FragmentSimpleRecycerViewBinding binding;
 
-    private ArrayList<Novel4Realm> novels = new ArrayList<>();
+    private BookmarkRecyclerController controller;
 
     public BookmarkRecyclerViewFragment() {}
 
@@ -48,22 +46,16 @@ public class BookmarkRecyclerViewFragment extends Fragment {
             return;
         }
 
+        controller = new BookmarkRecyclerController(this);
+
         adapter = new SimpleRecyclerViewAdapter(context);
         adapter.setOnItemClickListener((view, position) -> startNovelActivity(position));
 
-        Realm realm = RealmUtils.getRealm(context);
-        RealmResults<Novel4Realm> results = realm.where(Novel4Realm.class).notEqualTo("bookmark", 0).findAll();
-
-        for (Novel4Realm novel4Realm : results) {
-            novels.add(novel4Realm);
-        }
-
-        adapter.clearData();
-        adapter.addDataOf(novels);
+        controller.fetchBookmarkNovels();
     }
 
     private void startNovelActivity(int position) {
-        final Novel4Realm novel = novels.get(position);
+        final Novel4Realm novel = adapter.getList().get(position);
 
         Intent intent = new Intent(context, NovelViewActivity.class);
         intent.putExtra("ncode", novel.getNcode());
@@ -97,5 +89,12 @@ public class BookmarkRecyclerViewFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
+        controller.detach();
+    }
+
+    @Override
+    public void showBookmarks(ArrayList<Novel4Realm> novels) {
+        adapter.clearData();
+        adapter.addDataOf(novels);
     }
 }
