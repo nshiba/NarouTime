@@ -9,7 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import net.nashihara.naroureader.R;
-import net.nashihara.naroureader.views.adapters.RankingFragmentPagerAdapter;
+import net.nashihara.naroureader.adapters.RankingFragmentPagerAdapter;
 import net.nashihara.naroureader.databinding.FragmentRankingViewpagerBinding;
 
 public class RankingViewPagerFragment extends Fragment {

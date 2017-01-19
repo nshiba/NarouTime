@@ -14,7 +14,7 @@ import android.view.ViewGroup;
 import com.google.firebase.crash.FirebaseCrash;
 
 import net.nashihara.naroureader.R;
-import net.nashihara.naroureader.views.adapters.NovelDetailRecyclerViewAdapter;
+import net.nashihara.naroureader.adapters.NovelDetailRecyclerViewAdapter;
 import net.nashihara.naroureader.databinding.FragmentSearchRecyclerBinding;
 import net.nashihara.naroureader.databinding.ItemRankingRecyclerBinding;
 import net.nashihara.naroureader.models.entities.NovelItem;

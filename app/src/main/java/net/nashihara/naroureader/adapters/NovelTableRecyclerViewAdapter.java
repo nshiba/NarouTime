@@ -1,4 +1,4 @@
-package net.nashihara.naroureader.views.adapters;
+package net.nashihara.naroureader.adapters;
 
 import android.content.Context;
 import android.databinding.DataBindingUtil;
@@ -8,24 +8,23 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import net.nashihara.naroureader.R;
-import net.nashihara.naroureader.databinding.ItemSimpleRecyclerBinding;
-import net.nashihara.naroureader.models.entities.Novel4Realm;
+import net.nashihara.naroureader.databinding.ItemTableRecyclerBinding;
 import net.nashihara.naroureader.models.entities.NovelItem;
-import net.nashihara.naroureader.utils.OnItemClickListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class SimpleRecyclerViewAdapter extends RecyclerView.Adapter<SimpleRecyclerViewAdapter.BindingHolder> {
-    private static final String TAG = SimpleRecyclerViewAdapter.class.getSimpleName();
+import narou4j.entities.NovelBody;
+
+public class NovelTableRecyclerViewAdapter extends RecyclerView.Adapter<NovelTableRecyclerViewAdapter.BindingHolder> {
+    private static final String TAG = NovelTableRecyclerViewAdapter.class.getSimpleName();
 
     private LayoutInflater mInflater;
-    private ArrayList<Novel4Realm> mArrayList;
+    private ArrayList<NovelBody> mArrayList;
     private OnItemClickListener mListener;
     private RecyclerView mRecyclerView;
-    private Context mContext;
 
-    public SimpleRecyclerViewAdapter(Context context) {
+    public NovelTableRecyclerViewAdapter(Context context) {
         this.mInflater = LayoutInflater.from(context);
         mArrayList = new ArrayList<>();
     }
@@ -44,16 +43,35 @@ public class SimpleRecyclerViewAdapter extends RecyclerView.Adapter<SimpleRecycl
 
     @Override
     public BindingHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        final View v = mInflater.inflate(R.layout.item_simple_recycler, parent, false);
+        final View v = mInflater.inflate(R.layout.item_table_recycler, parent, false);
+
+//        v.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+//            @Override
+//            public void onGlobalLayout() {
+//                v.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+//                Log.d(TAG, "onGlobalLayout: height -> " + v.getHeight());
+//            }
+//        });
+
         return new BindingHolder(v, mListener);
     }
 
     @Override
     public void onBindViewHolder(BindingHolder holder, int position) {
         if (mArrayList != null && mArrayList.size() > position && mArrayList.get(position) != null) {
-            ItemSimpleRecyclerBinding binding = holder.getBinding();
+            ItemTableRecyclerBinding binding = holder.getBinding();
 
-            binding.title.setText(mArrayList.get(position).getTitle());
+            NovelBody body = mArrayList.get(position);
+            if (body.isChapter()) {
+                binding.chapter.setText(body.getTitle());
+                binding.chapter.setVisibility(View.VISIBLE);
+                binding.pageTitle.setVisibility(View.GONE);
+            }
+            else {
+                binding.pageTitle.setText(body.getTitle());
+                binding.pageTitle.setVisibility(View.VISIBLE);
+                binding.chapter.setVisibility(View.GONE);
+            }
         }
     }
 
@@ -65,7 +83,7 @@ public class SimpleRecyclerViewAdapter extends RecyclerView.Adapter<SimpleRecycl
         return mArrayList.size();
     }
 
-    public void addDataOf(List<Novel4Realm> dataList) {
+    public void addDataOf(List<NovelBody> dataList) {
         mArrayList.addAll(dataList);
     }
 
@@ -79,7 +97,7 @@ public class SimpleRecyclerViewAdapter extends RecyclerView.Adapter<SimpleRecycl
         mArrayList.clear();
     }
 
-    public ArrayList<Novel4Realm> getList() {
+    public ArrayList<NovelBody> getList() {
         return this.mArrayList;
     }
 
@@ -87,8 +105,12 @@ public class SimpleRecyclerViewAdapter extends RecyclerView.Adapter<SimpleRecycl
         this.mListener = listener;
     }
 
+    public interface OnItemClickListener {
+        void onItemClick(View view, int position, ItemTableRecyclerBinding binding);
+    }
+
     static class BindingHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        private ItemSimpleRecyclerBinding binding;
+        private final ItemTableRecyclerBinding binding;
         private OnItemClickListener mListener;
 
         public BindingHolder(View itemView, OnItemClickListener listener) {
@@ -96,17 +118,17 @@ public class SimpleRecyclerViewAdapter extends RecyclerView.Adapter<SimpleRecycl
             this.mListener = listener;
             binding = DataBindingUtil.bind(itemView);
 
-            binding.itemContainer.setOnClickListener(this);
+            binding.pageTitle.setOnClickListener(this);
         }
 
-        public ItemSimpleRecyclerBinding getBinding(){
+        public ItemTableRecyclerBinding getBinding(){
             return this.binding;
         }
 
         @Override
         public void onClick(View v) {
             if (mListener != null) {
-                mListener.onItemClick(v, getLayoutPosition());
+                mListener.onItemClick(v, getLayoutPosition(), binding);
             }
         }
     }

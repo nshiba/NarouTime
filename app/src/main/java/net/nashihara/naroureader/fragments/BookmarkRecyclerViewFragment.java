@@ -15,7 +15,7 @@ import net.nashihara.naroureader.activities.NovelViewActivity;
 import net.nashihara.naroureader.databinding.FragmentSimpleRecycerViewBinding;
 import net.nashihara.naroureader.models.entities.Novel4Realm;
 import net.nashihara.naroureader.utils.RealmUtils;
-import net.nashihara.naroureader.views.adapters.SimpleRecyclerViewAdapter;
+import net.nashihara.naroureader.adapters.SimpleRecyclerViewAdapter;
 
 import java.util.ArrayList;
 

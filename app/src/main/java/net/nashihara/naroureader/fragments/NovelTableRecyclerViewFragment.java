@@ -22,8 +22,8 @@ import net.nashihara.naroureader.databinding.FragmentNovelTableViewBinding;
 import net.nashihara.naroureader.models.entities.Novel4Realm;
 import net.nashihara.naroureader.models.entities.NovelTable4Realm;
 import net.nashihara.naroureader.utils.RealmUtils;
-import net.nashihara.naroureader.views.adapters.NovelTableRecyclerViewAdapter;
-import net.nashihara.naroureader.views.widgets.OkCancelDialogFragment;
+import net.nashihara.naroureader.adapters.NovelTableRecyclerViewAdapter;
+import net.nashihara.naroureader.widgets.OkCancelDialogFragment;
 
 import java.io.IOException;
 import java.util.ArrayList;

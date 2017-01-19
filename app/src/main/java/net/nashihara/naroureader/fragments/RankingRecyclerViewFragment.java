@@ -24,11 +24,11 @@ import net.nashihara.naroureader.databinding.ItemRankingRecyclerBinding;
 import net.nashihara.naroureader.models.entities.NovelItem;
 import net.nashihara.naroureader.utils.DownloadUtils;
 import net.nashihara.naroureader.utils.OnFragmentReplaceListener;
-import net.nashihara.naroureader.views.adapters.NovelDetailRecyclerViewAdapter;
-import net.nashihara.naroureader.views.widgets.FilterDialogFragment;
-import net.nashihara.naroureader.views.widgets.ListDailogFragment;
-import net.nashihara.naroureader.views.widgets.NovelDownloadDialogFragment;
-import net.nashihara.naroureader.views.widgets.OkCancelDialogFragment;
+import net.nashihara.naroureader.adapters.NovelDetailRecyclerViewAdapter;
+import net.nashihara.naroureader.widgets.FilterDialogFragment;
+import net.nashihara.naroureader.widgets.ListDailogFragment;
+import net.nashihara.naroureader.widgets.NovelDownloadDialogFragment;
+import net.nashihara.naroureader.widgets.OkCancelDialogFragment;
 
 import java.io.IOException;
 import java.util.ArrayList;

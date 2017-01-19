@@ -15,8 +15,8 @@ import net.nashihara.naroureader.controller.SearchController;
 import net.nashihara.naroureader.databinding.FragmentSearchBinding;
 import net.nashihara.naroureader.utils.OnFragmentReplaceListener;
 import net.nashihara.naroureader.views.SearchView;
-import net.nashihara.naroureader.views.widgets.FilterDialogFragment;
-import net.nashihara.naroureader.views.widgets.OkCancelDialogFragment;
+import net.nashihara.naroureader.widgets.FilterDialogFragment;
+import net.nashihara.naroureader.widgets.OkCancelDialogFragment;
 
 import java.util.ArrayList;
 

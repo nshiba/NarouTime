@@ -1,4 +1,4 @@
-package net.nashihara.naroureader.views.adapters;
+package net.nashihara.naroureader.adapters;
 
 import android.content.Context;
 import android.content.res.Resources;

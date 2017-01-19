@@ -32,9 +32,9 @@ import net.nashihara.naroureader.models.entities.NovelItem;
 import net.nashihara.naroureader.utils.DownloadUtils;
 import net.nashihara.naroureader.utils.NetworkUtils;
 import net.nashihara.naroureader.utils.OnFragmentReplaceListener;
-import net.nashihara.naroureader.views.widgets.ListDailogFragment;
-import net.nashihara.naroureader.views.widgets.NovelDownloadDialogFragment;
-import net.nashihara.naroureader.views.widgets.OkCancelDialogFragment;
+import net.nashihara.naroureader.widgets.ListDailogFragment;
+import net.nashihara.naroureader.widgets.NovelDownloadDialogFragment;
+import net.nashihara.naroureader.widgets.OkCancelDialogFragment;
 
 import java.util.Stack;
 

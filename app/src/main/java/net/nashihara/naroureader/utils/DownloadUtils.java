@@ -7,8 +7,8 @@ import android.util.Log;
 
 import com.google.firebase.crash.FirebaseCrash;
 
-import net.nashihara.naroureader.views.widgets.NovelDownloadDialogFragment;
-import net.nashihara.naroureader.views.widgets.OkCancelDialogFragment;
+import net.nashihara.naroureader.widgets.NovelDownloadDialogFragment;
+import net.nashihara.naroureader.widgets.OkCancelDialogFragment;
 import net.nashihara.naroureader.models.entities.Novel4Realm;
 import net.nashihara.naroureader.models.entities.NovelBody4Realm;
 import net.nashihara.naroureader.models.entities.NovelTable4Realm;
