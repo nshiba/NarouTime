@@ -21,7 +21,7 @@ import com.google.firebase.crash.FirebaseCrash;
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.databinding.FragmentRankingRecyclerBinding;
 import net.nashihara.naroureader.databinding.ItemRankingRecyclerBinding;
-import net.nashihara.naroureader.models.entities.NovelItem;
+import net.nashihara.naroureader.entities.NovelItem;
 import net.nashihara.naroureader.utils.DownloadUtils;
 import net.nashihara.naroureader.listeners.FragmentTransactionListener;
 import net.nashihara.naroureader.adapters.NovelDetailRecyclerViewAdapter;

@@ -1,6 +1,6 @@
 package net.nashihara.naroureader.views;
 
-import net.nashihara.naroureader.models.entities.Novel4Realm;
+import net.nashihara.naroureader.entities.Novel4Realm;
 
 import java.util.ArrayList;
 

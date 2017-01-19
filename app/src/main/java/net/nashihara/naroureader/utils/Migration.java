@@ -14,7 +14,7 @@ public class Migration implements RealmMigration {
 
         /************************************************
          // Version 0
-         class {@link net.nashihara.naroureader.models.entities.Novel4Realm}
+         class {@link net.nashihara.naroureader.entities.Novel4Realm}
          private String ncode;
          private String title;
          private String writer;
@@ -22,7 +22,7 @@ public class Migration implements RealmMigration {
          private boolean fav;
 
          // Version 1
-         class {@link net.nashihara.naroureader.models.entities.Novel4Realm}
+         class {@link net.nashihara.naroureader.entities.Novel4Realm}
          private String ncode;
          private String title;
          private String writer;
@@ -40,7 +40,7 @@ public class Migration implements RealmMigration {
 
         /************************************************
          // Version 1
-         class {@link net.nashihara.naroureader.models.entities.Novel4Realm}
+         class {@link net.nashihara.naroureader.entities.Novel4Realm}
          private String ncode;
          private String title;
          private String writer;
@@ -49,7 +49,7 @@ public class Migration implements RealmMigration {
          private int totalPage;
 
          // Version 2
-         class {@link net.nashihara.naroureader.models.entities.Novel4Realm}
+         class {@link net.nashihara.naroureader.entities.Novel4Realm}
          private String ncode;
          private String title;
          private String writer;
@@ -69,7 +69,7 @@ public class Migration implements RealmMigration {
 
         /************************************************
          // Version 2
-         class {@link net.nashihara.naroureader.models.entities.Novel4Realm}
+         class {@link net.nashihara.naroureader.entities.Novel4Realm}
          private String ncode;
          private String title;
          private String writer;
@@ -79,7 +79,7 @@ public class Migration implements RealmMigration {
          private boolean isDownload;
 
          // Version 3
-         class {@link net.nashihara.naroureader.models.entities.Novel4Realm}
+         class {@link net.nashihara.naroureader.entities.Novel4Realm}
          private String ncode;
          private String title;
          private String writer;
@@ -90,7 +90,7 @@ public class Migration implements RealmMigration {
          private boolean isDownload = false;
 
          // add new model
-         class {@link net.nashihara.naroureader.models.entities.NovelTable4Realm}
+         class {@link net.nashihara.naroureader.entities.NovelTable4Realm}
          private int tableNumber;
          private String ncode;
          private int page;

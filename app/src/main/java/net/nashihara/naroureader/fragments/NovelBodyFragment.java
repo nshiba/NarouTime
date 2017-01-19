@@ -16,8 +16,8 @@ import com.google.firebase.crash.FirebaseCrash;
 
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.databinding.FragmentNovelBodyBinding;
-import net.nashihara.naroureader.models.entities.Novel4Realm;
-import net.nashihara.naroureader.models.entities.NovelBody4Realm;
+import net.nashihara.naroureader.entities.Novel4Realm;
+import net.nashihara.naroureader.entities.NovelBody4Realm;
 import net.nashihara.naroureader.utils.RealmUtils;
 
 import java.io.IOException;

@@ -1,4 +1,4 @@
-package net.nashihara.naroureader.models.entities;
+package net.nashihara.naroureader.entities;
 
 import io.realm.RealmObject;
 

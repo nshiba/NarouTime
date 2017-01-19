@@ -14,8 +14,8 @@ import net.nashihara.naroureader.adapters.SimpleRecyclerViewAdapter;
 import net.nashihara.naroureader.controller.DownlaodedRecyclerController;
 import net.nashihara.naroureader.databinding.FragmentSimpleRecycerViewBinding;
 import net.nashihara.naroureader.listeners.FragmentTransactionListener;
-import net.nashihara.naroureader.models.entities.Novel4Realm;
-import net.nashihara.naroureader.models.entities.NovelItem;
+import net.nashihara.naroureader.entities.Novel4Realm;
+import net.nashihara.naroureader.entities.NovelItem;
 import net.nashihara.naroureader.views.DownloadedRecyclerView;
 
 import java.util.ArrayList;

@@ -1,6 +1,6 @@
 package net.nashihara.naroureader.controller;
 
-import net.nashihara.naroureader.models.entities.Novel4Realm;
+import net.nashihara.naroureader.entities.Novel4Realm;
 import net.nashihara.naroureader.utils.RealmUtils;
 import net.nashihara.naroureader.views.DownloadedRecyclerView;
 

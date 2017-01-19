@@ -13,7 +13,7 @@ import android.view.ViewGroup;
 
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.databinding.ItemRankingRecyclerBinding;
-import net.nashihara.naroureader.models.entities.NovelItem;
+import net.nashihara.naroureader.entities.NovelItem;
 
 import java.util.List;
 

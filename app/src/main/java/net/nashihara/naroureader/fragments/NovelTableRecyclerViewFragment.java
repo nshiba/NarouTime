@@ -19,8 +19,8 @@ import com.google.firebase.crash.FirebaseCrash;
 
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.databinding.FragmentNovelTableViewBinding;
-import net.nashihara.naroureader.models.entities.Novel4Realm;
-import net.nashihara.naroureader.models.entities.NovelTable4Realm;
+import net.nashihara.naroureader.entities.Novel4Realm;
+import net.nashihara.naroureader.entities.NovelTable4Realm;
 import net.nashihara.naroureader.utils.RealmUtils;
 import net.nashihara.naroureader.adapters.NovelTableRecyclerViewAdapter;
 import net.nashihara.naroureader.widgets.OkCancelDialogFragment;

@@ -15,7 +15,7 @@ import net.nashihara.naroureader.activities.NovelViewActivity;
 import net.nashihara.naroureader.adapters.SimpleRecyclerViewAdapter;
 import net.nashihara.naroureader.controller.BookmarkRecyclerController;
 import net.nashihara.naroureader.databinding.FragmentSimpleRecycerViewBinding;
-import net.nashihara.naroureader.models.entities.Novel4Realm;
+import net.nashihara.naroureader.entities.Novel4Realm;
 import net.nashihara.naroureader.views.BookmarkRecyclerView;
 
 import java.util.ArrayList;

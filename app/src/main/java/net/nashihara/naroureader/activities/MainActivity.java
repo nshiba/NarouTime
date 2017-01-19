@@ -29,7 +29,7 @@ import net.nashihara.naroureader.fragments.RankingViewPagerFragment;
 import net.nashihara.naroureader.fragments.SearchFragment;
 import net.nashihara.naroureader.fragments.SearchRecyclerViewFragment;
 import net.nashihara.naroureader.listeners.FragmentTransactionListener;
-import net.nashihara.naroureader.models.entities.NovelItem;
+import net.nashihara.naroureader.entities.NovelItem;
 import net.nashihara.naroureader.utils.DownloadUtils;
 import net.nashihara.naroureader.utils.NetworkUtils;
 import net.nashihara.naroureader.widgets.ListDailogFragment;
