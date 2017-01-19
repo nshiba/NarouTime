@@ -7,32 +7,21 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.preference.PreferenceManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.firebase.crash.FirebaseCrash;
-
 import net.nashihara.naroureader.R;
+import net.nashihara.naroureader.controller.NovelBodyController;
 import net.nashihara.naroureader.databinding.FragmentNovelBodyBinding;
 import net.nashihara.naroureader.entities.Novel4Realm;
-import net.nashihara.naroureader.entities.NovelBody4Realm;
 import net.nashihara.naroureader.utils.RealmUtils;
-
-import java.io.IOException;
+import net.nashihara.naroureader.views.NovelBodyView;
 
 import io.realm.Realm;
-import io.realm.RealmQuery;
-import io.realm.RealmResults;
-import narou4j.Narou;
 import narou4j.entities.NovelBody;
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
-public class NovelBodyFragment extends Fragment{
+public class NovelBodyFragment extends Fragment implements NovelBodyView {
 
     private static final String TAG = NovelBodyFragment.class.getSimpleName();
 
@@ -70,6 +59,8 @@ public class NovelBodyFragment extends Fragment{
 
     private FragmentNovelBodyBinding binding;
 
+    private NovelBodyController controller;
+
     public NovelBodyFragment() {}
 
     public static NovelBodyFragment newInstance(String ncode, String title, String body, int page, int totalPage) {
@@ -89,6 +80,7 @@ public class NovelBodyFragment extends Fragment{
         super.onCreate(savedInstanceState);
         pref = PreferenceManager.getDefaultSharedPreferences(context);
         realm = RealmUtils.getRealm(context);
+        controller = new NovelBodyController(this, realm);
 
         Bundle args = getArguments();
         if (args != null) {
@@ -106,13 +98,13 @@ public class NovelBodyFragment extends Fragment{
 
         if (body.equals("")) {
             goneBody();
-            return binding.getRoot();
+        } else {
+            binding.body.setText(body);
+            binding.title.setText(title);
+            visibleBody();
         }
 
         setupPageButton();
-        binding.body.setText(body);
-        binding.title.setText(title);
-        visibleBody();
 
         return binding.getRoot();
     }
@@ -142,48 +134,10 @@ public class NovelBodyFragment extends Fragment{
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        RealmQuery<Novel4Realm> query = realm.where(Novel4Realm.class);
-        query.equalTo("ncode", ncode);
-        RealmResults<Novel4Realm> results = query.findAll();
 
-        if (body.equals("")) {
-            if (results.size() == 0) {
-                updateNovelBody(page);
-            }
-            else {
-                RealmResults<NovelBody4Realm> targetBody = getNovelBody(ncode, page);
-
-                if (targetBody.size() > 0) {
-                    binding.body.setText(targetBody.get(0).getBody());
-                    binding.title.setText(targetBody.get(0).getTitle());
-                    visibleBody();
-                }
-                else {
-                    updateNovelBody(page);
-                }
-            }
-        }
-        else {
-            if (results.size() == 0) {
-                if (pref.getBoolean(getString(R.string.auto_download), false)) {
-                    addNovelBody(page, title, body);
-                }
-            } else {
-                Novel4Realm novel4Realm = results.get(0);
-                RealmResults<NovelBody4Realm> targetBody = getNovelBody(ncode, page);
-
-                if (targetBody.size() > 0) {
-                    if (pref.getBoolean(getString(R.string.auto_sync), false)) {
-                        addNovelBody(page, title, body);
-                    }
-                }
-                else {
-                    if (pref.getBoolean(getString(R.string.auto_download), false)) {
-                        addNovelBody(page, title, body);
-                    }
-                }
-            }
-        }
+        boolean autoDownload = pref.getBoolean(getString(R.string.auto_download), false);
+        boolean autoSync = pref.getBoolean(getString(R.string.auto_sync), false);
+        controller.setupNovelPage(ncode, title, body, page, autoDownload, autoSync);
     }
 
     @Override
@@ -191,6 +145,9 @@ public class NovelBodyFragment extends Fragment{
         super.onAttach(context);
         this.context = context;
         listener = (OnNovelBodyInteraction) context;
+        pref = PreferenceManager.getDefaultSharedPreferences(context);
+        realm = RealmUtils.getRealm(context);
+        controller = new NovelBodyController(this, realm);
     }
 
     @Override
@@ -198,10 +155,16 @@ public class NovelBodyFragment extends Fragment{
         super.onDetach();
         listener = null;
         realm.close();
+        controller.detach();
     }
 
     @Override
     public void onResume() {
+        super.onResume();
+        setupPageColor();
+    }
+
+    private void setupPageColor() {
         int text = pref.getInt(getString(R.string.body_text), 0);
         int background = pref.getInt(getString(R.string.body_background), 0);
 
@@ -216,93 +179,6 @@ public class NovelBodyFragment extends Fragment{
         if (background != 0) {
             binding.root.setBackgroundColor(background);
         }
-
-        super.onResume();
-    }
-
-    private void addNovelBody(int page, String title, String body) {
-
-        realm.beginTransaction();
-
-        RealmResults<NovelBody4Realm> results = getNovelBody(ncode, page);
-        if (results.size() > 0) {
-            results.get(0).setNcode(ncode);
-            results.get(0).setPage(page);
-            results.get(0).setTitle(title);
-            results.get(0).setBody(body);
-        }
-        else {
-            NovelBody4Realm tmpBody = realm.createObject(NovelBody4Realm.class);
-            tmpBody.setNcode(ncode);
-            tmpBody.setPage(page);
-            tmpBody.setTitle(title);
-            tmpBody.setBody(body);
-        }
-
-        realm.commitTransaction();
-
-    }
-
-    private RealmResults<NovelBody4Realm> getNovelBody(String ncode, int page) {
-        RealmResults<NovelBody4Realm> ncodeResults = realm.where(NovelBody4Realm.class).equalTo("ncode", ncode).findAll();
-        return ncodeResults.where().equalTo("page", page).findAll();
-    }
-
-    private void updateNovelBody(final int targetPage) {
-        Observable.create(new Observable.OnSubscribe<NovelBody>() {
-            @Override
-            public void call(Subscriber<? super NovelBody> subscriber) {
-                Narou narou = new Narou();
-                try {
-                    subscriber.onNext(narou.getNovelBody(ncode, targetPage));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                subscriber.onCompleted();
-            }
-        })
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(new Subscriber<NovelBody>() {
-                @Override
-                public void onCompleted() {}
-
-                @Override
-                public void onError(Throwable e) {
-                    onLoadError();
-                    Log.e(TAG, "onError: ", e.fillInStackTrace());
-                    FirebaseCrash.report(e);
-                }
-
-                @Override
-                public void onNext(NovelBody s) {
-                    if (pref.getBoolean(getString(R.string.auto_download), false)) {
-                        realm.beginTransaction();
-
-                        RealmResults<NovelBody4Realm> results = getNovelBody(ncode, targetPage);
-                        if (results.size() <= 0) {
-                            NovelBody4Realm body4Realm = realm.createObject(NovelBody4Realm.class);
-                            body4Realm.setNcode(ncode);
-                            body4Realm.setTitle(s.getTitle());
-                            body4Realm.setBody(s.getBody());
-                            body4Realm.setPage(targetPage);
-                        }
-                        else {
-                            NovelBody4Realm body4Realm = results.get(0);
-                            body4Realm.setNcode(ncode);
-                            body4Realm.setTitle(s.getTitle());
-                            body4Realm.setBody(s.getBody());
-                            body4Realm.setPage(targetPage);
-                        }
-
-                        realm.commitTransaction();
-                    }
-                    binding.body.setText(s.getBody());
-                    binding.title.setText(s.getTitle());
-
-                    visibleBody();
-                }
-            });
     }
 
     private void visibleBody() {
@@ -346,6 +222,18 @@ public class NovelBodyFragment extends Fragment{
             binding.btnReload.setVisibility(View.GONE);
             reload();
         });
+    }
+
+    @Override
+    public void showNovelBody(NovelBody novelBody) {
+        binding.body.setText(novelBody.getBody());
+        binding.title.setText(novelBody.getTitle());
+        visibleBody();
+    }
+
+    @Override
+    public void showError() {
+        onLoadError();
     }
 
     public interface OnNovelBodyInteraction {
