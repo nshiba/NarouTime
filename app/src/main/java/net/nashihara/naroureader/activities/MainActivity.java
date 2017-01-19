@@ -28,10 +28,10 @@ import net.nashihara.naroureader.fragments.NovelTableRecyclerViewFragment;
 import net.nashihara.naroureader.fragments.RankingViewPagerFragment;
 import net.nashihara.naroureader.fragments.SearchFragment;
 import net.nashihara.naroureader.fragments.SearchRecyclerViewFragment;
+import net.nashihara.naroureader.listeners.FragmentTransactionListener;
 import net.nashihara.naroureader.models.entities.NovelItem;
 import net.nashihara.naroureader.utils.DownloadUtils;
 import net.nashihara.naroureader.utils.NetworkUtils;
-import net.nashihara.naroureader.listeners.OnFragmentReplaceListener;
 import net.nashihara.naroureader.widgets.ListDailogFragment;
 import net.nashihara.naroureader.widgets.NovelDownloadDialogFragment;
 import net.nashihara.naroureader.widgets.OkCancelDialogFragment;
@@ -44,23 +44,28 @@ import narou4j.enums.RankingType;
 import static android.support.v4.view.GravityCompat.START;
 
 public class MainActivity extends AppCompatActivity
-    implements NavigationView.OnNavigationItemSelectedListener, OnFragmentReplaceListener, NovelTableRecyclerViewFragment.OnNovelSelectionListener, Toolbar.OnMenuItemClickListener {
+    implements NavigationView.OnNavigationItemSelectedListener, FragmentTransactionListener,
+    NovelTableRecyclerViewFragment.OnNovelSelectionListener, Toolbar.OnMenuItemClickListener {
 
-    ActivityMainBinding binding;
+    private ActivityMainBinding binding;
+
     private String TAG = MainActivity.class.getSimpleName();
-    private FragmentManager manager;
-    private Stack<String> titleStack = new Stack<>();
+
+    private FragmentManager fragmentManager;
+
+    private Stack<CharSequence> titleStack = new Stack<>();
 
     private MaterialMenuDrawable materialMenu;
 
     private boolean isNovelTableView = false;
+
     private NovelItem downloadTargetNovel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
-        manager = getSupportFragmentManager();
+        fragmentManager = getSupportFragmentManager();
 
         materialMenu = new MaterialMenuDrawable(this, Color.WHITE, MaterialMenuDrawable.Stroke.THIN);
         materialMenu.animateIconState(MaterialMenuDrawable.IconState.BURGER);
@@ -85,14 +90,14 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onBackPressed() {
         isNovelTableView = false;
-        int stack = manager.getBackStackEntryCount();
+        int stack = fragmentManager.getBackStackEntryCount();
         if (stack == 1) {
-            manager.popBackStack();
+            fragmentManager.popBackStack();
             materialMenu.animateIconState(MaterialMenuDrawable.IconState.BURGER);
             binding.toolbar.setTitle(titleStack.pop());
             binding.navView.setCheckedItem(R.id.nav_ranking);
         } else if (stack > 1) {
-            manager.popBackStack();
+            fragmentManager.popBackStack();
             binding.toolbar.setTitle(titleStack.pop());
         } else if (binding.drawer.isDrawerOpen(GravityCompat.START)) {
             binding.drawer.closeDrawer(GravityCompat.START);
@@ -138,13 +143,8 @@ public class MainActivity extends AppCompatActivity
                 public void onDownloadSuccess(NovelDownloadDialogFragment dialog, final Novel novel) {
                     dialog.dismiss();
 
-                    OkCancelDialogFragment okCancelDialog =
-                        OkCancelDialogFragment.newInstance("ダウンロード完了", "ダウンロードしました。", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        });
+                    OkCancelDialogFragment okCancelDialog = OkCancelDialogFragment.newInstance(
+                        "ダウンロード完了", "ダウンロードしました。", (dialog1, which) -> dialog1.dismiss());
                     okCancelDialog.show(getSupportFragmentManager(), "okcansel");
                 }
 
@@ -175,7 +175,7 @@ public class MainActivity extends AppCompatActivity
                     RankingType.MONTHLY.toString(), RankingType.QUARTET.toString(), "all"};
                 String[] titles = new String[]{"日間", "週間", "月間", "四半期", "累計"};
                 Fragment fragment = RankingViewPagerFragment.newInstance(types, titles);
-                manager.beginTransaction()
+                fragmentManager.beginTransaction()
                     .replace(R.id.main_container, fragment)
                     .commit();
                 break;
@@ -184,7 +184,7 @@ public class MainActivity extends AppCompatActivity
                 binding.toolbar.setTitle("しおり");
                 binding.navView.setCheckedItem(R.id.nav_bookmark);
                 BookmarkRecyclerViewFragment fragment = BookmarkRecyclerViewFragment.newInstance();
-                manager.beginTransaction()
+                fragmentManager.beginTransaction()
                     .replace(R.id.main_container, fragment)
                     .commit();
                 break;
@@ -193,7 +193,7 @@ public class MainActivity extends AppCompatActivity
                 binding.toolbar.setTitle("ダウンロード済み小説");
                 binding.navView.setCheckedItem(R.id.nav_download);
                 DownloadedRecyclerViewFragment fragment = DownloadedRecyclerViewFragment.newInstance();
-                manager.beginTransaction()
+                fragmentManager.beginTransaction()
                     .replace(R.id.main_container, fragment)
                     .commit();
                 break;
@@ -201,8 +201,8 @@ public class MainActivity extends AppCompatActivity
             case R.id.nav_search: {
                 binding.toolbar.setTitle("検索");
                 binding.navView.setCheckedItem(R.id.nav_search);
-                SearchFragment fragment = SearchFragment.newInstance().newInstance();
-                manager.beginTransaction()
+                SearchFragment fragment = SearchFragment.newInstance();
+                fragmentManager.beginTransaction()
                     .replace(R.id.main_container, fragment)
                     .commit();
                 break;
@@ -261,13 +261,13 @@ public class MainActivity extends AppCompatActivity
             binding.toolbar.setTitle("ダウンロード済み小説");
         }
 
-        manager.beginTransaction()
+        fragmentManager.beginTransaction()
             .add(R.id.main_container, fragment)
             .commit();
     }
 
     @Override
-    public void onFragmentReplaceAction(Fragment fragment, String title, NovelItem item) {
+    public void replaceFragment(Fragment fragment, String title, NovelItem item) {
         if (fragment == null) {
             return;
         }
@@ -281,13 +281,12 @@ public class MainActivity extends AppCompatActivity
             materialMenu.animateIconState(MaterialMenuDrawable.IconState.ARROW);
         }
 
-        titleStack.push((String) binding.toolbar.getTitle());
+        titleStack.push(binding.toolbar.getTitle());
         binding.toolbar.setTitle(title);
-        manager.beginTransaction()
+        fragmentManager.beginTransaction()
             .replace(R.id.main_container, fragment)
             .addToBackStack(null)
             .commit();
-
     }
 
     @Override

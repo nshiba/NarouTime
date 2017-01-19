@@ -13,7 +13,7 @@ import android.widget.ArrayAdapter;
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.controller.SearchController;
 import net.nashihara.naroureader.databinding.FragmentSearchBinding;
-import net.nashihara.naroureader.listeners.OnFragmentReplaceListener;
+import net.nashihara.naroureader.listeners.FragmentTransactionListener;
 import net.nashihara.naroureader.views.SearchView;
 import net.nashihara.naroureader.widgets.FilterDialogFragment;
 import net.nashihara.naroureader.widgets.OkCancelDialogFragment;
@@ -24,7 +24,7 @@ public class SearchFragment extends Fragment implements SearchView {
 
     private FragmentSearchBinding binding;
     private Context context;
-    private OnFragmentReplaceListener replaceListener;
+    private FragmentTransactionListener replaceListener;
 
     private int sortItem = 0;
     private int timeItem = 0;
@@ -155,7 +155,7 @@ public class SearchFragment extends Fragment implements SearchView {
     public void onAttach(Context context) {
         super.onAttach(context);
         this.context = context;
-        this.replaceListener = (OnFragmentReplaceListener) context;
+        this.replaceListener = (FragmentTransactionListener) context;
     }
 
     @Override
@@ -190,7 +190,7 @@ public class SearchFragment extends Fragment implements SearchView {
             ncode, limit, sortItem, search, notSearch, targetTitle, targetStory, targetKeyword,
             targetWriter, time, maxLength, minLength, end, stop, pickup, genreList);
 
-        replaceListener.onFragmentReplaceAction(fragment, "検索結果", null);
+        replaceListener.replaceFragment(fragment, "検索結果", null);
     }
 
     @Override

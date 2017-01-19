@@ -13,7 +13,7 @@ import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.databinding.FragmentSimpleRecycerViewBinding;
 import net.nashihara.naroureader.models.entities.Novel4Realm;
 import net.nashihara.naroureader.models.entities.NovelItem;
-import net.nashihara.naroureader.listeners.OnFragmentReplaceListener;
+import net.nashihara.naroureader.listeners.FragmentTransactionListener;
 import net.nashihara.naroureader.utils.RealmUtils;
 import net.nashihara.naroureader.adapters.SimpleRecyclerViewAdapter;
 
@@ -27,7 +27,7 @@ public class DownloadedRecyclerViewFragment extends Fragment {
 
     private SimpleRecyclerViewAdapter adapter;
 
-    private OnFragmentReplaceListener listener;
+    private FragmentTransactionListener listener;
 
     private Context context;
 
@@ -77,7 +77,7 @@ public class DownloadedRecyclerViewFragment extends Fragment {
 
         NovelItem item = new NovelItem();
         item.setNovelDetail(novelDetail);
-        listener.onFragmentReplaceAction(NovelTableRecyclerViewFragment.newInstance(novel.getNcode()), novel.getTitle(), item);
+        listener.replaceFragment(NovelTableRecyclerViewFragment.newInstance(novel.getNcode()), novel.getTitle(), item);
     }
 
     @Override
@@ -97,8 +97,8 @@ public class DownloadedRecyclerViewFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         this.context = context;
-        if (context instanceof OnFragmentReplaceListener) {
-            listener = (OnFragmentReplaceListener) context;
+        if (context instanceof FragmentTransactionListener) {
+            listener = (FragmentTransactionListener) context;
         } else {
             throw new RuntimeException(context.toString()
                 + " must implement context instanceof OnFragmentReplaceListener");

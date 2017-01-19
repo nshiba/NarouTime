@@ -18,7 +18,7 @@ import net.nashihara.naroureader.adapters.NovelDetailRecyclerViewAdapter;
 import net.nashihara.naroureader.databinding.FragmentSearchRecyclerBinding;
 import net.nashihara.naroureader.databinding.ItemRankingRecyclerBinding;
 import net.nashihara.naroureader.models.entities.NovelItem;
-import net.nashihara.naroureader.listeners.OnFragmentReplaceListener;
+import net.nashihara.naroureader.listeners.FragmentTransactionListener;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -76,7 +76,7 @@ public class SearchRecyclerViewFragment extends Fragment {
     private FragmentSearchRecyclerBinding binding;
     private Context context;
     private RecyclerView recyclerView;
-    private OnFragmentReplaceListener replaceListener;
+    private FragmentTransactionListener replaceListener;
 
     private ArrayList<NovelItem> allItems;
 
@@ -211,7 +211,7 @@ public class SearchRecyclerViewFragment extends Fragment {
                             }
                         } else {
                             NovelItem item = ((NovelDetailRecyclerViewAdapter) recyclerView.getAdapter()).getList().get(position);
-                            replaceListener.onFragmentReplaceAction(NovelTableRecyclerViewFragment.newInstance(item.getNovelDetail().getNcode()), item.getNovelDetail().getTitle(), item);
+                            replaceListener.replaceFragment(NovelTableRecyclerViewFragment.newInstance(item.getNovelDetail().getNcode()), item.getNovelDetail().getTitle(), item);
                         }
                     }
 
@@ -229,7 +229,7 @@ public class SearchRecyclerViewFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        this.replaceListener = (OnFragmentReplaceListener) context;
+        this.replaceListener = (FragmentTransactionListener) context;
         this.context = context;
     }
 
