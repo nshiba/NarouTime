@@ -10,20 +10,19 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import net.nashihara.naroureader.R;
+import net.nashihara.naroureader.adapters.SimpleRecyclerViewAdapter;
+import net.nashihara.naroureader.controller.DownlaodedRecyclerController;
 import net.nashihara.naroureader.databinding.FragmentSimpleRecycerViewBinding;
+import net.nashihara.naroureader.listeners.FragmentTransactionListener;
 import net.nashihara.naroureader.models.entities.Novel4Realm;
 import net.nashihara.naroureader.models.entities.NovelItem;
-import net.nashihara.naroureader.listeners.FragmentTransactionListener;
-import net.nashihara.naroureader.utils.RealmUtils;
-import net.nashihara.naroureader.adapters.SimpleRecyclerViewAdapter;
+import net.nashihara.naroureader.views.DownloadedRecyclerView;
 
 import java.util.ArrayList;
 
-import io.realm.Realm;
-import io.realm.RealmResults;
 import narou4j.entities.Novel;
 
-public class DownloadedRecyclerViewFragment extends Fragment {
+public class DownloadedRecyclerViewFragment extends Fragment implements DownloadedRecyclerView {
 
     private SimpleRecyclerViewAdapter adapter;
 
@@ -33,7 +32,7 @@ public class DownloadedRecyclerViewFragment extends Fragment {
 
     private FragmentSimpleRecycerViewBinding binding;
 
-    private ArrayList<Novel4Realm> novels = new ArrayList<>();
+    private DownlaodedRecyclerController controller;
 
     public DownloadedRecyclerViewFragment() {}
 
@@ -51,22 +50,16 @@ public class DownloadedRecyclerViewFragment extends Fragment {
             return;
         }
 
-        Realm realm = RealmUtils.getRealm(context);
-        RealmResults<Novel4Realm> results = realm.where(Novel4Realm.class).equalTo("isDownload", true).findAll();
-
-        for (Novel4Realm novel4Realm : results) {
-            novels.add(novel4Realm);
-        }
+        controller = new DownlaodedRecyclerController(this);
 
         adapter = new SimpleRecyclerViewAdapter(context);
         adapter.setOnItemClickListener((view, position) -> replaceFragment(position));
 
-        adapter.clearData();
-        adapter.addDataOf(novels);
+        controller.fetchDownloadedNovels();
     }
 
     private void replaceFragment(int position) {
-        final Novel4Realm novel = novels.get(position);
+        final Novel4Realm novel = adapter.getList().get(position);
 
         Novel novelDetail = new Novel();
         novelDetail.setNcode(novel.getNcode());
@@ -109,5 +102,11 @@ public class DownloadedRecyclerViewFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         listener = null;
+    }
+
+    @Override
+    public void showDownloadedNovels(ArrayList<Novel4Realm> novels) {
+        adapter.clearData();
+        adapter.addDataOf(novels);
     }
 }
