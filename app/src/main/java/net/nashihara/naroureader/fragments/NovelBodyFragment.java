@@ -33,28 +33,41 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 public class NovelBodyFragment extends Fragment{
+
     private static final String TAG = NovelBodyFragment.class.getSimpleName();
+
     private static final String ARG_NCODE = "ncode";
+
     private static final String ARG_TITLE = "title";
+
     private static final String ARG_BODY = "body";
+
     private static final String ARG_PAGE = "page";
+
     private static final String ARG_TOTAL_PAGE = "total_page";
 
-    private static final String PREF_IS_HIDE = "is_hide";
-
     private SharedPreferences pref;
+
     private Realm realm;
 
     private int page;
+
     private int totalPage;
+
     private String title;
+
     private String body;
+
     private String ncode;
+
     private String nextBody = "";
+
     private String prevBody = "";
 
-    private Context mContext;
-    private OnNovelBodyInteraction mListener;
+    private Context context;
+
+    private OnNovelBodyInteraction listener;
+
     private FragmentNovelBodyBinding binding;
 
     public NovelBodyFragment() {}
@@ -74,8 +87,8 @@ public class NovelBodyFragment extends Fragment{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        pref = PreferenceManager.getDefaultSharedPreferences(mContext);
-        realm = RealmUtils.getRealm(mContext);
+        pref = PreferenceManager.getDefaultSharedPreferences(context);
+        realm = RealmUtils.getRealm(context);
 
         Bundle args = getArguments();
         if (args != null) {
@@ -97,7 +110,7 @@ public class NovelBodyFragment extends Fragment{
                 return;
             }
             realm.close();
-            mListener.onNovelBodyLoadAction(nextBody, page+1, "");
+            listener.onNovelBodyLoadAction(nextBody, page+1, "");
         });
 
         binding.btnPrev.setOnClickListener(v -> {
@@ -105,7 +118,7 @@ public class NovelBodyFragment extends Fragment{
                 return;
             }
             realm.close();
-            mListener.onNovelBodyLoadAction(prevBody, page-1, "");
+            listener.onNovelBodyLoadAction(prevBody, page-1, "");
         });
 
         if (body.equals("")) {
@@ -171,14 +184,14 @@ public class NovelBodyFragment extends Fragment{
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        mContext = context;
-        mListener = (OnNovelBodyInteraction) context;
+        this.context = context;
+        listener = (OnNovelBodyInteraction) context;
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+        listener = null;
         realm.close();
     }
 
@@ -331,7 +344,7 @@ public class NovelBodyFragment extends Fragment{
     }
 
     public interface OnNovelBodyInteraction {
-        public void onNovelBodyLoadAction(String body, int nextPage, String bodyTitle);
-        public Novel4Realm getNovel4RealmInstance();
+        void onNovelBodyLoadAction(String body, int nextPage, String bodyTitle);
+        Novel4Realm getNovel4RealmInstance();
     }
 }
