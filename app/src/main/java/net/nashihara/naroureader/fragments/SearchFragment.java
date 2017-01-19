@@ -13,7 +13,7 @@ import android.widget.ArrayAdapter;
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.controller.SearchController;
 import net.nashihara.naroureader.databinding.FragmentSearchBinding;
-import net.nashihara.naroureader.utils.OnFragmentReplaceListener;
+import net.nashihara.naroureader.listeners.OnFragmentReplaceListener;
 import net.nashihara.naroureader.views.SearchView;
 import net.nashihara.naroureader.widgets.FilterDialogFragment;
 import net.nashihara.naroureader.widgets.OkCancelDialogFragment;

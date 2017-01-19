@@ -18,7 +18,7 @@ import net.nashihara.naroureader.adapters.NovelDetailRecyclerViewAdapter;
 import net.nashihara.naroureader.databinding.FragmentSearchRecyclerBinding;
 import net.nashihara.naroureader.databinding.ItemRankingRecyclerBinding;
 import net.nashihara.naroureader.models.entities.NovelItem;
-import net.nashihara.naroureader.utils.OnFragmentReplaceListener;
+import net.nashihara.naroureader.listeners.OnFragmentReplaceListener;
 
 import java.io.IOException;
 import java.util.ArrayList;

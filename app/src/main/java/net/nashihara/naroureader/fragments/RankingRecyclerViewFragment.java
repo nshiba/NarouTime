@@ -23,7 +23,7 @@ import net.nashihara.naroureader.databinding.FragmentRankingRecyclerBinding;
 import net.nashihara.naroureader.databinding.ItemRankingRecyclerBinding;
 import net.nashihara.naroureader.models.entities.NovelItem;
 import net.nashihara.naroureader.utils.DownloadUtils;
-import net.nashihara.naroureader.utils.OnFragmentReplaceListener;
+import net.nashihara.naroureader.listeners.OnFragmentReplaceListener;
 import net.nashihara.naroureader.adapters.NovelDetailRecyclerViewAdapter;
 import net.nashihara.naroureader.widgets.FilterDialogFragment;
 import net.nashihara.naroureader.widgets.ListDailogFragment;
