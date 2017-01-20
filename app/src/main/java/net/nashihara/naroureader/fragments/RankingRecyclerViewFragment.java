@@ -1,6 +1,5 @@
 package net.nashihara.naroureader.fragments;
 
-
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -53,12 +52,17 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 public class RankingRecyclerViewFragment extends Fragment {
+
     private static final String TAG = RankingRecyclerViewFragment.class.getSimpleName();
 
     private FragmentRankingRecyclerBinding binding;
-    private Context mContext;
-    private RecyclerView mRecyclerView;
-    private FragmentTransactionListener mReplaceListener;
+
+    private Context context;
+
+    private RecyclerView recyclerView;
+
+    private FragmentTransactionListener replaceListener;
+
     private ArrayList<NovelItem> allItems = new ArrayList<>();
 
     private static final String PARAM_TYPE = "rankingType";
@@ -76,8 +80,8 @@ public class RankingRecyclerViewFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        mContext = context;
-        mReplaceListener = (FragmentTransactionListener) context;
+        this.context = context;
+        replaceListener = (FragmentTransactionListener) context;
     }
 
     @Override
@@ -167,7 +171,7 @@ public class RankingRecyclerViewFragment extends Fragment {
                             resultList.add(target);
                         }
 
-                        NovelDetailRecyclerViewAdapter adapter = (NovelDetailRecyclerViewAdapter) mRecyclerView.getAdapter();
+                        NovelDetailRecyclerViewAdapter adapter = (NovelDetailRecyclerViewAdapter) recyclerView.getAdapter();
                         adapter.getList().clear();
                         adapter.getList().addAll(resultList);
                     }
@@ -175,7 +179,7 @@ public class RankingRecyclerViewFragment extends Fragment {
                     @Override
                     public void onNeutralButton(int which) {
 
-                        NovelDetailRecyclerViewAdapter adapter = (NovelDetailRecyclerViewAdapter) mRecyclerView.getAdapter();
+                        NovelDetailRecyclerViewAdapter adapter = (NovelDetailRecyclerViewAdapter) recyclerView.getAdapter();
                         adapter.getList().clear();
                         adapter.getList().addAll(allItems);
                     }
@@ -183,12 +187,12 @@ public class RankingRecyclerViewFragment extends Fragment {
             checkBoxDialog.show(getFragmentManager(), "multiple");
         });
 
-        mRecyclerView = binding.recycler;
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));
-//        mRecyclerView.addItemDecoration(new DividerItemDecoration(mContext));
+        recyclerView = binding.recycler;
+        recyclerView.setLayoutManager(new LinearLayoutManager(context));
+//        recyclerView.addItemDecoration(new DividerItemDecoration(context));
 
-        NovelDetailRecyclerViewAdapter adapter = new NovelDetailRecyclerViewAdapter(mContext, false);
-        mRecyclerView.setAdapter(adapter);
+        NovelDetailRecyclerViewAdapter adapter = new NovelDetailRecyclerViewAdapter(context, false);
+        recyclerView.setAdapter(adapter);
 
         Bundle args = getArguments();
         if (args != null) {
@@ -212,7 +216,7 @@ public class RankingRecyclerViewFragment extends Fragment {
     }
 
     public Context getContext() {
-        return mContext;
+        return context;
     }
 
     private void getTotalRanking() {
@@ -414,12 +418,12 @@ public class RankingRecyclerViewFragment extends Fragment {
     }
 
     public void onMyNext(List<NovelItem> novelItems) {
-        NovelDetailRecyclerViewAdapter adapter = (NovelDetailRecyclerViewAdapter) mRecyclerView.getAdapter();
+        NovelDetailRecyclerViewAdapter adapter = (NovelDetailRecyclerViewAdapter) recyclerView.getAdapter();
         adapter.clearData();
         adapter.addDataOf(novelItems);
         allItems = new ArrayList<>(novelItems);
         binding.progressBar.setVisibility(View.GONE);
-        mRecyclerView.setVisibility(View.VISIBLE);
+        recyclerView.setVisibility(View.VISIBLE);
 
         adapter.setOnItemClickListener(new NovelDetailRecyclerViewAdapter.OnItemClickListener() {
             @Override
@@ -436,15 +440,15 @@ public class RankingRecyclerViewFragment extends Fragment {
                     }
                 }
                 else {
-                    NovelItem item = ((NovelDetailRecyclerViewAdapter) mRecyclerView.getAdapter()).getList().get(position);
-                    mReplaceListener.replaceFragment(NovelTableRecyclerViewFragment.newInstance(item.getNovelDetail().getNcode()), item.getNovelDetail().getTitle(), item);
+                    NovelItem item = ((NovelDetailRecyclerViewAdapter) recyclerView.getAdapter()).getList().get(position);
+                    replaceListener.replaceFragment(NovelTableRecyclerViewFragment.newInstance(item.getNovelDetail().getNcode()), item.getNovelDetail().getTitle(), item);
                 }
             }
 
             @Override
             public void onItemLongClick(View view, final int position, ItemRankingRecyclerBinding binding) {
 
-                NovelDetailRecyclerViewAdapter adapter = (NovelDetailRecyclerViewAdapter) mRecyclerView.getAdapter();
+                NovelDetailRecyclerViewAdapter adapter = (NovelDetailRecyclerViewAdapter) recyclerView.getAdapter();
 
                 final NovelItem item = adapter.getList().get(position);
                 String[] strings = new String[]
@@ -453,8 +457,8 @@ public class RankingRecyclerViewFragment extends Fragment {
                     ListDailogFragment.newInstance(item.getNovelDetail().getTitle(), strings, (dialog, which) -> {
                         switch (which) {
                             case 0: {
-                                NovelItem item1 = ((NovelDetailRecyclerViewAdapter) mRecyclerView.getAdapter()).getList().get(position);
-                                mReplaceListener.replaceFragment(NovelTableRecyclerViewFragment.newInstance(item1.getNovelDetail().getNcode()), item1.getNovelDetail().getTitle(), item1);
+                                NovelItem item1 = ((NovelDetailRecyclerViewAdapter) recyclerView.getAdapter()).getList().get(position);
+                                replaceListener.replaceFragment(NovelTableRecyclerViewFragment.newInstance(item1.getNovelDetail().getNcode()), item1.getNovelDetail().getTitle(), item1);
                                 break;
                             }
                             case 1: {
@@ -471,7 +475,7 @@ public class RankingRecyclerViewFragment extends Fragment {
                                                     if (OkCancelDialogFragment.OK == which) {
                                                         NovelItem novelItem = new NovelItem();
                                                         novelItem.setNovelDetail(novel);
-                                                        mReplaceListener.replaceFragment(
+                                                        replaceListener.replaceFragment(
                                                             NovelTableRecyclerViewFragment.newInstance(novel.getNcode()), novelItem.getNovelDetail().getTitle(), novelItem);
                                                     }
                                                 }
@@ -486,7 +490,7 @@ public class RankingRecyclerViewFragment extends Fragment {
                                         dialog.dismiss();
                                     }
                                 };
-                                downloadUtils.novelDownlaod(item.getNovelDetail(), getFragmentManager(), mContext);
+                                downloadUtils.novelDownlaod(item.getNovelDetail(), getFragmentManager(), context);
                                 break;
                             }
                             case 2: {
