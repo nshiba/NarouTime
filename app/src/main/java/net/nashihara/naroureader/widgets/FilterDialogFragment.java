@@ -19,7 +19,6 @@ public class FilterDialogFragment extends DialogFragment {
     private String[] listItems = new String[]{};
     private boolean[] checked = new boolean[]{};
     private boolean isLength;
-    private DialogInterface.OnMultiChoiceClickListener onMultiChoiceClickListener = null;
     private OnDialogButtonClickListener mListener;
     FragmentFilterDialogBinding binding;
 
@@ -67,23 +66,27 @@ public class FilterDialogFragment extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(title)
             .setMultiChoiceItems(listItems, checked, onMultiChoiceClickListener)
-            .setNegativeButton("cansel", (dialog, which) -> {
-                dialog.dismiss();
-            })
+            .setNegativeButton("cansel", (dialog, which) -> dialog.dismiss())
             .setNeutralButton("reset", (dialog, which) -> {
-                mListener.onNeutralButton(which);
+                if (mListener != null) {
+                    mListener.onNeutralButton(which);
+                }
             });
         if (isLength) {
             builder.setView(binding.getRoot()).setPositiveButton("OK", (dialog, which) -> {
                 String max = binding.maxLength.getText().toString();
                 String min = binding.minLength.getText().toString();
-                mListener.onPositiveButton(which, checked, min, max);
+                if (mListener != null) {
+                    mListener.onPositiveButton(which, checked, min, max);
+                }
                 dialog.dismiss();
             });
         }
         else {
             builder.setPositiveButton("OK", (dialog, which) -> {
-                mListener.onPositiveButton(which, checked, "", "");
+                if (mListener != null) {
+                    mListener.onPositiveButton(which, checked, "", "");
+                }
                 dialog.dismiss();
             });
         }
@@ -91,7 +94,7 @@ public class FilterDialogFragment extends DialogFragment {
     }
 
     public interface OnDialogButtonClickListener{
-        public void onPositiveButton(int which, boolean[] itemChecked, String min, String max);
-        public void onNeutralButton(int which);
+        void onPositiveButton(int which, boolean[] itemChecked, String min, String max);
+        void onNeutralButton(int which);
     }
 }

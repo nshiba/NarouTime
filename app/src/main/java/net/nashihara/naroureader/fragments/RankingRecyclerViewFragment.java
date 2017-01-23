@@ -1,7 +1,6 @@
 package net.nashihara.naroureader.fragments;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
@@ -9,49 +8,33 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.firebase.crash.FirebaseCrash;
-
 import net.nashihara.naroureader.R;
+import net.nashihara.naroureader.adapters.NovelDetailRecyclerViewAdapter;
+import net.nashihara.naroureader.controller.RankingRecyclerController;
 import net.nashihara.naroureader.databinding.FragmentRankingRecyclerBinding;
 import net.nashihara.naroureader.databinding.ItemRankingRecyclerBinding;
 import net.nashihara.naroureader.entities.NovelItem;
-import net.nashihara.naroureader.utils.DownloadUtils;
 import net.nashihara.naroureader.listeners.FragmentTransactionListener;
-import net.nashihara.naroureader.adapters.NovelDetailRecyclerViewAdapter;
+import net.nashihara.naroureader.utils.DownloadUtils;
+import net.nashihara.naroureader.views.RankingRecyclerView;
 import net.nashihara.naroureader.widgets.FilterDialogFragment;
 import net.nashihara.naroureader.widgets.ListDailogFragment;
 import net.nashihara.naroureader.widgets.NovelDownloadDialogFragment;
 import net.nashihara.naroureader.widgets.OkCancelDialogFragment;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-import narou4j.Narou;
-import narou4j.Ranking;
 import narou4j.entities.Novel;
-import narou4j.entities.NovelRank;
 import narou4j.enums.NovelGenre;
-import narou4j.enums.OutputOrder;
-import narou4j.enums.RankingType;
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
-public class RankingRecyclerViewFragment extends Fragment {
+public class RankingRecyclerViewFragment extends Fragment implements RankingRecyclerView {
 
     private static final String TAG = RankingRecyclerViewFragment.class.getSimpleName();
 
@@ -59,13 +42,13 @@ public class RankingRecyclerViewFragment extends Fragment {
 
     private Context context;
 
-    private RecyclerView recyclerView;
-
     private FragmentTransactionListener replaceListener;
 
     private ArrayList<NovelItem> allItems = new ArrayList<>();
 
     private static final String PARAM_TYPE = "rankingType";
+
+    private RankingRecyclerController controller;
 
     public static RankingRecyclerViewFragment newInstance(String type) {
         RankingRecyclerViewFragment fragment = new RankingRecyclerViewFragment();
@@ -94,121 +77,151 @@ public class RankingRecyclerViewFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable final ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_ranking_recycler, container, false);
 
-        binding.fab.setOnClickListener(v -> {
+        controller = new RankingRecyclerController(this);
 
-            ArrayList<String> filters =
-                new ArrayList<>(Arrays.asList(getResources().getStringArray(R.array.genres)));
-            filters.add(0, "完結済み");
+        binding.fab.setOnClickListener(v -> setupFab());
 
-            final NovelGenre[] filterIds =NovelGenre.values();
+        binding.recycler.setLayoutManager(new LinearLayoutManager(context));
+
+        NovelDetailRecyclerViewAdapter adapter = setupRecyclerView();
+        binding.recycler.setAdapter(adapter);
+
+        Bundle args = getArguments();
+        if (args != null) {
+            String typeStr = args.getString(PARAM_TYPE, "");
+            controller.fetchRanking(typeStr);
+        }
+
+        return binding.getRoot();
+    }
+
+    private void setupFab() {
+        ArrayList<String> filters =
+            new ArrayList<>(Arrays.asList(getResources().getStringArray(R.array.genres)));
+        filters.add(0, "完結済み");
+
+        final NovelGenre[] filterIds =NovelGenre.values();
 
 
-            boolean[] checked = new boolean[filters.size()];
-            checked[0] = false;
-            for (int i = 1; i < checked.length; i++) {
-                checked[i] = true;
-            }
-
-            FilterDialogFragment checkBoxDialog = FilterDialogFragment
-                .newInstance("小説絞込み", filters.toArray(new String[0]), checked, true, new FilterDialogFragment.OnDialogButtonClickListener() {
+        boolean[] checked = new boolean[filters.size()];
+        checked[0] = false;
+        for (int i = 1; i < checked.length; i++) {
+            checked[i] = true;
+        }
+        FilterDialogFragment checkBoxDialog = FilterDialogFragment
+            .newInstance("小説絞込み", filters.toArray(new String[0]), checked, true,
+                new FilterDialogFragment.OnDialogButtonClickListener() {
                     @Override
                     public void onPositiveButton(int which, boolean[] itemChecked, String min, String max) {
-                        Set<NovelGenre> trueSet = new HashSet<>();
-                        ArrayList<NovelItem> filterList = new ArrayList<>();
-                        ArrayList<NovelItem> resultList = new ArrayList<>();
-                        int maxLength = 0;
-                        int minLength = 0;
-
-                        if (!min.equals("")) {
-                            minLength = Integer.parseInt(min);
-                        }
-                        if (!max.equals("")) {
-                            maxLength = Integer.parseInt(max);
-                        }
-
-                        for (int i = 0; i < itemChecked.length; i++) {
-                            if (i == 0) {
-                                // 完結済チェック
-                                if (itemChecked[i]) {
-                                    for (int j = 0; j < allItems.size(); j++) {
-                                        if (allItems.get(j).getNovelDetail().getIsNovelContinue() == 0) {
-                                            filterList.add(allItems.get(j));
-                                        }
-                                    }
-                                }
-                                else {
-                                    filterList.addAll(allItems);
-                                }
-
-                                continue;
-                            }
-
-                            // ジャンルチェック
-                            if (itemChecked[i]) {
-                                trueSet.add(filterIds[i -1]);
-                            }
-                        }
-
-                        for (int i = 0; i < filterList.size(); i++) {
-                            NovelItem target = filterList.get(i);
-
-                            if (!trueSet.contains(target.getNovelDetail().getGenre())) {
-                                continue;
-                            }
-
-                            // 文字数チェック
-                            if (maxLength <= 0) {
-                                if (minLength > target.getNovelDetail().getNumberOfChar()) {
-                                    continue;
-                                }
-                            }
-                            else {
-                                if (minLength > target.getNovelDetail().getNumberOfChar() || target.getNovelDetail().getNumberOfChar() > maxLength) {
-                                    continue;
-                                }
-                            }
-
-                            resultList.add(target);
-                        }
-
-                        NovelDetailRecyclerViewAdapter adapter = (NovelDetailRecyclerViewAdapter) recyclerView.getAdapter();
-                        adapter.getList().clear();
-                        adapter.getList().addAll(resultList);
+                        controller.filterNovelRanking(allItems, filterIds, itemChecked, min, max);
                     }
 
                     @Override
                     public void onNeutralButton(int which) {
 
-                        NovelDetailRecyclerViewAdapter adapter = (NovelDetailRecyclerViewAdapter) recyclerView.getAdapter();
+                        NovelDetailRecyclerViewAdapter adapter = (NovelDetailRecyclerViewAdapter) binding.recycler.getAdapter();
                         adapter.getList().clear();
                         adapter.getList().addAll(allItems);
                     }
                 });
-            checkBoxDialog.show(getFragmentManager(), "multiple");
+        checkBoxDialog.show(getFragmentManager(), "multiple");
+    }
+
+    private NovelDetailRecyclerViewAdapter setupRecyclerView() {
+        NovelDetailRecyclerViewAdapter adapter = new NovelDetailRecyclerViewAdapter(context, false);
+        adapter.setOnItemClickListener(new NovelDetailRecyclerViewAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position, ItemRankingRecyclerBinding itemBinding) {
+                if (view.getId() != R.id.btn_expand) {
+                    NovelItem item = ((NovelDetailRecyclerViewAdapter) binding.recycler.getAdapter()).getList().get(position);
+                    replaceListener.replaceFragment(NovelTableRecyclerViewFragment.newInstance(item.getNovelDetail().getNcode()), item.getNovelDetail().getTitle(), item);
+                    return;
+                }
+
+                if (itemBinding.allStory.getVisibility() == View.GONE) {
+                    itemBinding.allStory.setVisibility(View.VISIBLE);
+                    itemBinding.keyword.setVisibility(View.VISIBLE);
+                    itemBinding.btnExpand.setImageResource(R.drawable.ic_expand_less_black_24dp);
+                } else {
+                    itemBinding.allStory.setVisibility(View.GONE);
+                    itemBinding.keyword.setVisibility(View.GONE);
+                    itemBinding.btnExpand.setImageResource(R.drawable.ic_expand_more_black_24dp);
+                }
+            }
+
+            @Override
+            public void onItemLongClick(View view, final int position, ItemRankingRecyclerBinding itemBinding) {
+
+                NovelDetailRecyclerViewAdapter adapter = (NovelDetailRecyclerViewAdapter) binding.recycler.getAdapter();
+
+                final NovelItem item = adapter.getList().get(position);
+                String[] strings = new String[]
+                    {"小説を読む", "ダウンロード", "ブラウザで小説ページを開く", "ブラウザで作者ページを開く"};
+                ListDailogFragment listDialog =
+                    ListDailogFragment.newInstance(item.getNovelDetail().getTitle(), strings,
+                        (dialog, which) -> longClickListDialogListener(which, position, item));
+                listDialog.show(getFragmentManager(), "list_dialog");
+            }
         });
 
-        recyclerView = binding.recycler;
-        recyclerView.setLayoutManager(new LinearLayoutManager(context));
-//        recyclerView.addItemDecoration(new DividerItemDecoration(context));
+        return adapter;
+    }
 
-        NovelDetailRecyclerViewAdapter adapter = new NovelDetailRecyclerViewAdapter(context, false);
-        recyclerView.setAdapter(adapter);
-
-        Bundle args = getArguments();
-        if (args != null) {
-            String typeStr = args.getString(PARAM_TYPE);
-
-            if (typeStr != null && typeStr.equals("all")) {
-                getTotalRanking();
+    private void longClickListDialogListener(int which, int position, NovelItem item) {
+        switch (which) {
+            case 0: {
+                NovelItem item1 = ((NovelDetailRecyclerViewAdapter) binding.recycler.getAdapter()).getList().get(position);
+                replaceListener.replaceFragment(NovelTableRecyclerViewFragment.newInstance(
+                    item1.getNovelDetail().getNcode()), item1.getNovelDetail().getTitle(), item1);
+                break;
             }
-            else {
-                final RankingType type = RankingType.valueOf(typeStr);
-                getRanking(type);
+            case 1: {
+                DownloadUtils downloadUtils = new DownloadUtils() {
+                    @Override
+                    public void onDownloadSuccess(NovelDownloadDialogFragment dialog, final Novel novel) {
+                        dialog.dismiss();
+
+                        OkCancelDialogFragment okCancelDialog =
+                            OkCancelDialogFragment.newInstance("ダウンロード完了", "ダウンロードした小説を開きますか？",
+                                (dialog1, which1) -> {
+                                    dialog1.dismiss();
+                                    if (OkCancelDialogFragment.OK == which1) {
+                                        NovelItem novelItem = new NovelItem();
+                                        novelItem.setNovelDetail(novel);
+                                        replaceListener.replaceFragment(
+                                            NovelTableRecyclerViewFragment.newInstance(novel.getNcode()),
+                                            novelItem.getNovelDetail().getTitle(), novelItem);
+                                    }
+                                });
+                        okCancelDialog.show(getFragmentManager(), "okcansel");
+                    }
+
+                    @Override
+                    public void onDownloadError(NovelDownloadDialogFragment dialog) {
+                        Log.d(TAG, "onDownloadError: ");
+                        dialog.dismiss();
+                    }
+                };
+                downloadUtils.novelDownlaod(item.getNovelDetail(), getFragmentManager(), context);
+                break;
+            }
+            case 2: {
+                String url = "http://ncode.syosetu.com/" + item.getNovelDetail().getNcode() + "/";
+                Uri uri = Uri.parse(url);
+                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                startActivity(intent);
+                break;
+            }
+            case 3: {
+                String url = "http://mypage.syosetu.com/" + item.getNovelDetail().getUserId() + "/";
+                Uri uri = Uri.parse(url);
+                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                startActivity(intent);
+                break;
             }
         }
-
-        return binding.getRoot();
     }
+
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -217,301 +230,6 @@ public class RankingRecyclerViewFragment extends Fragment {
 
     public Context getContext() {
         return context;
-    }
-
-    private void getTotalRanking() {
-        Observable.create(new Observable.OnSubscribe<List<NovelItem>>() {
-            @Override
-            public void call(Subscriber<? super List<NovelItem>> subscriber) {
-
-                Narou narou = new Narou();
-                narou.setOrder(OutputOrder.TOTAL_POINT);
-                narou.setLim(301);
-                List<Novel> novels = null;
-                try {
-                    novels = narou.getNovels();
-                } catch (IOException e) {
-                    subscriber.onError(e);
-                }
-
-                if (novels == null) {
-                    return;
-                }
-
-                novels.remove(0);
-
-                List<NovelItem> items = new ArrayList<>();
-                NovelItem item;
-                for (Novel novel : novels) {
-                    // ncodeが大文字と小文字が混在しているので小文字に統一
-                    novel.setNcode(novel.getNcode().toLowerCase());
-
-                    item = new NovelItem();
-                    NovelRank rank = new NovelRank();
-                    rank.setPt(novel.getGlobalPoint());
-                    item.setNovelDetail(novel);
-                    item.setRank(rank);
-                    items.add(item);
-                }
-
-                subscriber.onNext(items);
-                subscriber.onCompleted();
-            }
-        })
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(new Subscriber<List<NovelItem>>() {
-                @Override
-                public void onCompleted() {}
-
-                @Override
-                public void onError(Throwable e) {
-                    Log.e(TAG, "onError: ", e.fillInStackTrace());
-                    FirebaseCrash.report(e);
-                    onLoadError();
-                }
-
-                @Override
-                public void onNext(List<NovelItem> novelItems) {
-                    onMyNext(novelItems);
-                }
-            });
-    }
-
-    private void getRanking(final RankingType type) {
-        Observable.create(new Observable.OnSubscribe<HashMap<String, NovelItem>>() {
-            @Override
-            public void call(Subscriber<? super HashMap<String, NovelItem>> subscriber) {
-                HashMap<String, NovelItem> map = new HashMap<>();
-                Ranking ranking = new Ranking();
-                ArrayList<NovelRank> ranks = null;
-                try {
-                    ranks = (ArrayList<NovelRank>) ranking.getRanking(type);
-                } catch (IOException e) {
-                    subscriber.onError(e);
-                }
-
-                if (ranks == null) {
-                    return;
-                }
-
-                for (NovelRank rank : ranks) {
-                    NovelItem novelItem = new NovelItem();
-                    rank.setRankingType(type);
-                    novelItem.setRank(rank);
-                    map.put(rank.getNcode(), novelItem);
-                }
-                subscriber.onNext(map);
-                subscriber.onCompleted();
-            }
-        })
-            .flatMap(map -> Observable.create(new Observable.OnSubscribe<HashMap<String, NovelItem>>() {
-                @Override
-                public void call(Subscriber<? super HashMap<String, NovelItem>> subscriber) {
-                    Ranking ranking = new Ranking();
-                    Calendar cal = Calendar.getInstance();
-                    cal.setTime(new Date());
-
-                    switch (type) {
-                        case DAILY: {
-                            cal.add(Calendar.DAY_OF_MONTH, -2);
-                            break;
-                        }
-                        case WEEKLY: {
-                            cal.add(Calendar.DAY_OF_MONTH, -7);
-                            break;
-                        }
-                        case MONTHLY: {
-                            cal.add(Calendar.DAY_OF_MONTH, -31);
-                            break;
-                        }
-                        case QUARTET: {
-                            cal.add(Calendar.DAY_OF_MONTH, -31);
-                            break;
-                        }
-                    }
-
-                    List<NovelRank> ranks = null;
-                    try {
-                        ranks = ranking.getRanking(type, cal.getTime());
-                    } catch (IOException e) {
-                        subscriber.onError(e);
-                    }
-
-                    if (ranks == null) {
-                        return;
-                    }
-
-                    for (NovelRank rank : ranks) {
-                        NovelItem item = map.get(rank.getNcode());
-
-                        if (item == null) {
-                            continue;
-                        }
-
-                        item.setPrevRank(rank);
-                        map.put(rank.getNcode(), item);
-                    }
-
-                    subscriber.onNext(map);
-                    subscriber.onCompleted();
-                }
-            }))
-            .flatMap(map -> Observable.create(new Observable.OnSubscribe<List<NovelItem>>() {
-                @Override
-                public void call(Subscriber<? super List<NovelItem>> subscriber) {
-                    Narou narou = new Narou();
-
-                    Set set = map.keySet();
-                    String[] array = new String[set.size()];
-                    set.toArray(array);
-
-                    narou.setNCode(array);
-                    narou.setLim(300);
-                    List<Novel> novels = null;
-                    try {
-                        novels = narou.getNovels();
-                    } catch (IOException e) {
-                        subscriber.onError(e);
-                    }
-
-                    if (novels == null) {
-                        return;
-                    }
-
-                    novels.remove(0);
-
-                    ArrayList<NovelItem> items = new ArrayList<>();
-                    for (Novel novel : novels) {
-                        NovelItem item = map.get(novel.getNcode());
-                        if (item != null) {
-                            // 大文字 → 小文字
-                            novel.setNcode(novel.getNcode().toLowerCase());
-
-                            item.setNovelDetail(novel);
-                            items.add(item);
-                        }
-                    }
-
-                    subscriber.onNext(items);
-                    subscriber.onCompleted();
-                }
-            }))
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(new Subscriber<List<NovelItem>>() {
-                @Override
-                public void onCompleted() {}
-
-                @Override
-                public void onError(Throwable e) {
-                    Log.e(TAG, "onError: ", e.fillInStackTrace());
-                    FirebaseCrash.report(e);
-                    onLoadError();
-                }
-
-                @Override
-                public void onNext(List<NovelItem> novelItems) {
-                    onMyNext(novelItems);
-                }
-            });
-    }
-
-    public void onMyNext(List<NovelItem> novelItems) {
-        NovelDetailRecyclerViewAdapter adapter = (NovelDetailRecyclerViewAdapter) recyclerView.getAdapter();
-        adapter.clearData();
-        adapter.addDataOf(novelItems);
-        allItems = new ArrayList<>(novelItems);
-        binding.progressBar.setVisibility(View.GONE);
-        recyclerView.setVisibility(View.VISIBLE);
-
-        adapter.setOnItemClickListener(new NovelDetailRecyclerViewAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(View view, int position, ItemRankingRecyclerBinding binding) {
-                if (view.getId() == R.id.btn_expand) {
-                    if (binding.allStory.getVisibility() == View.GONE) {
-                        binding.allStory.setVisibility(View.VISIBLE);
-                        binding.keyword.setVisibility(View.VISIBLE);
-                        binding.btnExpand.setImageResource(R.drawable.ic_expand_less_black_24dp);
-                    } else {
-                        binding.allStory.setVisibility(View.GONE);
-                        binding.keyword.setVisibility(View.GONE);
-                        binding.btnExpand.setImageResource(R.drawable.ic_expand_more_black_24dp);
-                    }
-                }
-                else {
-                    NovelItem item = ((NovelDetailRecyclerViewAdapter) recyclerView.getAdapter()).getList().get(position);
-                    replaceListener.replaceFragment(NovelTableRecyclerViewFragment.newInstance(item.getNovelDetail().getNcode()), item.getNovelDetail().getTitle(), item);
-                }
-            }
-
-            @Override
-            public void onItemLongClick(View view, final int position, ItemRankingRecyclerBinding binding) {
-
-                NovelDetailRecyclerViewAdapter adapter = (NovelDetailRecyclerViewAdapter) recyclerView.getAdapter();
-
-                final NovelItem item = adapter.getList().get(position);
-                String[] strings = new String[]
-                    {"小説を読む", "ダウンロード", "ブラウザで小説ページを開く", "ブラウザで作者ページを開く"};
-                ListDailogFragment listDialog =
-                    ListDailogFragment.newInstance(item.getNovelDetail().getTitle(), strings, (dialog, which) -> {
-                        switch (which) {
-                            case 0: {
-                                NovelItem item1 = ((NovelDetailRecyclerViewAdapter) recyclerView.getAdapter()).getList().get(position);
-                                replaceListener.replaceFragment(NovelTableRecyclerViewFragment.newInstance(item1.getNovelDetail().getNcode()), item1.getNovelDetail().getTitle(), item1);
-                                break;
-                            }
-                            case 1: {
-                                DownloadUtils downloadUtils = new DownloadUtils() {
-                                    @Override
-                                    public void onDownloadSuccess(NovelDownloadDialogFragment dialog, final Novel novel) {
-                                        dialog.dismiss();
-
-                                        OkCancelDialogFragment okCancelDialog =
-                                            OkCancelDialogFragment.newInstance("ダウンロード完了", "ダウンロードした小説を開きますか？", new DialogInterface.OnClickListener() {
-                                                @Override
-                                                public void onClick(DialogInterface dialog, int which) {
-                                                    dialog.dismiss();
-                                                    if (OkCancelDialogFragment.OK == which) {
-                                                        NovelItem novelItem = new NovelItem();
-                                                        novelItem.setNovelDetail(novel);
-                                                        replaceListener.replaceFragment(
-                                                            NovelTableRecyclerViewFragment.newInstance(novel.getNcode()), novelItem.getNovelDetail().getTitle(), novelItem);
-                                                    }
-                                                }
-                                            });
-                                        okCancelDialog.show(getFragmentManager(), "okcansel");
-                                    }
-
-                                    @Override
-                                    public void onDownloadError(NovelDownloadDialogFragment dialog) {
-                                        Log.d(TAG, "onDownloadError: ");
-
-                                        dialog.dismiss();
-                                    }
-                                };
-                                downloadUtils.novelDownlaod(item.getNovelDetail(), getFragmentManager(), context);
-                                break;
-                            }
-                            case 2: {
-                                String url = "http://ncode.syosetu.com/" + item.getNovelDetail().getNcode() + "/";
-                                Uri uri = Uri.parse(url);
-                                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-                                startActivity(intent);
-                                break;
-                            }
-                            case 3: {
-                                String url = "http://mypage.syosetu.com/" + item.getNovelDetail().getUserId() + "/";
-                                Uri uri = Uri.parse(url);
-                                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-                                startActivity(intent);
-                                break;
-                            }
-                        }
-                    });
-                listDialog.show(getFragmentManager(), "list_dialog");
-            }
-        });
     }
 
     private void reload() {
@@ -526,5 +244,29 @@ public class RankingRecyclerViewFragment extends Fragment {
             binding.btnReload.setVisibility(View.GONE);
             reload();
         });
+    }
+
+    @Override
+    public void showRanking(List<NovelItem> novelItems) {
+        if (allItems.isEmpty()) {
+            allItems = new ArrayList<>(novelItems);
+        }
+
+        NovelDetailRecyclerViewAdapter adapter = (NovelDetailRecyclerViewAdapter) binding.recycler.getAdapter();
+        adapter.clearData();
+        adapter.addDataOf(novelItems);
+        binding.progressBar.setVisibility(View.GONE);
+        binding.recycler.setVisibility(View.VISIBLE);
+    }
+
+
+    @Override
+    public void showFilteredList() {
+
+    }
+
+    @Override
+    public void showError() {
+        onLoadError();
     }
 }
