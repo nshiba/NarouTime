@@ -259,12 +259,6 @@ public class RankingRecyclerViewFragment extends Fragment implements RankingRecy
         binding.recycler.setVisibility(View.VISIBLE);
     }
 
-
-    @Override
-    public void showFilteredList() {
-
-    }
-
     @Override
     public void showError() {
         onLoadError();

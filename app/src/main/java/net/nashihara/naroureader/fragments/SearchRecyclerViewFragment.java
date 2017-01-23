@@ -11,32 +11,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.firebase.crash.FirebaseCrash;
-
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.adapters.NovelDetailRecyclerViewAdapter;
+import net.nashihara.naroureader.controller.SearchRecyclerController;
 import net.nashihara.naroureader.databinding.FragmentSearchRecyclerBinding;
 import net.nashihara.naroureader.databinding.ItemRankingRecyclerBinding;
 import net.nashihara.naroureader.entities.NovelItem;
 import net.nashihara.naroureader.listeners.FragmentTransactionListener;
+import net.nashihara.naroureader.views.SearchRecyclerView;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import narou4j.Narou;
-import narou4j.entities.Novel;
-import narou4j.entities.NovelRank;
-import narou4j.enums.NovelGenre;
-import narou4j.enums.NovelType;
-import narou4j.enums.OutputOrder;
-import narou4j.enums.SearchWordTarget;
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
-
-public class SearchRecyclerViewFragment extends Fragment {
+public class SearchRecyclerViewFragment extends Fragment implements SearchRecyclerView {
     private static final String TAG = SearchRecyclerViewFragment.class.getSimpleName();
 
     private static final String ARG_NCODE = "ncode";
@@ -57,28 +44,48 @@ public class SearchRecyclerViewFragment extends Fragment {
     private static final String ARG_GENRE_LIST = "genre";
 
     private String ncode;
+
     private String search;
+
     private String notSearch;
+
     private int limit;
+
     private int sortOrder;
+
     private int time;
+
     private int maxLength;
+
     private int minLength;
+
     private boolean targetTitle;
+
     private boolean targetStory;
+
     private boolean targetKeyword;
+
     private boolean targetWriter;
+
     private boolean end;
+
     private boolean stop;
+
     private boolean pickup;
+
     private ArrayList<Integer> genreList;
 
     private FragmentSearchRecyclerBinding binding;
+
     private Context context;
+
     private RecyclerView recyclerView;
+
     private FragmentTransactionListener replaceListener;
 
-    private ArrayList<NovelItem> allItems;
+    private SearchRecyclerController controller;
+
+    private List<NovelItem> allItems = new ArrayList<>();
 
     public SearchRecyclerViewFragment() {}
 
@@ -140,88 +147,16 @@ public class SearchRecyclerViewFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_search_recycler, container, false);
 
+        controller = new SearchRecyclerController(this);
+
         recyclerView = binding.recycler;
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
-//        mRecyclerView.addItemDecoration(new DividerItemDecoration(mContext));
 
         NovelDetailRecyclerViewAdapter adapter = new NovelDetailRecyclerViewAdapter(context, true);
         recyclerView.setAdapter(adapter);
 
-        searchNovel().subscribe(new Subscriber<List<Novel>>() {
-            @Override
-            public void onCompleted() {
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                Log.e(TAG, "onError: ", e.fillInStackTrace());
-                FirebaseCrash.report(e);
-                onLoadError();
-            }
-
-            @Override
-            public void onNext(List<Novel> novels) {
-                if (novels == null) {
-                    Log.d(TAG, "onNext: novels are null");
-                    binding.noResultNovel.setVisibility(View.VISIBLE);
-                    return;
-                }
-
-                if (novels.size() == 0) {
-                    Log.d(TAG, "onNext: novels size is zero");
-                    binding.noResultNovel.setVisibility(View.VISIBLE);
-                }
-
-                List<NovelItem> novelItems = new ArrayList<>();
-                for (int i = 0; i < novels.size(); i++) {
-                    Novel novel = novels.get(i);
-                    NovelItem item = new NovelItem();
-                    NovelRank rank = new NovelRank();
-
-                    novel.setNcode(novel.getNcode().toLowerCase());
-
-                    rank.setNcode(novel.getNcode());
-                    rank.setRank(i);
-
-                    item.setNovelDetail(novel);
-                    item.setRank(rank);
-
-                    novelItems.add(item);
-                }
-
-                NovelDetailRecyclerViewAdapter adapter = (NovelDetailRecyclerViewAdapter) recyclerView.getAdapter();
-                adapter.clearData();
-                adapter.addDataOf(novelItems);
-                allItems = new ArrayList<>(novelItems);
-                binding.progressBar.setVisibility(View.GONE);
-                recyclerView.setVisibility(View.VISIBLE);
-
-                adapter.setOnItemClickListener(new NovelDetailRecyclerViewAdapter.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(View view, int position, ItemRankingRecyclerBinding binding) {
-                        if (view.getId() == R.id.btn_expand) {
-                            if (binding.allStory.getVisibility() == View.GONE) {
-                                binding.allStory.setVisibility(View.VISIBLE);
-                                binding.keyword.setVisibility(View.VISIBLE);
-                                binding.btnExpand.setImageResource(R.drawable.ic_expand_less_black_24dp);
-                            } else {
-                                binding.allStory.setVisibility(View.GONE);
-                                binding.keyword.setVisibility(View.GONE);
-                                binding.btnExpand.setImageResource(R.drawable.ic_expand_more_black_24dp);
-                            }
-                        } else {
-                            NovelItem item = ((NovelDetailRecyclerViewAdapter) recyclerView.getAdapter()).getList().get(position);
-                            replaceListener.replaceFragment(NovelTableRecyclerViewFragment.newInstance(item.getNovelDetail().getNcode()), item.getNovelDetail().getTitle(), item);
-                        }
-                    }
-
-                    @Override
-                    public void onItemLongClick(View view, int position, ItemRankingRecyclerBinding binding) {
-
-                    }
-                });
-            }
-        });
+        controller.searchNovel(ncode, limit, sortOrder, search, notSearch, targetTitle, targetStory,
+            targetKeyword, targetWriter, time, maxLength, minLength, end, stop, pickup, genreList);
 
         return binding.getRoot();
     }
@@ -231,11 +166,16 @@ public class SearchRecyclerViewFragment extends Fragment {
         super.onAttach(context);
         this.replaceListener = (FragmentTransactionListener) context;
         this.context = context;
+
+        if (controller != null) {
+            controller.attach(this);
+        }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
+        controller.detach();
     }
 
     private void reload() {
@@ -251,218 +191,48 @@ public class SearchRecyclerViewFragment extends Fragment {
             reload();
         });
     }
+    @Override
+    public void showRecyclerView(List<NovelItem> novelItems) {
+        if (novelItems == null) {
+            binding.noResultNovel.setVisibility(View.VISIBLE);
+            return;
+        }
 
-    private Observable<List<Novel>> searchNovel() {
-        return Observable.create(new Observable.OnSubscribe<List<Novel>>() {
+        NovelDetailRecyclerViewAdapter adapter = (NovelDetailRecyclerViewAdapter) recyclerView.getAdapter();
+        adapter.clearData();
+        adapter.addDataOf(novelItems);
+        allItems = new ArrayList<>(novelItems);
+        binding.progressBar.setVisibility(View.GONE);
+        recyclerView.setVisibility(View.VISIBLE);
+
+        adapter.setOnItemClickListener(new NovelDetailRecyclerViewAdapter.OnItemClickListener() {
             @Override
-            public void call(Subscriber<? super List<Novel>> subscriber) {
-                Narou narou = new Narou();
-
-                if (!ncode.equals("")) {
-                    Novel novel = null;
-                    try {
-                        novel = narou.getNovel(ncode);
-                    } catch (IOException e) {
-                        subscriber.onError(e);
+            public void onItemClick(View view, int position, ItemRankingRecyclerBinding binding) {
+                if (view.getId() == R.id.btn_expand) {
+                    if (binding.allStory.getVisibility() == View.GONE) {
+                        binding.allStory.setVisibility(View.VISIBLE);
+                        binding.keyword.setVisibility(View.VISIBLE);
+                        binding.btnExpand.setImageResource(R.drawable.ic_expand_less_black_24dp);
+                    } else {
+                        binding.allStory.setVisibility(View.GONE);
+                        binding.keyword.setVisibility(View.GONE);
+                        binding.btnExpand.setImageResource(R.drawable.ic_expand_more_black_24dp);
                     }
-
-                    if (novel == null) {
-                        subscriber.onNext(null);
-                    }
-                    else {
-                        List<Novel> list = new ArrayList<>();
-                        list.add(novel);
-                        subscriber.onNext(list);
-                    }
+                } else {
+                    NovelItem item = ((NovelDetailRecyclerViewAdapter) recyclerView.getAdapter()).getList().get(position);
+                    replaceListener.replaceFragment(NovelTableRecyclerViewFragment.newInstance(item.getNovelDetail().getNcode()), item.getNovelDetail().getTitle(), item);
                 }
-                else {
-                    if (!search.equals("")) {
-                        narou.setSearchWord(search);
-                    }
-
-                    if (limit == 0) {
-                        narou.setLim(50);
-                    }
-                    else {
-                        narou.setLim(limit);
-                    }
-
-                    setSortOrder(narou, sortOrder);
-                    setTime(narou, time);
-
-                    if (minLength != 0 || maxLength != 0) {
-                        narou.setCharacterLength(minLength, maxLength);
-                    }
-
-                    if (!notSearch.equals("")) {
-                        narou.setNotWord(notSearch);
-                    }
-                    if (targetTitle) {
-                        narou.setSearchTarget(SearchWordTarget.TITLE);
-                    }
-                    if (targetStory) {
-                        narou.setSearchTarget(SearchWordTarget.SYNOPSIS);
-                    }
-                    if (targetKeyword) {
-                        narou.setSearchTarget(SearchWordTarget.KEYWORD);
-                    }
-                    if (targetWriter) {
-                        narou.setSearchTarget(SearchWordTarget.WRITER);
-                    }
-
-                    if (end) {
-                        narou.setNovelType(NovelType.ALL_NOVEL);
-                    }
-                    else {
-                        narou.setNovelType(NovelType.ALL_SERIES);
-                    }
-
-                    if (stop) {
-                        narou.setExcludeStop(true);
-                    }
-
-                    if (pickup) {
-                        narou.setPickup(true);
-                    }
-
-                    if (genreList.size() > 0) {
-                        for (Integer genre : genreList) {
-                            narou.setGenre(NovelGenre.valueOf(genre));
-                        }
-                    }
-
-                    List<Novel> novels = null;
-                    try {
-                        novels = narou.getNovels();
-                    } catch (IOException e) {
-                        subscriber.onError(e);
-                    }
-
-                    if (novels == null) {
-                        return;
-                    }
-
-                    novels.remove(0);
-                    subscriber.onNext(novels);
-                }
-
-                subscriber.onCompleted();
             }
-        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+
+            @Override
+            public void onItemLongClick(View view, int position, ItemRankingRecyclerBinding binding) {
+
+            }
+        });
     }
 
-    private void setSortOrder(Narou narou, int order) {
-        switch (order) {
-            case 1: {
-                narou.setOrder(OutputOrder.BOOKMARK_COUNT);
-                break;
-            }
-            case 2: {
-                narou.setOrder(OutputOrder.REVIEW_COUNT);
-                break;
-            }
-            case 3: {
-                narou.setOrder(OutputOrder.TOTAL_POINT);
-                break;
-            }
-            case 4: {
-                narou.setOrder(OutputOrder.TOTAL_POINT_ASC);
-                break;
-            }
-            case 5: {
-                narou.setOrder(OutputOrder.IMPRESSION_COUNT);
-                break;
-            }
-            case 6: {
-                narou.setOrder(OutputOrder.HYOKA_COUNT);
-                break;
-            }
-            case 7: {
-                narou.setOrder(OutputOrder.HYOKA_COUNT_ASC);
-                break;
-            }
-            case 8: {
-                narou.setOrder(OutputOrder.WEEKLY_UU);
-                break;
-            }
-            case 9: {
-                narou.setOrder(OutputOrder.CHARACTER_LENGTH_ASC);
-                break;
-            }
-            case 10: {
-                narou.setOrder(OutputOrder.CHARACTER_LENGTH_DESC);
-                break;
-            }
-            case 11: {
-                narou.setOrder(OutputOrder.NCODE_DESC);
-                break;
-            }
-            case 12: {
-                narou.setOrder(OutputOrder.OLD);
-                break;
-            }
-        }
-    }
-
-    private void setTime(Narou narou, int time) {
-        switch (time) {
-            case 1: {
-                narou.setReadTime(0, 5);
-                break;
-            }
-            case 2: {
-                narou.setReadTime(5, 10);
-                break;
-            }
-            case 3: {
-                narou.setReadTime(10, 30);
-                break;
-            }
-            case 4: {
-                narou.setReadTime(30, 60);
-                break;
-            }
-            case 5: {
-                narou.setReadTime(60, 120);
-                break;
-            }
-            case 6: {
-                narou.setReadTime(120, 180);
-                break;
-            }
-            case 7: {
-                narou.setReadTime(180, 240);
-                break;
-            }
-            case 8: {
-                // 異世界
-                narou.setReadTime(240, 300);
-                break;
-            }
-            case 9: {
-                narou.setReadTime(300, 360);
-                break;
-            }
-            case 10: {
-                narou.setReadTime(360, 420);
-                break;
-            }
-            case 11: {
-                narou.setReadTime(420, 480);
-                break;
-            }
-            case 12: {
-                narou.setReadTime(480, 540);
-                break;
-            }
-            case 13: {
-                narou.setReadTime(540, 600);
-                break;
-            }
-            case 14: {
-                narou.setReadTime(600, 0);
-                break;
-            }
-        }
+    @Override
+    public void showError() {
+        onLoadError();
     }
 }

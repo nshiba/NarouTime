@@ -4,9 +4,9 @@ import net.nashihara.naroureader.entities.NovelItem;
 
 import java.util.List;
 
-public interface RankingRecyclerView extends BaseView {
+public interface SearchRecyclerView extends BaseView {
 
-    void showRanking(List<NovelItem> novelItems);
+    void showRecyclerView(List<NovelItem> novelItems);
 
     void showError();
 }
