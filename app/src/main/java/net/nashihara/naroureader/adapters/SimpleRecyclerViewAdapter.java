@@ -9,82 +9,78 @@ import android.view.ViewGroup;
 
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.databinding.ItemSimpleRecyclerBinding;
-import net.nashihara.naroureader.entities.Novel4Realm;
-import net.nashihara.naroureader.entities.NovelItem;
 import net.nashihara.naroureader.listeners.OnItemClickListener;
+import net.nashihara.naroureader.entities.Novel4Realm;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class SimpleRecyclerViewAdapter extends RecyclerView.Adapter<SimpleRecyclerViewAdapter.BindingHolder> {
-    private static final String TAG = SimpleRecyclerViewAdapter.class.getSimpleName();
 
-    private LayoutInflater mInflater;
-    private ArrayList<Novel4Realm> mArrayList;
-    private OnItemClickListener mListener;
-    private RecyclerView mRecyclerView;
-    private Context mContext;
+    private LayoutInflater inflater;
+
+    private ArrayList<Novel4Realm> arrayList;
+
+    private OnItemClickListener listener;
+
+    private RecyclerView recyclerView;
 
     public SimpleRecyclerViewAdapter(Context context) {
-        this.mInflater = LayoutInflater.from(context);
-        mArrayList = new ArrayList<>();
+        this.inflater = LayoutInflater.from(context);
+        arrayList = new ArrayList<>();
     }
 
     @Override
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
-        mRecyclerView = recyclerView;
+        this.recyclerView = recyclerView;
     }
 
     @Override
     public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
         super.onDetachedFromRecyclerView(recyclerView);
-        mRecyclerView = null;
+        recyclerView = null;
     }
 
     @Override
     public BindingHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        final View v = mInflater.inflate(R.layout.item_simple_recycler, parent, false);
-        return new BindingHolder(v, mListener);
+        final View v = inflater.inflate(R.layout.item_simple_recycler, parent, false);
+        return new BindingHolder(v, listener);
     }
 
     @Override
     public void onBindViewHolder(BindingHolder holder, int position) {
-        if (mArrayList != null && mArrayList.size() > position && mArrayList.get(position) != null) {
+        if (arrayList != null && arrayList.size() > position && arrayList.get(position) != null) {
             ItemSimpleRecyclerBinding binding = holder.getBinding();
 
-            binding.title.setText(mArrayList.get(position).getTitle());
+            binding.title.setText(arrayList.get(position).getTitle());
         }
     }
 
     @Override
     public int getItemCount() {
-        if (mArrayList == null) {
+        if (arrayList == null) {
             return 0;
         }
-        return mArrayList.size();
+        return arrayList.size();
     }
 
     public void addDataOf(List<Novel4Realm> dataList) {
-        mArrayList.addAll(dataList);
-    }
-
-    public void removeDataOf(List<NovelItem> dataList) {
-        for (NovelItem item : dataList) {
-            mArrayList.remove(item);
-        }
+        int beforePos = arrayList.size();
+        arrayList.addAll(dataList);
+        notifyItemRangeInserted(beforePos, dataList.size());
     }
 
     public void clearData() {
-        mArrayList.clear();
+        arrayList.clear();
     }
 
     public ArrayList<Novel4Realm> getList() {
-        return this.mArrayList;
+        return this.arrayList;
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {
-        this.mListener = listener;
+        this.listener = listener;
     }
 
     static class BindingHolder extends RecyclerView.ViewHolder implements View.OnClickListener {

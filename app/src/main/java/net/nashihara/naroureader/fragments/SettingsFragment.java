@@ -2,13 +2,10 @@ package net.nashihara.naroureader.fragments;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.annotation.ColorInt;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.preference.PreferenceManager;
-
-import com.pavelsikun.vintagechroma.OnColorSelectedListener;
 
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.utils.ColorPickerDialog;
@@ -41,14 +38,9 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                 text = ContextCompat.getColor(getContext(), R.color.colorText);
             }
             ColorPickerDialog.show(
-                    getFragmentManager(),
-                    text,
-                    new OnColorSelectedListener() {
-                        @Override
-                        public void onColorSelected(@ColorInt int color) {
-                            pref.edit().putInt(getString(R.string.body_text), color).apply();
-                        }
-                    });
+                getFragmentManager(),
+                text,
+                color -> pref.edit().putInt(getString(R.string.body_text), color).apply());
         }
 
         if (title.equals("背景色")) {
@@ -57,14 +49,9 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                 background = ContextCompat.getColor(getContext(), R.color.colorBackground);
             }
             ColorPickerDialog.show(
-                    getFragmentManager(),
-                    background,
-                    new OnColorSelectedListener() {
-                        @Override
-                        public void onColorSelected(@ColorInt int color) {
-                            pref.edit().putInt(getString(R.string.body_background), color).apply();
-                        }
-                    });
+                getFragmentManager(),
+                background,
+                color -> pref.edit().putInt(getString(R.string.body_background), color).apply());
         }
 
         return super.onPreferenceTreeClick(preference);

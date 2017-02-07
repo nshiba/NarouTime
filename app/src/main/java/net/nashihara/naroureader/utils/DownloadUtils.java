@@ -7,12 +7,13 @@ import android.util.Log;
 
 import com.google.firebase.crash.FirebaseCrash;
 
-import net.nashihara.naroureader.dialogs.NovelDownloadDialogFragment;
-import net.nashihara.naroureader.dialogs.OkCancelDialogFragment;
+import net.nashihara.naroureader.widgets.NovelDownloadDialogFragment;
+import net.nashihara.naroureader.widgets.OkCancelDialogFragment;
 import net.nashihara.naroureader.entities.Novel4Realm;
 import net.nashihara.naroureader.entities.NovelBody4Realm;
 import net.nashihara.naroureader.entities.NovelTable4Realm;
 
+import java.io.IOException;
 import java.util.List;
 
 import io.realm.Realm;
@@ -77,13 +78,9 @@ public abstract class DownloadUtils {
     }
 
     private void downloaded(FragmentManager manager) {
-        OkCancelDialogFragment okCancelDialog =
-                OkCancelDialogFragment.newInstance("小説ダウンロード", "すでにこの小説はダウンロード済みです", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
+        OkCancelDialogFragment okCancelDialog = OkCancelDialogFragment.newInstance(
+            "小説ダウンロード", "すでにこの小説はダウンロード済みです", (dialog, which) -> dialog.dismiss());
+
         okCancelDialog.show(manager, "okcancel");
     }
 
@@ -92,7 +89,11 @@ public abstract class DownloadUtils {
             @Override
             public void call(Subscriber<? super List<NovelBody>> subscriber) {
                 Narou narou = new Narou();
-                subscriber.onNext(narou.getNovelTable(novel.getNcode().toLowerCase()));
+                try {
+                    subscriber.onNext(narou.getNovelTable(novel.getNcode().toLowerCase()));
+                } catch (IOException e) {
+                    subscriber.onError(e);
+                }
                 subscriber.onCompleted();
             }
         }).subscribeOn(Schedulers.io()).subscribe(new Subscriber<List<NovelBody>>() {
@@ -122,11 +123,15 @@ public abstract class DownloadUtils {
             public void call(Subscriber<? super NovelBody> subscriber) {
                 Narou narou = new Narou();
 
-                realm = RealmUtils.getRealm(mContext);
-                for (int i = 1; i <= totalPage; i++) {
-                    subscriber.onNext(narou.getNovelBody(novel.getNcode().toLowerCase(), i));
+                try {
+                    realm = RealmUtils.getRealm(mContext);
+                    for (int i = 1; i <= totalPage; i++) {
+                        subscriber.onNext(narou.getNovelBody(novel.getNcode().toLowerCase(), i));
+                    }
+                    realm.close();
+                } catch (IOException e) {
+                    subscriber.onError(e);
                 }
-                realm.close();
                 subscriber.onCompleted();
             }
         }).subscribe(new Subscriber<NovelBody>() {
