@@ -1,4 +1,4 @@
-package net.nashihara.naroureader.controller;
+package net.nashihara.naroureader.presenter;
 
 import android.support.v4.util.Pair;
 import android.util.Log;
@@ -24,13 +24,13 @@ import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
-public class SearchRecyclerController implements Controller<SearchRecyclerView> {
+public class SearchRecyclerPresenter implements Presenter<SearchRecyclerView> {
 
-    private final static String TAG = SearchRecyclerController.class.getSimpleName();
+    private final static String TAG = SearchRecyclerPresenter.class.getSimpleName();
 
     private SearchRecyclerView view;
 
-    public SearchRecyclerController(SearchRecyclerView view) {
+    public SearchRecyclerPresenter(SearchRecyclerView view) {
         attach(view);
     }
 

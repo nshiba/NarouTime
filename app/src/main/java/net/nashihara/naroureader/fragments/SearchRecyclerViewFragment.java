@@ -13,7 +13,7 @@ import android.view.ViewGroup;
 
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.adapters.NovelDetailRecyclerViewAdapter;
-import net.nashihara.naroureader.controller.SearchRecyclerController;
+import net.nashihara.naroureader.presenter.SearchRecyclerPresenter;
 import net.nashihara.naroureader.databinding.FragmentSearchRecyclerBinding;
 import net.nashihara.naroureader.databinding.ItemRankingRecyclerBinding;
 import net.nashihara.naroureader.entities.NovelItem;
@@ -83,7 +83,7 @@ public class SearchRecyclerViewFragment extends Fragment implements SearchRecycl
 
     private FragmentTransactionListener replaceListener;
 
-    private SearchRecyclerController controller;
+    private SearchRecyclerPresenter controller;
 
     private List<NovelItem> allItems = new ArrayList<>();
 
@@ -147,7 +147,7 @@ public class SearchRecyclerViewFragment extends Fragment implements SearchRecycl
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_search_recycler, container, false);
 
-        controller = new SearchRecyclerController(this);
+        controller = new SearchRecyclerPresenter(this);
 
         recyclerView = binding.recycler;
         recyclerView.setLayoutManager(new LinearLayoutManager(context));

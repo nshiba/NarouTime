@@ -11,7 +11,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 
 import net.nashihara.naroureader.R;
-import net.nashihara.naroureader.controller.SearchController;
+import net.nashihara.naroureader.presenter.SearchPresenter;
 import net.nashihara.naroureader.databinding.FragmentSearchBinding;
 import net.nashihara.naroureader.listeners.FragmentTransactionListener;
 import net.nashihara.naroureader.views.SearchView;
@@ -32,7 +32,7 @@ public class SearchFragment extends Fragment implements SearchView {
     private boolean[] genreChecked;
     private String[] genreStrings;
 
-    private SearchController controller;
+    private SearchPresenter controller;
 
     public SearchFragment() { }
 
@@ -50,7 +50,7 @@ public class SearchFragment extends Fragment implements SearchView {
             return;
         }
 
-        controller = new SearchController(this);
+        controller = new SearchPresenter(this);
     }
 
     @Override

@@ -1,4 +1,4 @@
-package net.nashihara.naroureader.controller;
+package net.nashihara.naroureader.presenter;
 
 import android.support.v4.util.Pair;
 import android.text.TextUtils;
@@ -30,13 +30,13 @@ import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
-public class RankingRecyclerController implements Controller<RankingRecyclerView> {
+public class RankingRecyclerPresenter implements Presenter<RankingRecyclerView> {
 
-    private static final String TAG = RankingRecyclerController.class.getSimpleName();
+    private static final String TAG = RankingRecyclerPresenter.class.getSimpleName();
 
     private RankingRecyclerView view;
 
-    public RankingRecyclerController(RankingRecyclerView view) {
+    public RankingRecyclerPresenter(RankingRecyclerView view) {
         attach(view);
     }
 

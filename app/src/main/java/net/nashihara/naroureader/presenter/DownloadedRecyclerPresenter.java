@@ -1,4 +1,6 @@
-package net.nashihara.naroureader.controller;
+package net.nashihara.naroureader.presenter;
+
+import android.support.v7.widget.RecyclerView;
 
 import net.nashihara.naroureader.entities.Novel4Realm;
 import net.nashihara.naroureader.utils.RealmUtils;
@@ -9,11 +11,11 @@ import java.util.ArrayList;
 import io.realm.Realm;
 import io.realm.RealmResults;
 
-public class DownlaodedRecyclerController implements Controller<DownloadedRecyclerView> {
+public class DownloadedRecyclerPresenter implements Presenter<DownloadedRecyclerView> {
 
     private DownloadedRecyclerView view;
 
-    public DownlaodedRecyclerController(DownloadedRecyclerView view) {
+    public DownloadedRecyclerPresenter(DownloadedRecyclerView view) {
         attach(view);
     }
 

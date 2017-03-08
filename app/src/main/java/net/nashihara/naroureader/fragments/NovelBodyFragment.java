@@ -12,7 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import net.nashihara.naroureader.R;
-import net.nashihara.naroureader.controller.NovelBodyController;
+import net.nashihara.naroureader.presenter.NovelBodyPresenter;
 import net.nashihara.naroureader.databinding.FragmentNovelBodyBinding;
 import net.nashihara.naroureader.entities.Novel4Realm;
 import net.nashihara.naroureader.utils.RealmUtils;
@@ -59,7 +59,7 @@ public class NovelBodyFragment extends Fragment implements NovelBodyView {
 
     private FragmentNovelBodyBinding binding;
 
-    private NovelBodyController controller;
+    private NovelBodyPresenter controller;
 
     public NovelBodyFragment() {}
 
@@ -80,7 +80,7 @@ public class NovelBodyFragment extends Fragment implements NovelBodyView {
         super.onCreate(savedInstanceState);
         pref = PreferenceManager.getDefaultSharedPreferences(context);
         realm = RealmUtils.getRealm(context);
-        controller = new NovelBodyController(this, realm);
+        controller = new NovelBodyPresenter(this, realm);
 
         Bundle args = getArguments();
         if (args != null) {
@@ -146,7 +146,7 @@ public class NovelBodyFragment extends Fragment implements NovelBodyView {
         listener = (OnNovelBodyInteraction) context;
         pref = PreferenceManager.getDefaultSharedPreferences(context);
         realm = RealmUtils.getRealm(context);
-        controller = new NovelBodyController(this, realm);
+        controller = new NovelBodyPresenter(this, realm);
     }
 
     @Override

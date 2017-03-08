@@ -1,4 +1,4 @@
-package net.nashihara.naroureader.controller;
+package net.nashihara.naroureader.presenter;
 
 import android.util.Log;
 
@@ -23,15 +23,15 @@ import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
-public class NovelTableRecyclerViewController implements Controller<NovelTableRecyclerView> {
+public class NovelTableRecyclerViewPresenter implements Presenter<NovelTableRecyclerView> {
 
-    private static final String TAG = NovelTableRecyclerViewController.class.getSimpleName();
+    private static final String TAG = NovelTableRecyclerViewPresenter.class.getSimpleName();
 
     private NovelTableRecyclerView view;
 
     private Realm realm;
 
-    public NovelTableRecyclerViewController(NovelTableRecyclerView view, Realm realm) {
+    public NovelTableRecyclerViewPresenter(NovelTableRecyclerView view, Realm realm) {
         attach(view);
         this.realm = realm;
     }

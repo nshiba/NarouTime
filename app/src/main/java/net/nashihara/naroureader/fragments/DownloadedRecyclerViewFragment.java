@@ -11,7 +11,7 @@ import android.view.ViewGroup;
 
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.adapters.SimpleRecyclerViewAdapter;
-import net.nashihara.naroureader.controller.DownlaodedRecyclerController;
+import net.nashihara.naroureader.presenter.DownloadedRecyclerPresenter;
 import net.nashihara.naroureader.databinding.FragmentSimpleRecycerViewBinding;
 import net.nashihara.naroureader.listeners.FragmentTransactionListener;
 import net.nashihara.naroureader.entities.Novel4Realm;
@@ -32,7 +32,7 @@ public class DownloadedRecyclerViewFragment extends Fragment implements Download
 
     private FragmentSimpleRecycerViewBinding binding;
 
-    private DownlaodedRecyclerController controller;
+    private DownloadedRecyclerPresenter controller;
 
     public DownloadedRecyclerViewFragment() {}
 
@@ -50,7 +50,7 @@ public class DownloadedRecyclerViewFragment extends Fragment implements Download
             return;
         }
 
-        controller = new DownlaodedRecyclerController(this);
+        controller = new DownloadedRecyclerPresenter(this);
 
         adapter = new SimpleRecyclerViewAdapter(context);
         adapter.setOnItemClickListener((view, position) -> replaceFragment(position));

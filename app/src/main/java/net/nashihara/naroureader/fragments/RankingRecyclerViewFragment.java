@@ -15,7 +15,7 @@ import android.view.ViewGroup;
 
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.adapters.NovelDetailRecyclerViewAdapter;
-import net.nashihara.naroureader.controller.RankingRecyclerController;
+import net.nashihara.naroureader.presenter.RankingRecyclerPresenter;
 import net.nashihara.naroureader.databinding.FragmentRankingRecyclerBinding;
 import net.nashihara.naroureader.databinding.ItemRankingRecyclerBinding;
 import net.nashihara.naroureader.entities.NovelItem;
@@ -48,7 +48,7 @@ public class RankingRecyclerViewFragment extends Fragment implements RankingRecy
 
     private static final String PARAM_TYPE = "rankingType";
 
-    private RankingRecyclerController controller;
+    private RankingRecyclerPresenter controller;
 
     public static RankingRecyclerViewFragment newInstance(String type) {
         RankingRecyclerViewFragment fragment = new RankingRecyclerViewFragment();
@@ -77,7 +77,7 @@ public class RankingRecyclerViewFragment extends Fragment implements RankingRecy
     public View onCreateView(LayoutInflater inflater, @Nullable final ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_ranking_recycler, container, false);
 
-        controller = new RankingRecyclerController(this);
+        controller = new RankingRecyclerPresenter(this);
 
         binding.fab.setOnClickListener(v -> setupFab());
 

@@ -1,4 +1,4 @@
-package net.nashihara.naroureader.controller;
+package net.nashihara.naroureader.presenter;
 
 import android.util.Log;
 
@@ -19,15 +19,15 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
-public class NovelBodyController implements Controller<NovelBodyView> {
+public class NovelBodyPresenter implements Presenter<NovelBodyView> {
 
-    private final static String TAG = NovelBodyController.class.getSimpleName();
+    private final static String TAG = NovelBodyPresenter.class.getSimpleName();
 
     private NovelBodyView view;
 
     private Realm realm;
 
-    public NovelBodyController(NovelBodyView view, Realm realm) {
+    public NovelBodyPresenter(NovelBodyView view, Realm realm) {
         attach(view);
         this.realm = realm;
     }

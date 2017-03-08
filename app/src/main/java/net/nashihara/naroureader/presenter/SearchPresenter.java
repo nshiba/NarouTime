@@ -1,4 +1,4 @@
-package net.nashihara.naroureader.controller;
+package net.nashihara.naroureader.presenter;
 
 import android.renderscript.Int2;
 
@@ -8,11 +8,11 @@ import java.util.ArrayList;
 
 import narou4j.enums.NovelGenre;
 
-public class SearchController implements Controller<SearchView> {
+public class SearchPresenter implements Presenter<SearchView> {
 
     private SearchView view;
 
-    public SearchController(SearchView view) {
+    public SearchPresenter(SearchView view) {
         attach(view);
     }
 

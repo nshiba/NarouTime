@@ -13,7 +13,7 @@ import android.view.ViewGroup;
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.activities.NovelViewActivity;
 import net.nashihara.naroureader.adapters.SimpleRecyclerViewAdapter;
-import net.nashihara.naroureader.controller.BookmarkRecyclerController;
+import net.nashihara.naroureader.presenter.BookmarkRecyclerPresenter;
 import net.nashihara.naroureader.databinding.FragmentSimpleRecycerViewBinding;
 import net.nashihara.naroureader.entities.Novel4Realm;
 import net.nashihara.naroureader.views.BookmarkRecyclerView;
@@ -28,7 +28,7 @@ public class BookmarkRecyclerViewFragment extends Fragment implements BookmarkRe
 
     private FragmentSimpleRecycerViewBinding binding;
 
-    private BookmarkRecyclerController controller;
+    private BookmarkRecyclerPresenter controller;
 
     public BookmarkRecyclerViewFragment() {}
 
@@ -46,7 +46,7 @@ public class BookmarkRecyclerViewFragment extends Fragment implements BookmarkRe
             return;
         }
 
-        controller = new BookmarkRecyclerController(this);
+        controller = new BookmarkRecyclerPresenter(this);
 
         adapter = new SimpleRecyclerViewAdapter(context);
         adapter.setOnItemClickListener((view, position) -> startNovelActivity(position));

@@ -1,4 +1,4 @@
-package net.nashihara.naroureader.controller;
+package net.nashihara.naroureader.presenter;
 
 import net.nashihara.naroureader.entities.Novel4Realm;
 import net.nashihara.naroureader.utils.RealmUtils;
@@ -9,11 +9,11 @@ import java.util.ArrayList;
 import io.realm.Realm;
 import io.realm.RealmResults;
 
-public class BookmarkRecyclerController implements Controller<BookmarkRecyclerView> {
+public class BookmarkRecyclerPresenter implements Presenter<BookmarkRecyclerView> {
 
     private BookmarkRecyclerView view;
 
-    public BookmarkRecyclerController(BookmarkRecyclerView view) {
+    public BookmarkRecyclerPresenter(BookmarkRecyclerView view) {
         attach(view);
     }
 

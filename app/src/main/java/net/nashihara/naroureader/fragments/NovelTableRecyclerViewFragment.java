@@ -16,7 +16,7 @@ import android.widget.LinearLayout;
 
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.adapters.NovelTableRecyclerViewAdapter;
-import net.nashihara.naroureader.controller.NovelTableRecyclerViewController;
+import net.nashihara.naroureader.presenter.NovelTableRecyclerViewPresenter;
 import net.nashihara.naroureader.databinding.FragmentNovelTableViewBinding;
 import net.nashihara.naroureader.utils.RealmUtils;
 import net.nashihara.naroureader.views.NovelTableRecyclerView;
@@ -54,7 +54,7 @@ public class NovelTableRecyclerViewFragment extends Fragment implements NovelTab
 
     private FragmentNovelTableViewBinding binding;
 
-    private NovelTableRecyclerViewController controller;
+    private NovelTableRecyclerViewPresenter controller;
 
     public NovelTableRecyclerViewFragment() {}
 
@@ -81,7 +81,7 @@ public class NovelTableRecyclerViewFragment extends Fragment implements NovelTab
         }
 
         realm = RealmUtils.getRealm(context);
-        controller = new NovelTableRecyclerViewController(this, realm);
+        controller = new NovelTableRecyclerViewPresenter(this, realm);
     }
 
     @Override
