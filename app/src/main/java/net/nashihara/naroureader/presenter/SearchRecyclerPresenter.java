@@ -286,7 +286,7 @@ public class SearchRecyclerPresenter implements Presenter<SearchRecyclerView> {
           {60, 120},
           {120, 180},
           {180, 240},
-          {240, 300}, // 異世界
+          {240, 300},
           {300, 360},
           {360, 420},
           {420, 480},
