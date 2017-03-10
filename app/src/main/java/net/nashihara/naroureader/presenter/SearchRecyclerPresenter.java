@@ -24,6 +24,19 @@ import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
+import static narou4j.enums.OutputOrder.BOOKMARK_COUNT;
+import static narou4j.enums.OutputOrder.CHARACTER_LENGTH_ASC;
+import static narou4j.enums.OutputOrder.CHARACTER_LENGTH_DESC;
+import static narou4j.enums.OutputOrder.HYOKA_COUNT;
+import static narou4j.enums.OutputOrder.HYOKA_COUNT_ASC;
+import static narou4j.enums.OutputOrder.IMPRESSION_COUNT;
+import static narou4j.enums.OutputOrder.NCODE_DESC;
+import static narou4j.enums.OutputOrder.OLD;
+import static narou4j.enums.OutputOrder.REVIEW_COUNT;
+import static narou4j.enums.OutputOrder.TOTAL_POINT;
+import static narou4j.enums.OutputOrder.TOTAL_POINT_ASC;
+import static narou4j.enums.OutputOrder.WEEKLY_UU;
+
 public class SearchRecyclerPresenter implements Presenter<SearchRecyclerView> {
 
     private final static String TAG = SearchRecyclerPresenter.class.getSimpleName();
@@ -242,117 +255,48 @@ public class SearchRecyclerPresenter implements Presenter<SearchRecyclerView> {
     }
 
     private void setSortOrder(Narou narou, int order) {
-        switch (order) {
-            case 1: {
-                narou.setOrder(OutputOrder.BOOKMARK_COUNT);
-                break;
-            }
-            case 2: {
-                narou.setOrder(OutputOrder.REVIEW_COUNT);
-                break;
-            }
-            case 3: {
-                narou.setOrder(OutputOrder.TOTAL_POINT);
-                break;
-            }
-            case 4: {
-                narou.setOrder(OutputOrder.TOTAL_POINT_ASC);
-                break;
-            }
-            case 5: {
-                narou.setOrder(OutputOrder.IMPRESSION_COUNT);
-                break;
-            }
-            case 6: {
-                narou.setOrder(OutputOrder.HYOKA_COUNT);
-                break;
-            }
-            case 7: {
-                narou.setOrder(OutputOrder.HYOKA_COUNT_ASC);
-                break;
-            }
-            case 8: {
-                narou.setOrder(OutputOrder.WEEKLY_UU);
-                break;
-            }
-            case 9: {
-                narou.setOrder(OutputOrder.CHARACTER_LENGTH_ASC);
-                break;
-            }
-            case 10: {
-                narou.setOrder(OutputOrder.CHARACTER_LENGTH_DESC);
-                break;
-            }
-            case 11: {
-                narou.setOrder(OutputOrder.NCODE_DESC);
-                break;
-            }
-            case 12: {
-                narou.setOrder(OutputOrder.OLD);
-                break;
-            }
+        int index = order - 1;
+        OutputOrder[] orders = {
+          BOOKMARK_COUNT,
+          REVIEW_COUNT,
+          TOTAL_POINT,
+          TOTAL_POINT_ASC,
+          IMPRESSION_COUNT,
+          HYOKA_COUNT,
+          HYOKA_COUNT_ASC,
+          WEEKLY_UU,
+          CHARACTER_LENGTH_ASC,
+          CHARACTER_LENGTH_DESC,
+          NCODE_DESC,
+          OLD,
+        };
+
+        if (index < orders.length) {
+            narou.setOrder(orders[index]);
         }
     }
 
     private void setTime(Narou narou, int time) {
-        switch (time) {
-            case 1: {
-                narou.setReadTime(0, 5);
-                break;
-            }
-            case 2: {
-                narou.setReadTime(5, 10);
-                break;
-            }
-            case 3: {
-                narou.setReadTime(10, 30);
-                break;
-            }
-            case 4: {
-                narou.setReadTime(30, 60);
-                break;
-            }
-            case 5: {
-                narou.setReadTime(60, 120);
-                break;
-            }
-            case 6: {
-                narou.setReadTime(120, 180);
-                break;
-            }
-            case 7: {
-                narou.setReadTime(180, 240);
-                break;
-            }
-            case 8: {
-                // 異世界
-                narou.setReadTime(240, 300);
-                break;
-            }
-            case 9: {
-                narou.setReadTime(300, 360);
-                break;
-            }
-            case 10: {
-                narou.setReadTime(360, 420);
-                break;
-            }
-            case 11: {
-                narou.setReadTime(420, 480);
-                break;
-            }
-            case 12: {
-                narou.setReadTime(480, 540);
-                break;
-            }
-            case 13: {
-                narou.setReadTime(540, 600);
-                break;
-            }
-            case 14: {
-                narou.setReadTime(600, 0);
-                break;
-            }
+        int index = time - 1;
+        int times[][] = {
+          {0, 5},
+          {5, 10},
+          {10, 30},
+          {30, 60},
+          {60, 120},
+          {120, 180},
+          {180, 240},
+          {240, 300}, // 異世界
+          {300, 360},
+          {360, 420},
+          {420, 480},
+          {480, 540},
+          {540, 600},
+          {600, 0},
+        };
+
+        if (index < times.length) {
+            narou.setReadTime(times[index][0], times[index][1]);
         }
     }
 }
