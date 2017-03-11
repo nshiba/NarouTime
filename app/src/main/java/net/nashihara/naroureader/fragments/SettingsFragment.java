@@ -31,29 +31,24 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     @Override
     public boolean onPreferenceTreeClick(Preference preference) {
         String title = (String) preference.getTitle();
-
         if (title.equals("文字色")) {
-            int text = pref.getInt(getString(R.string.body_text), 0);
-            if (text == 0) {
-                text = ContextCompat.getColor(getContext(), R.color.colorText);
-            }
-            ColorPickerDialog.show(
-                getFragmentManager(),
-                text,
-                color -> pref.edit().putInt(getString(R.string.body_text), color).apply());
+            handleColorChange(R.string.body_text, R.color.colorText);
         }
 
         if (title.equals("背景色")) {
-            int background = pref.getInt(getString(R.string.body_background), 0);
-            if (background == 0) {
-                background = ContextCompat.getColor(getContext(), R.color.colorBackground);
-            }
-            ColorPickerDialog.show(
-                getFragmentManager(),
-                background,
-                color -> pref.edit().putInt(getString(R.string.body_background), color).apply());
+            handleColorChange(R.string.body_background, R.color.colorBackground);
         }
 
         return super.onPreferenceTreeClick(preference);
+    }
+
+    private void handleColorChange(int target, int defaultColor) {
+        int prefColor = pref.getInt(getString(target), 0);
+        int targetColor = prefColor == 0 ? ContextCompat.getColor(getContext(), defaultColor) : prefColor;
+
+        ColorPickerDialog.show(
+          getFragmentManager(),
+          targetColor,
+          color -> pref.edit().putInt(getString(target), color).apply());
     }
 }
