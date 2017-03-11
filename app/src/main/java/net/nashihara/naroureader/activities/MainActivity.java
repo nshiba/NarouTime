@@ -39,7 +39,6 @@ import net.nashihara.naroureader.widgets.OkCancelDialogFragment;
 import java.util.Stack;
 
 import narou4j.entities.Novel;
-import narou4j.enums.RankingType;
 
 import static android.support.v4.view.GravityCompat.START;
 
@@ -170,11 +169,7 @@ public class MainActivity extends AppCompatActivity
             case R.id.nav_ranking: {
                 binding.toolbar.setTitle("ランキング");
                 binding.navView.setCheckedItem(R.id.nav_ranking);
-                String[] types = new String[]{
-                    RankingType.DAILY.toString(), RankingType.WEEKLY.toString(),
-                    RankingType.MONTHLY.toString(), RankingType.QUARTET.toString(), "all"};
-                String[] titles = new String[]{"日間", "週間", "月間", "四半期", "累計"};
-                Fragment fragment = RankingViewPagerFragment.newInstance(types, titles);
+                Fragment fragment = RankingViewPagerFragment.newInstance();
                 fragmentManager.beginTransaction()
                     .replace(R.id.main_container, fragment)
                     .commit();
@@ -249,14 +244,9 @@ public class MainActivity extends AppCompatActivity
         Fragment fragment;
 
         if (NetworkUtils.isOnline(this)) {
-            String[] types = new String[]{
-                RankingType.DAILY.toString(), RankingType.WEEKLY.toString(),
-                RankingType.MONTHLY.toString(), RankingType.QUARTET.toString(), "all"};
-            String[] titles = new String[]{"日間", "週間", "月間", "四半期", "累計"};
-            fragment = RankingViewPagerFragment.newInstance(types, titles);
+            fragment = RankingViewPagerFragment.newInstance();
             binding.toolbar.setTitle("ランキング");
-        }
-        else {
+        } else {
             fragment = DownloadedRecyclerViewFragment.newInstance();
             binding.toolbar.setTitle("ダウンロード済み小説");
         }
