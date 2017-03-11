@@ -24,19 +24,6 @@ import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
-import static narou4j.enums.OutputOrder.BOOKMARK_COUNT;
-import static narou4j.enums.OutputOrder.CHARACTER_LENGTH_ASC;
-import static narou4j.enums.OutputOrder.CHARACTER_LENGTH_DESC;
-import static narou4j.enums.OutputOrder.HYOKA_COUNT;
-import static narou4j.enums.OutputOrder.HYOKA_COUNT_ASC;
-import static narou4j.enums.OutputOrder.IMPRESSION_COUNT;
-import static narou4j.enums.OutputOrder.NCODE_DESC;
-import static narou4j.enums.OutputOrder.OLD;
-import static narou4j.enums.OutputOrder.REVIEW_COUNT;
-import static narou4j.enums.OutputOrder.TOTAL_POINT;
-import static narou4j.enums.OutputOrder.TOTAL_POINT_ASC;
-import static narou4j.enums.OutputOrder.WEEKLY_UU;
-
 public class SearchRecyclerPresenter implements Presenter<SearchRecyclerView> {
 
     private final static String TAG = SearchRecyclerPresenter.class.getSimpleName();
@@ -256,22 +243,8 @@ public class SearchRecyclerPresenter implements Presenter<SearchRecyclerView> {
 
     private void setSortOrder(Narou narou, int order) {
         int index = order - 1;
-        OutputOrder[] orders = {
-          BOOKMARK_COUNT,
-          REVIEW_COUNT,
-          TOTAL_POINT,
-          TOTAL_POINT_ASC,
-          IMPRESSION_COUNT,
-          HYOKA_COUNT,
-          HYOKA_COUNT_ASC,
-          WEEKLY_UU,
-          CHARACTER_LENGTH_ASC,
-          CHARACTER_LENGTH_DESC,
-          NCODE_DESC,
-          OLD,
-        };
-
-        if (index < orders.length) {
+        OutputOrder[] orders = OutputOrder.values();
+        if (index >= 0 && index < orders.length) {
             narou.setOrder(orders[index]);
         }
     }
@@ -295,7 +268,7 @@ public class SearchRecyclerPresenter implements Presenter<SearchRecyclerView> {
           {600, 0},
         };
 
-        if (index < times.length) {
+        if (index >= 0 && index < times.length) {
             narou.setReadTime(times[index][0], times[index][1]);
         }
     }
