@@ -11,9 +11,10 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 
 import net.nashihara.naroureader.R;
-import net.nashihara.naroureader.presenter.SearchPresenter;
 import net.nashihara.naroureader.databinding.FragmentSearchBinding;
+import net.nashihara.naroureader.entities.Query;
 import net.nashihara.naroureader.listeners.FragmentTransactionListener;
+import net.nashihara.naroureader.presenter.SearchPresenter;
 import net.nashihara.naroureader.views.SearchView;
 import net.nashihara.naroureader.widgets.FilterDialogFragment;
 import net.nashihara.naroureader.widgets.OkCancelDialogFragment;
@@ -26,8 +27,7 @@ public class SearchFragment extends Fragment implements SearchView {
     private Context context;
     private FragmentTransactionListener replaceListener;
 
-    private int sortItem = 0;
-    private int timeItem = 0;
+    private Query mQuery;
 
     private boolean[] genreChecked;
     private String[] genreStrings;
@@ -57,6 +57,7 @@ public class SearchFragment extends Fragment implements SearchView {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_search, container, false);
 
+        mQuery = new Query();
         setupSort();
         setupGenre();
         setupReadTime();
@@ -66,24 +67,22 @@ public class SearchFragment extends Fragment implements SearchView {
     }
 
     private void setupSearchButton() {
-        binding.btnSearch.setOnClickListener(v -> controller.shapeSearchQuery(
-            binding.editNcode.getText().toString(),
-            binding.editLimit.getText().toString(),
-            sortItem,
-            binding.editSearch.getText().toString(),
-            binding.editNotSearch.getText().toString(),
-            binding.keywordTitle.isChecked(),
-            binding.keywordStory.isChecked(),
-            binding.keywordKeyword.isChecked(),
-            binding.keywordWriter.isChecked(),
-            timeItem,
-            binding.maxLength.getText().toString(),
-            binding.minLength.getText().toString(),
-            binding.end.isChecked(),
-            binding.stop.isChecked(),
-            binding.pickup.isChecked(),
-            genreChecked
-        ));
+        binding.btnSearch.setOnClickListener(v -> {
+            mQuery.setNcode(binding.editNcode.getText().toString());
+            mQuery.setLimit(binding.editLimit.getText().toString());
+            mQuery.setSearch(binding.editSearch.getText().toString());
+            mQuery.setNotSearch(binding.editNotSearch.getText().toString());
+            mQuery.setTargetTitle(binding.keywordTitle.isChecked());
+            mQuery.setTargetStory(binding.keywordStory.isChecked());
+            mQuery.setTargetKeyword(binding.keywordKeyword.isChecked());
+            mQuery.setTargetKeyword(binding.keywordWriter.isChecked());
+            mQuery.setMaxLength(binding.maxLength.getText().toString());
+            mQuery.setMinLength(binding.minLength.getText().toString());
+            mQuery.setEnd(binding.end.isChecked());
+            mQuery.setStop(binding.stop.isChecked());
+            mQuery.setPickup(binding.pickup.isChecked());
+            controller.shapeSearchQuery(mQuery, genreChecked);
+        });
     }
 
     private void setupReadTime() {
@@ -94,7 +93,7 @@ public class SearchFragment extends Fragment implements SearchView {
         binding.timeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                timeItem = position;
+                mQuery.setTime(position);
             }
 
             @Override
@@ -143,7 +142,7 @@ public class SearchFragment extends Fragment implements SearchView {
         binding.sortSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                sortItem = position;
+                mQuery.setSortOrder(position);
             }
 
             @Override
@@ -168,28 +167,8 @@ public class SearchFragment extends Fragment implements SearchView {
     }
 
     @Override
-    public void showResult(
-        String ncode,
-        int limit,
-        int sortOrder,
-        String search,
-        String notSearch,
-        boolean targetTitle,
-        boolean targetStory,
-        boolean targetKeyword,
-        boolean targetWriter,
-        int time,
-        int maxLength,
-        int minLength,
-        boolean end,
-        boolean stop,
-        boolean pickup,
-        ArrayList<Integer> genreList) {
-
-        SearchRecyclerViewFragment fragment = SearchRecyclerViewFragment.newInstance(
-            ncode, limit, sortItem, search, notSearch, targetTitle, targetStory, targetKeyword,
-            targetWriter, time, maxLength, minLength, end, stop, pickup, genreList);
-
+    public void showResult(Query query, ArrayList<Integer> genreList) {
+        SearchRecyclerViewFragment fragment = SearchRecyclerViewFragment.newInstance(query, genreList);
         replaceListener.replaceFragment(fragment, "検索結果", null);
     }
 
