@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.databinding.ItemRankingRecyclerBinding;
 import net.nashihara.naroureader.entities.NovelItem;
+import net.nashihara.naroureader.utils.RankingManager;
 
 import java.util.List;
 
@@ -112,51 +113,26 @@ public class NovelDetailRecyclerViewAdapter extends RecyclerView.Adapter<NovelDe
     }
 
     private void setView4Ranking(ItemRankingRecyclerBinding binding, Novel novel, NovelRank rank, NovelRank prevRank, int position) {
-        if (rank.getRankingType() == null) {
-            binding.ranking.setText(String.valueOf(position +1) + "位");
-        }
-        else {
-            binding.ranking.setText(rank.getRank() + "位");
-            if (prevRank != null) {
-                binding.rankNew.setVisibility(View.GONE);
-                binding.rankDiffKigou.setVisibility(View.VISIBLE);
-                switch (rank.getRankingType()) {
-                    case DAILY: {
-                        binding.prevRankText.setText("前日：" + String.valueOf(prevRank.getRank()) + "位");
-                        break;
-                    }
-                    case WEEKLY: {
-                        binding.prevRankText.setText("前週：" + String.valueOf(prevRank.getRank()) + "位");
-                        break;
-                    }
-                    case MONTHLY: {
-                        binding.prevRankText.setText("前月：" + String.valueOf(prevRank.getRank()) + "位");
-                        break;
-                    }
-                    case QUARTET: {
-                        binding.prevRankText.setText("前月：" + String.valueOf(prevRank.getRank()) + "位");
-                        break;
-                    }
-                }
-                if (rank.getRank() < prevRank.getRank()) {
-//                    binding.prevRankText.setText("前回のランキングから" + String.valueOf(diff) + "位上昇しました！");
-                    binding.rankDiffKigou.setImageResource(R.drawable.ic_up);
-                }
-                else if (rank.getRank() > prevRank.getRank()) {
-//                    binding.prevRankText.setText("前回のランキングから" + String.valueOf(diff) + "位下降しました...");
-                    binding.rankDiffKigou.setImageResource(R.drawable.ic_down);
-                }
-                else if (rank.getRank() == prevRank.getRank()) {
-//                    binding.prevRankText.setText("前回のランキングと同じだよ");
-                    binding.rankDiffKigou.setImageResource(R.drawable.ic_sonomama);
-                }
+        RankingManager rankingManager = new RankingManager(rank, prevRank);
+
+        binding.ranking.setText(rankingManager.positionMessage(position));
+        binding.prevRankText.setText(rankingManager.prevRankingMessage());
+
+        if (rankingManager.hasPrevNovelRank()) {
+            binding.rankNew.setVisibility(View.GONE);
+            binding.rankDiffKigou.setVisibility(View.VISIBLE);
+
+            if (rankingManager.isRankUp()) {
+                binding.rankDiffKigou.setImageResource(R.drawable.ic_up);
+            } else if (rankingManager.isRankDown()) {
+                binding.rankDiffKigou.setImageResource(R.drawable.ic_down);
+            } else if (rankingManager.isEqual()) {
+                binding.rankDiffKigou.setImageResource(R.drawable.ic_sonomama);
             }
-            else {
-                binding.prevRankText.setText("前回：ー");
-                binding.rankDiffKigou.setVisibility(View.GONE);
-                binding.rankNew.setVisibility(View.VISIBLE);
-                binding.rankNew.setTextColor(Color.RED);
-            }
+        } else {
+            binding.rankDiffKigou.setVisibility(View.GONE);
+            binding.rankNew.setVisibility(View.VISIBLE);
+            binding.rankNew.setTextColor(Color.RED);
         }
 
         binding.title.setText(novel.getTitle());
