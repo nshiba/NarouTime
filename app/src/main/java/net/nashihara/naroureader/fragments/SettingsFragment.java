@@ -2,6 +2,8 @@ package net.nashihara.naroureader.fragments;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.annotation.ColorRes;
+import android.support.annotation.StringRes;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
@@ -31,29 +33,24 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     @Override
     public boolean onPreferenceTreeClick(Preference preference) {
         String title = (String) preference.getTitle();
-
         if (title.equals("文字色")) {
-            int text = pref.getInt(getString(R.string.body_text), 0);
-            if (text == 0) {
-                text = ContextCompat.getColor(getContext(), R.color.colorText);
-            }
-            ColorPickerDialog.show(
-                getFragmentManager(),
-                text,
-                color -> pref.edit().putInt(getString(R.string.body_text), color).apply());
+            handleColorChange(R.string.body_text, R.color.colorText);
         }
 
         if (title.equals("背景色")) {
-            int background = pref.getInt(getString(R.string.body_background), 0);
-            if (background == 0) {
-                background = ContextCompat.getColor(getContext(), R.color.colorBackground);
-            }
-            ColorPickerDialog.show(
-                getFragmentManager(),
-                background,
-                color -> pref.edit().putInt(getString(R.string.body_background), color).apply());
+            handleColorChange(R.string.body_background, R.color.colorBackground);
         }
 
         return super.onPreferenceTreeClick(preference);
+    }
+
+    private void handleColorChange(@StringRes int stringResId, @ColorRes int colorResId) {
+        int prefColor = pref.getInt(getString(stringResId), 0);
+        int targetColor = prefColor == 0 ? ContextCompat.getColor(getContext(), colorResId) : prefColor;
+
+        ColorPickerDialog.show(
+          getFragmentManager(),
+          targetColor,
+          color -> pref.edit().putInt(getString(stringResId), color).apply());
     }
 }
