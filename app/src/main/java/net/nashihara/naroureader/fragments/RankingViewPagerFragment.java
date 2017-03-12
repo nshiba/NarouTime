@@ -12,21 +12,31 @@ import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.adapters.RankingFragmentPagerAdapter;
 import net.nashihara.naroureader.databinding.FragmentRankingViewpagerBinding;
 
+import static narou4j.enums.RankingType.DAILY;
+import static narou4j.enums.RankingType.MONTHLY;
+import static narou4j.enums.RankingType.QUARTET;
+import static narou4j.enums.RankingType.WEEKLY;
+
 public class RankingViewPagerFragment extends Fragment {
     private static final String TAG = RankingViewPagerFragment.class.getSimpleName();
 
     private static final String PARAM_TYPE = "type";
     private static final String PARAM_TITLE = "title";
 
+    private static final String[] RANKING_TYPES = new String[]{
+      DAILY.toString(),
+      WEEKLY.toString(),
+      MONTHLY.toString(),
+      QUARTET.toString(),
+      "all"
+    };
+
+    private static final String[] TITLES = new String[]{"日間", "週間", "月間", "四半期", "累計"};
+
     private FragmentRankingViewpagerBinding binding;
 
-    public static RankingViewPagerFragment newInstance(String[] types, String[] titles) {
-        RankingViewPagerFragment fragment = new RankingViewPagerFragment();
-        Bundle args = new Bundle();
-        args.putStringArray(PARAM_TYPE, types);
-        args.putStringArray(PARAM_TITLE, titles);
-        fragment.setArguments(args);
-        return fragment;
+    public static RankingViewPagerFragment newInstance() {
+        return new RankingViewPagerFragment();
     }
 
     public RankingViewPagerFragment() {}
@@ -41,19 +51,14 @@ public class RankingViewPagerFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_ranking_viewpager, container, false);
 
-        Bundle args = getArguments();
-        if (args != null) {
-            String[] titles = args.getStringArray(PARAM_TITLE);
-            String[] types = args.getStringArray(PARAM_TYPE);
-            Fragment fragments[] = new Fragment[titles.length];
-            for (int i = 0; i < fragments.length; i++) {
-                fragments[i] = RankingRecyclerViewFragment.newInstance(types[i]);
-            }
-            RankingFragmentPagerAdapter adapter = new RankingFragmentPagerAdapter(getChildFragmentManager(), fragments, titles);
-            binding.pager.setAdapter(adapter);
-            binding.pager.setOffscreenPageLimit(4);
-            binding.tabStrip.setupWithViewPager(binding.pager);
+        Fragment fragments[] = new Fragment[TITLES.length];
+        for (int i = 0; i < fragments.length; i++) {
+            fragments[i] = RankingRecyclerViewFragment.newInstance(RANKING_TYPES[i]);
         }
+        RankingFragmentPagerAdapter adapter = new RankingFragmentPagerAdapter(getChildFragmentManager(), fragments, TITLES);
+        binding.pager.setAdapter(adapter);
+        binding.pager.setOffscreenPageLimit(4);
+        binding.tabStrip.setupWithViewPager(binding.pager);
 
         return binding.getRoot();
     }
