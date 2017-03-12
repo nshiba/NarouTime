@@ -19,18 +19,18 @@ public class RankingManager {
         return prevNovelRank != null;
     }
 
-    public String positionMessage(int position) {
+    public String buildPositionMessage(int position) {
         if (novelRank.getRankingType() == null) {
             return String.valueOf(position +1) + "位";
         }
-        return positionMessage();
+        return buildPositionMessage();
     }
 
-    public String positionMessage() {
+    public String buildPositionMessage() {
         return novelRank.getRank() + "位";
     }
 
-    public String prevRankingMessage() {
+    public String buildPrevRankingMessage() {
         String defaultMessage = "前回：ー";
         if (!hasPrevNovelRank()) {
             return defaultMessage;

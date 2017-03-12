@@ -115,8 +115,8 @@ public class NovelDetailRecyclerViewAdapter extends RecyclerView.Adapter<NovelDe
     private void setView4Ranking(ItemRankingRecyclerBinding binding, Novel novel, NovelRank rank, NovelRank prevRank, int position) {
         RankingManager rankingManager = new RankingManager(rank, prevRank);
 
-        binding.ranking.setText(rankingManager.positionMessage(position));
-        binding.prevRankText.setText(rankingManager.prevRankingMessage());
+        binding.ranking.setText(rankingManager.buildPositionMessage(position));
+        binding.prevRankText.setText(rankingManager.buildPrevRankingMessage());
 
         if (rankingManager.hasPrevNovelRank()) {
             binding.rankNew.setVisibility(View.GONE);
