@@ -1,4 +1,4 @@
-package net.nashihara.naroureader.utils;
+package net.nashihara.naroureader.models;
 
 import android.support.annotation.NonNull;
 
