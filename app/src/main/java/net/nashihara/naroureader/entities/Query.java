@@ -1,6 +1,11 @@
 package net.nashihara.naroureader.entities;
 
-public class Query {
+import net.nashihara.naroureader.models.EasyParcelable;
+
+public class Query extends EasyParcelable {
+
+    public static final Creator<Query> CREATOR = new EasyCreator<>(Query.class);
+
     private int limit;
     private int sortOrder;
     private String search;
