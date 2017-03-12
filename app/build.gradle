@@ -55,6 +55,7 @@ dependencies {
     compile 'com.balysv.materialmenu:material-menu-toolbar:1.5.4'
     compile 'net.nashihara:narou4j:1.2.6'
     compile 'com.pavelsikun:vintage-chroma:1.4'
+    compile 'com.google.code.gson:gson:2.8.0'
 
     retrolambdaConfig 'net.orfjackal.retrolambda:retrolambda:2.3.0'
 }
