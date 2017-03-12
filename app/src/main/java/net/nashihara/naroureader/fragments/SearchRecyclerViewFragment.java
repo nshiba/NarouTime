@@ -13,11 +13,12 @@ import android.view.ViewGroup;
 
 import net.nashihara.naroureader.R;
 import net.nashihara.naroureader.adapters.NovelDetailRecyclerViewAdapter;
-import net.nashihara.naroureader.presenter.SearchRecyclerPresenter;
 import net.nashihara.naroureader.databinding.FragmentSearchRecyclerBinding;
 import net.nashihara.naroureader.databinding.ItemRankingRecyclerBinding;
 import net.nashihara.naroureader.entities.NovelItem;
+import net.nashihara.naroureader.entities.Query;
 import net.nashihara.naroureader.listeners.FragmentTransactionListener;
+import net.nashihara.naroureader.presenter.SearchRecyclerPresenter;
 import net.nashihara.naroureader.views.SearchRecyclerView;
 
 import java.util.ArrayList;
@@ -43,35 +44,7 @@ public class SearchRecyclerViewFragment extends Fragment implements SearchRecycl
     private static final String ARG_PICKUP = "pickup";
     private static final String ARG_GENRE_LIST = "genre";
 
-    private String ncode;
-
-    private String search;
-
-    private String notSearch;
-
-    private int limit;
-
-    private int sortOrder;
-
-    private int time;
-
-    private int maxLength;
-
-    private int minLength;
-
-    private boolean targetTitle;
-
-    private boolean targetStory;
-
-    private boolean targetKeyword;
-
-    private boolean targetWriter;
-
-    private boolean end;
-
-    private boolean stop;
-
-    private boolean pickup;
+    private Query mQuery;
 
     private ArrayList<Integer> genreList;
 
@@ -89,28 +62,25 @@ public class SearchRecyclerViewFragment extends Fragment implements SearchRecycl
 
     public SearchRecyclerViewFragment() {}
 
-    public static SearchRecyclerViewFragment newInstance(
-        String ncode, int limit, int sortOrder, String search, String notSearch, boolean targetTitle,
-        boolean targetStory, boolean targetKeyword, boolean targetWriter, int time,
-        int maxLength, int minLength, boolean end, boolean stop, boolean pickup, ArrayList<Integer> genreList) {
+    public static SearchRecyclerViewFragment newInstance(Query query , ArrayList<Integer> genreList) {
 
         SearchRecyclerViewFragment fragment = new SearchRecyclerViewFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_NCODE, ncode);
-        args.putString(ARG_SEARCH, search);
-        args.putString(ARG_NOT_SEARCH, notSearch);
-        args.putInt(ARG_LIMIT, limit);
-        args.putInt(ARG_SORT_ORDER, sortOrder);
-        args.putInt(ARG_TIME, time);
-        args.putInt(ARG_MAX_LENGTH, maxLength);
-        args.putInt(ARG_MIN_LENGTH, minLength);
-        args.putBoolean(ARG_TARGET_TITLE, targetTitle);
-        args.putBoolean(ARG_TARGET_STORY, targetStory);
-        args.putBoolean(ARG_TARGET_KEYWORD, targetKeyword);
-        args.putBoolean(ARG_TARGET_WRITER, targetWriter);
-        args.putBoolean(ARG_END, end);
-        args.putBoolean(ARG_STOP, stop);
-        args.putBoolean(ARG_PICKUP, pickup);
+        args.putString(ARG_NCODE, query.getNcode());
+        args.putString(ARG_SEARCH, query.getSearch());
+        args.putString(ARG_NOT_SEARCH, query.getNotSearch());
+        args.putInt(ARG_LIMIT, query.getLimit());
+        args.putInt(ARG_SORT_ORDER, query.getSortOrder());
+        args.putInt(ARG_TIME, query.getTime());
+        args.putInt(ARG_MAX_LENGTH, query.getMaxLength());
+        args.putInt(ARG_MIN_LENGTH, query.getMinLength());
+        args.putBoolean(ARG_TARGET_TITLE, query.isTargetTitle());
+        args.putBoolean(ARG_TARGET_STORY, query.isTargetStory());
+        args.putBoolean(ARG_TARGET_KEYWORD, query.isTargetKeyword());
+        args.putBoolean(ARG_TARGET_WRITER, query.isTargetWriter());
+        args.putBoolean(ARG_END, query.isEnd());
+        args.putBoolean(ARG_STOP, query.isStop());
+        args.putBoolean(ARG_PICKUP, query.isPickup());
         args.putIntegerArrayList(ARG_GENRE_LIST, genreList);
         fragment.setArguments(args);
         return fragment;
@@ -125,21 +95,23 @@ public class SearchRecyclerViewFragment extends Fragment implements SearchRecycl
             return;
         }
 
-        ncode = args.getString(ARG_NCODE);
-        search = args.getString(ARG_SEARCH);
-        notSearch = args.getString(ARG_NOT_SEARCH);
-        limit = args.getInt(ARG_LIMIT);
-        sortOrder = args.getInt(ARG_SORT_ORDER);
-        time = args.getInt(ARG_TIME);
-        maxLength = args.getInt(ARG_MAX_LENGTH);
-        minLength = args.getInt(ARG_MIN_LENGTH);
-        targetTitle = args.getBoolean(ARG_TARGET_TITLE);
-        targetStory = args.getBoolean(ARG_TARGET_STORY);
-        targetKeyword = args.getBoolean(ARG_TARGET_KEYWORD);
-        targetWriter = args.getBoolean(ARG_TARGET_WRITER);
-        end = args.getBoolean(ARG_END);
-        stop = args.getBoolean(ARG_STOP);
-        pickup = args.getBoolean(ARG_PICKUP);
+        mQuery = new Query();
+        mQuery.setNcode(args.getString(ARG_NCODE));
+        mQuery.setSearch(args.getString(ARG_SEARCH));
+        mQuery.setNotSearch(args.getString(ARG_NOT_SEARCH));
+        mQuery.setLimit(args.getInt(ARG_LIMIT));
+        mQuery.setSortOrder(args.getInt(ARG_SORT_ORDER));
+        mQuery.setTime(args.getInt(ARG_TIME));
+        mQuery.setMaxLength(args.getInt(ARG_MAX_LENGTH));
+        mQuery.setMinLength(args.getInt(ARG_MIN_LENGTH));
+        mQuery.setTargetTitle(args.getBoolean(ARG_TARGET_TITLE));
+        mQuery.setTargetTitle(args.getBoolean(ARG_TARGET_TITLE));
+        mQuery.setTargetStory(args.getBoolean(ARG_TARGET_STORY));
+        mQuery.setTargetKeyword(args.getBoolean(ARG_TARGET_KEYWORD));
+        mQuery.setTargetWriter(args.getBoolean(ARG_TARGET_WRITER));
+        mQuery.setEnd(args.getBoolean(ARG_END));
+        mQuery.setStop(args.getBoolean(ARG_STOP));
+        mQuery.setPickup(args.getBoolean(ARG_PICKUP));
         genreList = args.getIntegerArrayList(ARG_GENRE_LIST);
     }
 
@@ -155,8 +127,7 @@ public class SearchRecyclerViewFragment extends Fragment implements SearchRecycl
         NovelDetailRecyclerViewAdapter adapter = new NovelDetailRecyclerViewAdapter(context, true);
         recyclerView.setAdapter(adapter);
 
-        controller.searchNovel(ncode, limit, sortOrder, search, notSearch, targetTitle, targetStory,
-            targetKeyword, targetWriter, time, maxLength, minLength, end, stop, pickup, genreList);
+        controller.searchNovel(mQuery, genreList);
 
         return binding.getRoot();
     }

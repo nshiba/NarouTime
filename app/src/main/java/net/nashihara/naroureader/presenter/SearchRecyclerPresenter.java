@@ -6,6 +6,7 @@ import android.util.Log;
 import com.google.firebase.crash.FirebaseCrash;
 
 import net.nashihara.naroureader.entities.NovelItem;
+import net.nashihara.naroureader.entities.Query;
 import net.nashihara.naroureader.views.SearchRecyclerView;
 
 import java.io.IOException;
@@ -50,13 +51,8 @@ public class SearchRecyclerPresenter implements Presenter<SearchRecyclerView> {
         view.showError();
     }
 
-    public void searchNovel(String ncode, int limit, int sortOrder, String search, String notSearch,
-                            boolean targetTitle, boolean targetStory, boolean targetKeyword,
-                            boolean targetWriter, int time, int maxLength, int minLength,
-                            boolean end, boolean stop, boolean pickup, ArrayList<Integer> genreList) {
-
-        buildSearchObservable(ncode, limit, sortOrder, search, notSearch, targetTitle, targetStory,
-            targetKeyword, targetWriter, time, maxLength, minLength, end, stop, pickup, genreList)
+    public void searchNovel(Query query, ArrayList<Integer> genreList) {
+        buildSearchObservable(query, genreList)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(novels -> {
@@ -98,27 +94,23 @@ public class SearchRecyclerPresenter implements Presenter<SearchRecyclerView> {
         return novelItemList;
     }
 
-    private Observable<List<Novel>> buildSearchObservable(String ncode, int limit, int sortOrder,
-                                                          String search, String notSearch,
-                                                          boolean targetTitle, boolean targetStory,
-                                                          boolean targetKeyword, boolean targetWriter,
-                                                          int time, int maxLength, int minLength,
-                                                          boolean end, boolean stop, boolean pickup,
-                                                          ArrayList<Integer> genreList) {
+    private Observable<List<Novel>> buildSearchObservable(Query query, ArrayList<Integer> genreList) {
 
         return Observable.fromEmitter(emitter -> {
             Narou narou = new Narou();
 
-            if (!ncode.equals("")) {
-                emitSearchObservableFromNcode(emitter, narou, ncode);
-            } else {
-                emitSearchObservableFromSearchQuery(emitter, narou, limit, sortOrder, search,
-                    notSearch, targetTitle, targetStory, targetKeyword, targetWriter, time,
-                    maxLength, minLength, end, stop, pickup, genreList);
-            }
+            emitSearchObservable(emitter, narou, query, genreList);
 
             emitter.onCompleted();
         }, Emitter.BackpressureMode.NONE);
+    }
+
+    private void emitSearchObservable(Emitter<List<Novel>> emitter, Narou narou, Query query, ArrayList<Integer> genreList) {
+        if (query.getNcode().equals("")) {
+            emitSearchObservableFromSearchQuery(emitter, narou, query, genreList);
+        } else {
+            emitSearchObservableFromNcode(emitter, narou, query.getNcode());
+        }
     }
 
     private void emitSearchObservableFromNcode(Emitter<List<Novel>> emitter, Narou narou, String ncode) {
@@ -138,20 +130,15 @@ public class SearchRecyclerPresenter implements Presenter<SearchRecyclerView> {
         }
     }
 
-    private void emitSearchObservableFromSearchQuery(Emitter<List<Novel>> emitter, Narou narou,
-                                                     int limit, int sortOrder, String search,
-                                                     String notSearch, boolean targetTitle,
-                                                     boolean targetStory, boolean targetKeyword,
-                                                     boolean targetWriter, int time, int maxLength, int minLength,
-                                                     boolean end, boolean stop, boolean pickup,
-                                                     ArrayList<Integer> genreList) {
-        setTextParam(narou, search, notSearch);
-        setPageLimit(narou, limit);
-        setSortOrder(narou, sortOrder);
-        setTime(narou, time);
-        setSummary(narou, targetTitle, targetStory, targetKeyword, targetWriter);
-        setCharLength(narou, minLength, maxLength);
-        setSerializationInfo(narou, end, stop, pickup);
+    private void emitSearchObservableFromSearchQuery(
+      Emitter<List<Novel>> emitter, Narou narou, Query query, ArrayList<Integer> genreList) {
+        setTextParam(narou, query.getSearch(), query.getNotSearch());
+        setPageLimit(narou, query.getLimit());
+        setSortOrder(narou, query.getSortOrder());
+        setTime(narou, query.getTime());
+        setSummary(narou, query.isTargetTitle(), query.isTargetStory(), query.isTargetKeyword(), query.isTargetWriter());
+        setCharLength(narou, query.getMinLength(), query.getMaxLength());
+        setSerializationInfo(narou, query.isEnd(), query.isStop(), query.isPickup());
         setGenre(narou, genreList);
 
         Pair<List<Novel>, Throwable> result = fetchNovel(narou);
