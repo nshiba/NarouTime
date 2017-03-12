@@ -2,6 +2,8 @@ package net.nashihara.naroureader.fragments;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.annotation.ColorRes;
+import android.support.annotation.StringRes;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
@@ -42,13 +44,13 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         return super.onPreferenceTreeClick(preference);
     }
 
-    private void handleColorChange(int target, int defaultColor) {
-        int prefColor = pref.getInt(getString(target), 0);
-        int targetColor = prefColor == 0 ? ContextCompat.getColor(getContext(), defaultColor) : prefColor;
+    private void handleColorChange(@StringRes int stringResId, @ColorRes int colorResId) {
+        int prefColor = pref.getInt(getString(stringResId), 0);
+        int targetColor = prefColor == 0 ? ContextCompat.getColor(getContext(), colorResId) : prefColor;
 
         ColorPickerDialog.show(
           getFragmentManager(),
           targetColor,
-          color -> pref.edit().putInt(getString(target), color).apply());
+          color -> pref.edit().putInt(getString(stringResId), color).apply());
     }
 }
