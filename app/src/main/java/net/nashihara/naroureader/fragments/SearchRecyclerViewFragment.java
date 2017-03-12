@@ -27,24 +27,11 @@ import java.util.List;
 public class SearchRecyclerViewFragment extends Fragment implements SearchRecyclerView {
     private static final String TAG = SearchRecyclerViewFragment.class.getSimpleName();
 
-    private static final String ARG_NCODE = "ncode";
-    private static final String ARG_LIMIT = "limit";
-    private static final String ARG_SORT_ORDER = "sort";
-    private static final String ARG_SEARCH = "search";
-    private static final String ARG_NOT_SEARCH = "not_search";
-    private static final String ARG_TARGET_TITLE = "title";
-    private static final String ARG_TARGET_STORY = "story";
-    private static final String ARG_TARGET_KEYWORD = "keyword";
-    private static final String ARG_TARGET_WRITER = "writer";
-    private static final String ARG_TIME = "time";
-    private static final String ARG_MAX_LENGTH = "max";
-    private static final String ARG_MIN_LENGTH = "min";
-    private static final String ARG_END = "end";
-    private static final String ARG_STOP = "stop";
-    private static final String ARG_PICKUP = "pickup";
-    private static final String ARG_GENRE_LIST = "genre";
+    private static final String ARG_QUERY = "query";
 
-    private Query mQuery;
+    private static final String ARG_GENRE_LIST = "genre_list";
+
+    private Query query;
 
     private ArrayList<Integer> genreList;
 
@@ -62,25 +49,11 @@ public class SearchRecyclerViewFragment extends Fragment implements SearchRecycl
 
     public SearchRecyclerViewFragment() {}
 
-    public static SearchRecyclerViewFragment newInstance(Query query , ArrayList<Integer> genreList) {
+    public static SearchRecyclerViewFragment newInstance(Query query, ArrayList<Integer> genreList) {
 
         SearchRecyclerViewFragment fragment = new SearchRecyclerViewFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_NCODE, query.getNcode());
-        args.putString(ARG_SEARCH, query.getSearch());
-        args.putString(ARG_NOT_SEARCH, query.getNotSearch());
-        args.putInt(ARG_LIMIT, query.getLimit());
-        args.putInt(ARG_SORT_ORDER, query.getSortOrder());
-        args.putInt(ARG_TIME, query.getTime());
-        args.putInt(ARG_MAX_LENGTH, query.getMaxLength());
-        args.putInt(ARG_MIN_LENGTH, query.getMinLength());
-        args.putBoolean(ARG_TARGET_TITLE, query.isTargetTitle());
-        args.putBoolean(ARG_TARGET_STORY, query.isTargetStory());
-        args.putBoolean(ARG_TARGET_KEYWORD, query.isTargetKeyword());
-        args.putBoolean(ARG_TARGET_WRITER, query.isTargetWriter());
-        args.putBoolean(ARG_END, query.isEnd());
-        args.putBoolean(ARG_STOP, query.isStop());
-        args.putBoolean(ARG_PICKUP, query.isPickup());
+        args.putParcelable(ARG_QUERY, query);
         args.putIntegerArrayList(ARG_GENRE_LIST, genreList);
         fragment.setArguments(args);
         return fragment;
@@ -95,23 +68,7 @@ public class SearchRecyclerViewFragment extends Fragment implements SearchRecycl
             return;
         }
 
-        mQuery = new Query();
-        mQuery.setNcode(args.getString(ARG_NCODE));
-        mQuery.setSearch(args.getString(ARG_SEARCH));
-        mQuery.setNotSearch(args.getString(ARG_NOT_SEARCH));
-        mQuery.setLimit(args.getInt(ARG_LIMIT));
-        mQuery.setSortOrder(args.getInt(ARG_SORT_ORDER));
-        mQuery.setTime(args.getInt(ARG_TIME));
-        mQuery.setMaxLength(args.getInt(ARG_MAX_LENGTH));
-        mQuery.setMinLength(args.getInt(ARG_MIN_LENGTH));
-        mQuery.setTargetTitle(args.getBoolean(ARG_TARGET_TITLE));
-        mQuery.setTargetTitle(args.getBoolean(ARG_TARGET_TITLE));
-        mQuery.setTargetStory(args.getBoolean(ARG_TARGET_STORY));
-        mQuery.setTargetKeyword(args.getBoolean(ARG_TARGET_KEYWORD));
-        mQuery.setTargetWriter(args.getBoolean(ARG_TARGET_WRITER));
-        mQuery.setEnd(args.getBoolean(ARG_END));
-        mQuery.setStop(args.getBoolean(ARG_STOP));
-        mQuery.setPickup(args.getBoolean(ARG_PICKUP));
+        query = args.getParcelable(ARG_QUERY);
         genreList = args.getIntegerArrayList(ARG_GENRE_LIST);
     }
 
@@ -127,7 +84,7 @@ public class SearchRecyclerViewFragment extends Fragment implements SearchRecycl
         NovelDetailRecyclerViewAdapter adapter = new NovelDetailRecyclerViewAdapter(context, true);
         recyclerView.setAdapter(adapter);
 
-        controller.searchNovel(mQuery, genreList);
+        controller.searchNovel(query, genreList);
 
         return binding.getRoot();
     }
