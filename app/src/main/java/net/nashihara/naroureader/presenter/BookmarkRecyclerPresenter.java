@@ -1,5 +1,7 @@
 package net.nashihara.naroureader.presenter;
 
+import android.util.Log;
+
 import net.nashihara.naroureader.entities.Novel4Realm;
 import net.nashihara.naroureader.utils.RealmUtils;
 import net.nashihara.naroureader.views.BookmarkRecyclerView;
@@ -33,6 +35,7 @@ public class BookmarkRecyclerPresenter implements Presenter<BookmarkRecyclerView
 
         ArrayList<Novel4Realm> novels = new ArrayList<>();
         for (Novel4Realm novel4Realm : results) {
+            Log.d(BookmarkRecyclerPresenter.class.getSimpleName(), "fetchBookmarkNovels: " + novel4Realm.toString());
             novels.add(novel4Realm);
         }
 

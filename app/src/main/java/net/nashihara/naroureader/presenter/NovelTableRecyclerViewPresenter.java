@@ -90,6 +90,7 @@ public class NovelTableRecyclerViewPresenter implements Presenter<NovelTableRecy
         novel.setWriter(String.format("作者 : %s", novel4Realm.getWriter()));
         novel.setTitle(novel4Realm.getTitle());
         novel.setStory(novel4Realm.getStory());
+        novel.setBodies(table);
 
         view.showNovelTable(novel);
 

@@ -1,8 +1,7 @@
 package net.nashihara.naroureader.models;
 
 import android.support.annotation.NonNull;
-
-import com.android.annotations.Nullable;
+import android.support.annotation.Nullable;
 
 import narou4j.entities.NovelRank;
 

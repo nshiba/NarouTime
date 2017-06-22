@@ -13,14 +13,15 @@ public class RealmUtils {
 
     public static Realm getRealm(Context context) {
         if (defaultConfig == null) {
-            defaultConfig = getConfig(context);
+            Realm.init(context);
+            defaultConfig = getConfig();
         }
 
         return Realm.getInstance(defaultConfig);
     }
 
-    private static RealmConfiguration getConfig(Context context) {
-        defaultConfig = new RealmConfiguration.Builder(context)
+    private static RealmConfiguration getConfig() {
+        defaultConfig = new RealmConfiguration.Builder()
             .schemaVersion(VERSION)
             .migration(migration)
             .build();

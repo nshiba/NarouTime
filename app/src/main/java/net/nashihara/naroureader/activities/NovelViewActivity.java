@@ -162,16 +162,13 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
             realm = RealmUtils.getRealm(this);
         }
 
-        realm.beginTransaction();
-
-        Novel4Realm novel4Realm = realm.createObject(Novel4Realm.class);
+        Novel4Realm novel4Realm = new Novel4Realm();
         novel4Realm.setTitle(title);
         novel4Realm.setWriter(writer);
         novel4Realm.setNcode(ncode);
         novel4Realm.setTotalPage(totalPage);
-
-        realm.commitTransaction();
-        realm.close();
+        Log.d(TAG, "getNovel4RealmInstance: " + novel4Realm.toString());
+        realm.executeTransaction(realmTransaction -> realmTransaction.copyToRealmOrUpdate(novel4Realm));
         return novel4Realm;
     }
 
@@ -202,23 +199,31 @@ public class NovelViewActivity extends AppCompatActivity implements NovelBodyFra
     }
 
     public void bookmark(int page) {
-        RealmResults<Novel4Realm> results = getRealmResult();
-
-        if (results.size() != 0) {
-            realm.beginTransaction();
-
-            Novel4Realm novel4Realm = results.get(0);
-            novel4Realm.setBookmark(page);
-            novel4Realm.setTotalPage(totalPage);
-
-            realm.commitTransaction();
-        }
-        else {
-            Novel4Realm novel4Realm = getNovel4RealmInstance();
-            realm.beginTransaction();
-            novel4Realm.setBookmark(page);
-            realm.commitTransaction();
-        }
+        Novel4Realm novel4Realm = new Novel4Realm();
+        novel4Realm.setTitle(title);
+        novel4Realm.setWriter(writer);
+        novel4Realm.setNcode(ncode);
+        novel4Realm.setTotalPage(totalPage);
+        novel4Realm.setBookmark(page);
+        Log.d(TAG, "getNovel4RealmInstance: " + novel4Realm.toString());
+        realm.executeTransaction(realmTransaction -> realmTransaction.copyToRealmOrUpdate(novel4Realm));
+//        RealmResults<Novel4Realm> results = getRealmResult();
+//
+//        if (results.size() != 0) {
+//            realm.beginTransaction();
+//
+//            Novel4Realm novel4Realm = results.get(0);
+//            novel4Realm.setBookmark(page);
+//            novel4Realm.setTotalPage(totalPage);
+//
+//            realm.commitTransaction();
+//        }
+//        else {
+//            Novel4Realm novel4Realm = getNovel4RealmInstance();
+//            realm.beginTransaction();
+//            novel4Realm.setBookmark(page);
+//            realm.commitTransaction();
+//        }
     }
 
     public void removeBookmark() {

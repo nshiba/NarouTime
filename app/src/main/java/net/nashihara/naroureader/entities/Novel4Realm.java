@@ -77,4 +77,18 @@ public class Novel4Realm extends RealmObject {
     public void setDownload(boolean download) {
         isDownload = download;
     }
+
+    @Override
+    public String toString() {
+        return "Novel4Realm{" +
+                "ncode='" + ncode + '\'' +
+                ", title='" + title + '\'' +
+                ", writer='" + writer + '\'' +
+                ", story='" + story + '\'' +
+                ", bookmark=" + bookmark +
+                ", fav=" + fav +
+                ", totalPage=" + totalPage +
+                ", isDownload=" + isDownload +
+                '}';
+    }
 }

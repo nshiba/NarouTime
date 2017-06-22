@@ -59,16 +59,16 @@ public abstract class DownloadUtils {
                 downloaded(manager);
                 return;
             }
-        }
-        else {
-            realm.beginTransaction();
-            novel4Realm = realm.createObject(Novel4Realm.class);
-            novel4Realm.setNcode(novel.getNcode().toLowerCase());
-            novel4Realm.setTitle(novel.getTitle());
-            novel4Realm.setWriter(novel.getWriter());
-            novel4Realm.setTotalPage(novel.getAllNumberOfNovel());
-            novel4Realm.setStory(novel.getStory());
-            realm.commitTransaction();
+        } else {
+            realm.executeTransaction(transaction -> {
+                Novel4Realm saveNovel = new Novel4Realm();
+                saveNovel.setNcode(novel.getNcode().toLowerCase());
+                saveNovel.setTitle(novel.getTitle());
+                saveNovel.setWriter(novel.getWriter());
+                saveNovel.setStory(novel.getStory());
+                saveNovel.setTotalPage(novel.getAllNumberOfNovel());
+                transaction.copyToRealmOrUpdate(saveNovel);
+            });
         }
         realm.close();
 
