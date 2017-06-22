@@ -66,7 +66,8 @@ class NovelViewActivity : AppCompatActivity(), NovelBodyFragment.OnNovelBodyInte
         binding.toolbar.inflateMenu(R.menu.menu_novelbody)
         binding.toolbar.setOnMenuItemClickListener(this)
 
-        val adapter = NovelBodyFragmentViewPagerAdapter(supportFragmentManager, ncode, title, totalPage)
+        val adapter = NovelBodyFragmentViewPagerAdapter(
+                supportFragmentManager, ncode ?: "", title ?: "", totalPage)
         binding.viewPager.adapter = adapter
         binding.viewPager.currentItem = page - 1
 
