@@ -148,7 +148,7 @@ public class SearchRecyclerViewFragment extends Fragment implements SearchRecycl
                     }
                 } else {
                     NovelItem item = ((NovelDetailRecyclerViewAdapter) recyclerView.getAdapter()).getList().get(position);
-                    replaceListener.replaceFragment(NovelTableRecyclerViewFragment.newInstance(item.getNovelDetail().getNcode()), item.getNovelDetail().getTitle(), item);
+                    replaceListener.replaceFragment(NovelTableRecyclerViewFragment.Companion.newInstance(item.getNovelDetail().getNcode()), item.getNovelDetail().getTitle(), item);
                 }
             }
 

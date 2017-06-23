@@ -134,7 +134,7 @@ public class RankingRecyclerViewFragment extends Fragment implements RankingRecy
             public void onItemClick(View view, int position, ItemRankingRecyclerBinding itemBinding) {
                 if (view.getId() != R.id.btn_expand) {
                     NovelItem item = ((NovelDetailRecyclerViewAdapter) binding.recycler.getAdapter()).getList().get(position);
-                    replaceListener.replaceFragment(NovelTableRecyclerViewFragment.newInstance(item.getNovelDetail().getNcode()), item.getNovelDetail().getTitle(), item);
+                    replaceListener.replaceFragment(NovelTableRecyclerViewFragment.Companion.newInstance(item.getNovelDetail().getNcode()), item.getNovelDetail().getTitle(), item);
                     return;
                 }
 
@@ -171,7 +171,7 @@ public class RankingRecyclerViewFragment extends Fragment implements RankingRecy
         switch (which) {
             case 0: {
                 NovelItem item1 = ((NovelDetailRecyclerViewAdapter) binding.recycler.getAdapter()).getList().get(position);
-                replaceListener.replaceFragment(NovelTableRecyclerViewFragment.newInstance(
+                replaceListener.replaceFragment(NovelTableRecyclerViewFragment.Companion.newInstance(
                     item1.getNovelDetail().getNcode()), item1.getNovelDetail().getTitle(), item1);
                 break;
             }
@@ -189,7 +189,7 @@ public class RankingRecyclerViewFragment extends Fragment implements RankingRecy
                                         NovelItem novelItem = new NovelItem();
                                         novelItem.setNovelDetail(novel);
                                         replaceListener.replaceFragment(
-                                            NovelTableRecyclerViewFragment.newInstance(novel.getNcode()),
+                                            NovelTableRecyclerViewFragment.Companion.newInstance(novel.getNcode()),
                                             novelItem.getNovelDetail().getTitle(), novelItem);
                                     }
                                 });
