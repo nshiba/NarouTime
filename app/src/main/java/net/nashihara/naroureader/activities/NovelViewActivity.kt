@@ -145,7 +145,7 @@ class NovelViewActivity : AppCompatActivity(), NovelBodyFragment.OnNovelBodyInte
     }
 
     override fun getNovel4RealmInstance(): Novel4Realm {
-        if (realm!!.isClosed) {
+        if (realm?.isClosed ?: false) {
             realm = RealmUtils.getRealm(this)
         }
 
@@ -155,7 +155,7 @@ class NovelViewActivity : AppCompatActivity(), NovelBodyFragment.OnNovelBodyInte
         novel4Realm.ncode = ncode
         novel4Realm.totalPage = totalPage
         Log.d(TAG, "getNovel4RealmInstance: " + novel4Realm.toString())
-        realm!!.executeTransaction { realmTransaction -> realmTransaction.copyToRealmOrUpdate(novel4Realm) }
+        realm?.executeTransaction { realmTransaction -> realmTransaction.copyToRealmOrUpdate(novel4Realm) }
         return novel4Realm
     }
 
