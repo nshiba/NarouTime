@@ -53,7 +53,7 @@ public class RankingViewPagerFragment extends Fragment {
 
         Fragment fragments[] = new Fragment[TITLES.length];
         for (int i = 0; i < fragments.length; i++) {
-            fragments[i] = RankingRecyclerViewFragment.newInstance(RANKING_TYPES[i]);
+            fragments[i] = RankingRecyclerViewFragment.Companion.newInstance(RANKING_TYPES[i]);
         }
         RankingFragmentPagerAdapter adapter = new RankingFragmentPagerAdapter(getChildFragmentManager(), fragments, TITLES);
         binding.pager.setAdapter(adapter);
