@@ -21,7 +21,6 @@ import net.nashihara.naroureader.views.DownloadedRecyclerView
 import java.util.ArrayList
 
 import narou4j.entities.Novel
-import net.nashihara.naroureader.listeners.OnItemClickListener
 
 class DownloadedRecyclerViewFragment : Fragment(), DownloadedRecyclerView {
 
@@ -42,7 +41,7 @@ class DownloadedRecyclerViewFragment : Fragment(), DownloadedRecyclerView {
         controller = DownloadedRecyclerPresenter(this)
 
         adapter = SimpleRecyclerViewAdapter(context)
-        adapter.setOnItemClickListener(OnItemClickListener { _, position -> replaceFragment(position) })
+        adapter.setOnItemClickListener { _, position -> replaceFragment(position) }
 
         controller.fetchDownloadedNovels()
     }

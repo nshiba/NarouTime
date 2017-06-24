@@ -9,7 +9,6 @@ import android.view.ViewGroup
 
 import net.nashihara.naroureader.R
 import net.nashihara.naroureader.databinding.ItemSimpleRecyclerBinding
-import net.nashihara.naroureader.listeners.OnItemClickListener
 import net.nashihara.naroureader.entities.Novel4Realm
 
 import java.util.ArrayList
@@ -20,7 +19,7 @@ class SimpleRecyclerViewAdapter(context: Context) : RecyclerView.Adapter<SimpleR
 
     val list = ArrayList<Novel4Realm>()
 
-    private var listener: OnItemClickListener? = null
+    private var listener: ((View, Int) -> Unit)? = null
 
     private var recyclerView: RecyclerView? = null
 
@@ -62,11 +61,11 @@ class SimpleRecyclerViewAdapter(context: Context) : RecyclerView.Adapter<SimpleR
         list.clear()
     }
 
-    fun setOnItemClickListener(listener: OnItemClickListener) {
-        this.listener = listener
+    fun setOnItemClickListener(listener: (View, Int) -> Unit){
+      this.listener = listener
     }
 
-    class BindingHolder(itemView: View, private val mListener: OnItemClickListener?) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
+    class BindingHolder(itemView: View, private val listener: ((View, Int) -> Unit)?) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
         val binding: ItemSimpleRecyclerBinding = DataBindingUtil.bind<ItemSimpleRecyclerBinding>(itemView)
 
         init {
@@ -74,7 +73,7 @@ class SimpleRecyclerViewAdapter(context: Context) : RecyclerView.Adapter<SimpleR
         }
 
         override fun onClick(v: View) {
-            mListener?.onItemClick(v, layoutPosition)
+            listener?.invoke(v, layoutPosition)
         }
     }
 }

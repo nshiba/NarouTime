@@ -16,7 +16,6 @@ import net.nashihara.naroureader.adapters.SimpleRecyclerViewAdapter
 import net.nashihara.naroureader.presenter.BookmarkRecyclerPresenter
 import net.nashihara.naroureader.databinding.FragmentSimpleRecycerViewBinding
 import net.nashihara.naroureader.entities.Novel4Realm
-import net.nashihara.naroureader.listeners.OnItemClickListener
 import net.nashihara.naroureader.views.BookmarkRecyclerView
 
 import java.util.ArrayList
@@ -38,7 +37,7 @@ class BookmarkRecyclerViewFragment : Fragment(), BookmarkRecyclerView {
         controller = BookmarkRecyclerPresenter(this)
 
         adapter = SimpleRecyclerViewAdapter(context)
-        adapter.setOnItemClickListener(OnItemClickListener { _, position -> startNovelActivity(position) })
+        adapter.setOnItemClickListener { _, position -> startNovelActivity(position) }
 
         controller!!.fetchBookmarkNovels()
     }
