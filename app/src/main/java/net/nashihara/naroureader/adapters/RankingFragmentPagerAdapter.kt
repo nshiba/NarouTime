@@ -6,7 +6,7 @@ import android.support.v4.app.FragmentPagerAdapter
 
 class RankingFragmentPagerAdapter(
         fm: FragmentManager,
-        private val fragments: Array<Fragment>,
+        private val fragments: List<Fragment>,
         private val titles: Array<String>) : FragmentPagerAdapter(fm) {
 
     override fun getItem(position: Int): Fragment? {
