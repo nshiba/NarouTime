@@ -102,11 +102,11 @@ class NovelDetailRecyclerViewAdapter(context: Context, private val isSearch: Boo
             binding.rankNew.visibility = View.GONE
             binding.rankDiffKigou.visibility = View.VISIBLE
 
-            if (rankingManager.isRankUp) {
+            if (rankingManager.isRankUp()) {
                 binding.rankDiffKigou.setImageResource(R.drawable.ic_up)
-            } else if (rankingManager.isRankDown) {
+            } else if (rankingManager.isRankDown()) {
                 binding.rankDiffKigou.setImageResource(R.drawable.ic_down)
-            } else if (rankingManager.isEqual) {
+            } else if (rankingManager.isEqual()) {
                 binding.rankDiffKigou.setImageResource(R.drawable.ic_sonomama)
             }
         } else {
