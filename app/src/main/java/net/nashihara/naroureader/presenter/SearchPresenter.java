@@ -1,5 +1,7 @@
 package net.nashihara.naroureader.presenter;
 
+import android.support.annotation.Nullable;
+
 import net.nashihara.naroureader.entities.Query;
 import net.nashihara.naroureader.views.SearchView;
 
@@ -37,8 +39,8 @@ public class SearchPresenter implements Presenter<SearchView> {
         return genres;
     }
 
-    public void shapeSearchQuery(Query query, boolean[] genreChecked) {
-        if (query.getLimit() > 500) {
+    public void shapeSearchQuery(@Nullable Query query, @Nullable boolean[] genreChecked) {
+        if ((query != null ? query.getLimit() : 0) > 500) {
             view.showError();
             return;
         }

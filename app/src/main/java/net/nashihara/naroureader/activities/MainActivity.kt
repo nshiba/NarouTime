@@ -240,7 +240,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 .commit()
     }
 
-    override fun replaceFragment(fragment: Fragment?, title: String, item: NovelItem) {
+    override fun replaceFragment(fragment: Fragment?, title: String, item: NovelItem?) {
         if (fragment == null) {
             return
         }
