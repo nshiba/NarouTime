@@ -174,7 +174,7 @@ class NovelDetailRecyclerViewAdapter(context: Context, private val isSearch: Boo
     }
 
     interface OnItemClickListener {
-        fun onItemClick(view: View, position: Int, binding: ItemRankingRecyclerBinding)
+        fun onItemClick(view: View, position: Int, itemBinding: ItemRankingRecyclerBinding)
         fun onItemLongClick(view: View, position: Int, binding: ItemRankingRecyclerBinding)
     }
 
