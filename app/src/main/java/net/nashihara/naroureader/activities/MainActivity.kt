@@ -136,7 +136,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     dialog.dismiss()
 
                     val okCancelDialog = OkCancelDialogFragment.newInstance(
-                            "ダウンロード完了", "ダウンロードしました。") { dialog1, which -> dialog1.dismiss() }
+                            "ダウンロード完了", "ダウンロードしました。"
+                            , DialogInterface.OnClickListener { dialog1, _ -> dialog1.dismiss() })
                     okCancelDialog.show(supportFragmentManager, "okcansel")
                 }
 

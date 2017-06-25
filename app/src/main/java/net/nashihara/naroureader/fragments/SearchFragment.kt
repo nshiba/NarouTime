@@ -1,6 +1,7 @@
 package net.nashihara.naroureader.fragments
 
 import android.content.Context
+import android.content.DialogInterface
 import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -151,10 +152,10 @@ class SearchFragment : Fragment(), SearchView {
     }
 
     override fun showError() {
-        OkCancelDialogFragment.newInstance("エラー", "最大取得件数は500件です。") { dialog, which ->
+        OkCancelDialogFragment.newInstance("エラー", "最大取得件数は500件です。", DialogInterface.OnClickListener { dialog, _ ->
             dialog.dismiss()
             reload()
-        }.show(fragmentManager, "okcancel")
+        }).show(fragmentManager, "okcancel")
     }
 
     companion object {

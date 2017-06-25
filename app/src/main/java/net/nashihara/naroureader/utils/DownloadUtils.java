@@ -37,10 +37,10 @@ public abstract class DownloadUtils {
         this.novel = novel;
         this.manager = manager;
 
-        OkCancelDialogFragment okCancelDialog = OkCancelDialogFragment.newInstance("小説ダウンロード", novel.getTitle() + "をダウンロードしますか？", new DialogInterface.OnClickListener() {
+        OkCancelDialogFragment okCancelDialog = OkCancelDialogFragment.Companion.newInstance("小説ダウンロード", novel.getTitle() + "をダウンロードしますか？", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                if (OkCancelDialogFragment.CANSEL == which) {
+                if (OkCancelDialogFragment.Companion.getCANCEL() == which) {
                     return;
                 }
                 dialog.dismiss();
@@ -78,7 +78,7 @@ public abstract class DownloadUtils {
     }
 
     private void downloaded(FragmentManager manager) {
-        OkCancelDialogFragment okCancelDialog = OkCancelDialogFragment.newInstance(
+        OkCancelDialogFragment okCancelDialog = OkCancelDialogFragment.Companion.newInstance(
             "小説ダウンロード", "すでにこの小説はダウンロード済みです", (dialog, which) -> dialog.dismiss());
 
         okCancelDialog.show(manager, "okcancel");

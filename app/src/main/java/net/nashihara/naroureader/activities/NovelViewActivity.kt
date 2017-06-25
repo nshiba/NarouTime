@@ -1,5 +1,6 @@
 package net.nashihara.naroureader.activities
 
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
 import android.databinding.DataBindingUtil
@@ -76,11 +77,11 @@ class NovelViewActivity : AppCompatActivity(), NovelBodyFragment.OnNovelBodyInte
             val builder = StringBuilder()
             builder.append(title)
             builder.append("にしおりをはさみますか？")
-            val dialogFragment = OkCancelDialogFragment.newInstance("しおり", builder.toString()) { dialog, which ->
+            val dialogFragment = OkCancelDialogFragment.newInstance("しおり", builder.toString(), DialogInterface.OnClickListener { _, which ->
                 if (which == OkCancelDialogFragment.OK) {
                     bookmark(binding.viewPager.currentItem + 1)
                 }
-            }
+            })
             dialogFragment.show(supportFragmentManager, "okcansel")
         }
 

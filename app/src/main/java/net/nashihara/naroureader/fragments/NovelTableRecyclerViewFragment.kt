@@ -1,6 +1,7 @@
 package net.nashihara.naroureader.fragments
 
 import android.content.Context
+import android.content.DialogInterface
 import android.databinding.DataBindingUtil
 import android.os.Build
 import android.os.Bundle
@@ -29,7 +30,7 @@ import net.nashihara.naroureader.databinding.ItemTableRecyclerBinding
 
 class NovelTableRecyclerViewFragment : Fragment(), NovelTableRecyclerView {
 
-    private val realm: Realm by lazy { RealmUtils.getRealm(context) }
+    private lateinit var realm: Realm
 
     private var globalLayoutListener: ViewTreeObserver.OnGlobalLayoutListener? = null
 
@@ -59,6 +60,7 @@ class NovelTableRecyclerViewFragment : Fragment(), NovelTableRecyclerView {
         if (arguments != null) {
             ncode = arguments.getString(PARAM_NCODE)
         }
+        realm = RealmUtils.getRealm(context)
         controller = NovelTableRecyclerViewPresenter(this, realm)
     }
 
@@ -161,7 +163,9 @@ class NovelTableRecyclerViewFragment : Fragment(), NovelTableRecyclerView {
 
     override fun showBookmark(bookmark: Int) {
         if (bookmark == 0) {
-            val dialogFragment = OkCancelDialogFragment.newInstance("ブックマーク", "この小説にはしおりをはさんでいません。") { dialog, which -> }
+            val dialogFragment = OkCancelDialogFragment.newInstance(
+                    "ブックマーク", "この小説にはしおりをはさんでいません。"
+                    , DialogInterface.OnClickListener { dialog, _ -> dialog.dismiss() })
             dialogFragment.show(fragmentManager, "okcansel")
         } else {
             listener?.onSelect(ncode?:"", totalPage, bookmark, title?:"", writer?:"", bodyTitles!![bookmark - 1])

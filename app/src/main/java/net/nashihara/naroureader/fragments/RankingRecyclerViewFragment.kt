@@ -147,16 +147,18 @@ class RankingRecyclerViewFragment : Fragment(), RankingRecyclerView {
                     override fun onDownloadSuccess(dialog: NovelDownloadDialogFragment, novel: Novel) {
                         dialog.dismiss()
 
-                        val okCancelDialog = OkCancelDialogFragment.newInstance("ダウンロード完了", "ダウンロードした小説を開きますか？") { dialog1, which1 ->
-                            dialog1.dismiss()
-                            if (OkCancelDialogFragment.OK == which1) {
-                                val novelItem = NovelItem()
-                                novelItem.novelDetail = novel
-                                replaceListener!!.replaceFragment(
-                                        NovelTableRecyclerViewFragment.newInstance(novel.ncode),
-                                        novelItem.novelDetail.title, novelItem)
-                            }
-                        }
+                        val okCancelDialog = OkCancelDialogFragment.newInstance(
+                                "ダウンロード完了", "ダウンロードした小説を開きますか？"
+                                , DialogInterface.OnClickListener { dialog1, which1 ->
+                                    dialog1.dismiss()
+                                    if (OkCancelDialogFragment.OK == which1) {
+                                        val novelItem = NovelItem()
+                                        novelItem.novelDetail = novel
+                                        replaceListener!!.replaceFragment(
+                                                NovelTableRecyclerViewFragment.newInstance(novel.ncode),
+                                                novelItem.novelDetail.title, novelItem)
+                                    }
+                                })
                         okCancelDialog.show(fragmentManager, "okcansel")
                     }
 
