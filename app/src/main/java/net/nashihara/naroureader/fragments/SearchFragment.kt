@@ -20,8 +20,6 @@ import net.nashihara.naroureader.views.SearchView
 import net.nashihara.naroureader.widgets.FilterDialogFragment
 import net.nashihara.naroureader.widgets.OkCancelDialogFragment
 
-import java.util.ArrayList
-
 class SearchFragment : Fragment(), SearchView {
 
     private lateinit var binding: FragmentSearchBinding
@@ -58,15 +56,15 @@ class SearchFragment : Fragment(), SearchView {
     private fun setupSearchButton() {
         binding.btnSearch.setOnClickListener {
             mQuery.ncode = binding.editNcode.text.toString()
-            mQuery.setLimit(binding.editLimit.text.toString())
+            mQuery.setLimitString(binding.editLimit.text.toString())
             mQuery.search = binding.editSearch.text.toString()
             mQuery.notSearch = binding.editNotSearch.text.toString()
             mQuery.isTargetTitle = binding.keywordTitle.isChecked
             mQuery.isTargetStory = binding.keywordStory.isChecked
             mQuery.isTargetKeyword = binding.keywordKeyword.isChecked
             mQuery.isTargetKeyword = binding.keywordWriter.isChecked
-            mQuery.setMaxLength(binding.maxLength.text.toString())
-            mQuery.setMinLength(binding.minLength.text.toString())
+            mQuery.setMaxLengthString(binding.maxLength.text.toString())
+            mQuery.setMinLengthString(binding.minLength.text.toString())
             mQuery.isEnd = binding.end.isChecked
             mQuery.isStop = binding.stop.isChecked
             mQuery.isPickup = binding.pickup.isChecked
