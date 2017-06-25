@@ -8,6 +8,7 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.preference.Preference
 import android.support.v7.preference.PreferenceFragmentCompat
 import android.support.v7.preference.PreferenceManager
+import com.pavelsikun.vintagechroma.OnColorSelectedListener
 
 import net.nashihara.naroureader.R
 import net.nashihara.naroureader.utils.ColorPickerDialog
@@ -41,7 +42,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         val prefColor = pref.getInt(getString(stringResId), 0)
         val targetColor = if (prefColor == 0) ContextCompat.getColor(context, colorResId) else prefColor
 
-        ColorPickerDialog.show( fragmentManager, targetColor) {
-            color -> pref.edit().putInt(getString(stringResId), color).apply() }
+        ColorPickerDialog.show( fragmentManager, targetColor, OnColorSelectedListener {
+            color -> pref.edit().putInt(getString(stringResId), color).apply() })
     }
 }
