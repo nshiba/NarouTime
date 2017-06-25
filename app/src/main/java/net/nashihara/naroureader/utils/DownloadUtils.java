@@ -72,7 +72,7 @@ public abstract class DownloadUtils {
         }
         realm.close();
 
-        downloadDialog = NovelDownloadDialogFragment.newInstance(novel.getAllNumberOfNovel(), "小説ダウンロード", novel.getTitle() + "をダウンロード中");
+        downloadDialog = NovelDownloadDialogFragment.Companion.newInstance(novel.getAllNumberOfNovel(), "小説ダウンロード", novel.getTitle() + "をダウンロード中");
         downloadDialog.show(manager, "download");
         downloadTable();
     }
