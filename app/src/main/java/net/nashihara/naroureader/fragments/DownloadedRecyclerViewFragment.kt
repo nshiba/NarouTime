@@ -58,7 +58,7 @@ class DownloadedRecyclerViewFragment : Fragment(), DownloadedRecyclerView {
 
         val item = NovelItem()
         item.novelDetail = novelDetail
-        listener?.replaceFragment(NovelTableRecyclerViewFragment.newInstance(novel.ncode), novel.title, item)
+        listener?.replaceFragment(NovelTableRecyclerViewFragment.newInstance(novel.ncode ?: ""), novel.title ?: "", item)
     }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
