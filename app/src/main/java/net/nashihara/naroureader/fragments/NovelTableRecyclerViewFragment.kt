@@ -29,7 +29,7 @@ import net.nashihara.naroureader.databinding.ItemTableRecyclerBinding
 
 class NovelTableRecyclerViewFragment : Fragment(), NovelTableRecyclerView {
 
-    private var realm: Realm? = null
+    private val realm: Realm by lazy { RealmUtils.getRealm(context) }
 
     private var globalLayoutListener: ViewTreeObserver.OnGlobalLayoutListener? = null
 
@@ -59,8 +59,6 @@ class NovelTableRecyclerViewFragment : Fragment(), NovelTableRecyclerView {
         if (arguments != null) {
             ncode = arguments.getString(PARAM_NCODE)
         }
-
-        realm = RealmUtils.getRealm(context)
         controller = NovelTableRecyclerViewPresenter(this, realm)
     }
 
