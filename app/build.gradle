@@ -33,6 +33,9 @@ android {
     packagingOptions {
         exclude 'META-INF/LICENSE'
     }
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
 }
 
 repositories {
