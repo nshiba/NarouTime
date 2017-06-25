@@ -11,13 +11,11 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.GravityCompat
-import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.widget.Toast
 
 import com.balysv.materialmenu.MaterialMenuDrawable
@@ -34,7 +32,7 @@ import net.nashihara.naroureader.listeners.FragmentTransactionListener
 import net.nashihara.naroureader.entities.NovelItem
 import net.nashihara.naroureader.utils.DownloadUtils
 import net.nashihara.naroureader.utils.NetworkUtils
-import net.nashihara.naroureader.widgets.ListDailogFragment
+import net.nashihara.naroureader.widgets.ListDialogFragment
 import net.nashihara.naroureader.widgets.NovelDownloadDialogFragment
 import net.nashihara.naroureader.widgets.OkCancelDialogFragment
 
@@ -215,7 +213,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         startActivity(intent)
                     }
                 }
-                val fragment = ListDailogFragment.newInstance("フィードバック", arrayOf("Twitter", "Google Play Store"), onClickListener)
+                val fragment = ListDialogFragment.newInstance("フィードバック", arrayOf("Twitter", "Google Play Store"), onClickListener)
                 fragment.show(supportFragmentManager, "list")
             }
         }

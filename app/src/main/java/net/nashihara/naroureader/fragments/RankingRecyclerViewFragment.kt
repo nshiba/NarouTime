@@ -1,6 +1,7 @@
 package net.nashihara.naroureader.fragments
 
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.databinding.DataBindingUtil
 import android.net.Uri
@@ -22,7 +23,7 @@ import net.nashihara.naroureader.listeners.FragmentTransactionListener
 import net.nashihara.naroureader.utils.DownloadUtils
 import net.nashihara.naroureader.views.RankingRecyclerView
 import net.nashihara.naroureader.widgets.FilterDialogFragment
-import net.nashihara.naroureader.widgets.ListDailogFragment
+import net.nashihara.naroureader.widgets.ListDialogFragment
 import net.nashihara.naroureader.widgets.NovelDownloadDialogFragment
 import net.nashihara.naroureader.widgets.OkCancelDialogFragment
 
@@ -125,9 +126,8 @@ class RankingRecyclerViewFragment : Fragment(), RankingRecyclerView {
 
                 val item = adapter.list.get(position)
                 val strings = arrayOf("小説を読む", "ダウンロード", "ブラウザで小説ページを開く", "ブラウザで作者ページを開く")
-                val listDialog = ListDailogFragment.newInstance(item.novelDetail.title, strings) {
-                    _, which -> longClickListDialogListener(which, position, item)
-                }
+                val listDialog = ListDialogFragment.newInstance(item.novelDetail.title, strings,
+                        DialogInterface.OnClickListener { _, which ->  longClickListDialogListener(which, position, item)})
                 listDialog.show(fragmentManager, "list_dialog")
             }
         })
