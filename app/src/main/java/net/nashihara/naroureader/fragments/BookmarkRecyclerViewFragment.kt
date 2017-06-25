@@ -18,8 +18,6 @@ import net.nashihara.naroureader.databinding.FragmentSimpleRecycerViewBinding
 import net.nashihara.naroureader.entities.Novel4Realm
 import net.nashihara.naroureader.views.BookmarkRecyclerView
 
-import java.util.ArrayList
-
 class BookmarkRecyclerViewFragment : Fragment(), BookmarkRecyclerView {
 
     private lateinit var adapter: SimpleRecyclerViewAdapter
@@ -39,7 +37,7 @@ class BookmarkRecyclerViewFragment : Fragment(), BookmarkRecyclerView {
         adapter = SimpleRecyclerViewAdapter(context)
         adapter.setOnItemClickListener { _, position -> startNovelActivity(position) }
 
-        controller!!.fetchBookmarkNovels()
+        controller?.fetchBookmarkNovels(context)
     }
 
     private fun startNovelActivity(position: Int) {
@@ -76,7 +74,7 @@ class BookmarkRecyclerViewFragment : Fragment(), BookmarkRecyclerView {
         controller!!.detach()
     }
 
-    override fun showBookmarks(novels: ArrayList<Novel4Realm>) {
+    override fun showBookmarks(novels: List<Novel4Realm>) {
         adapter.clearData()
         adapter.addDataOf(novels)
     }
