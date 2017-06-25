@@ -145,7 +145,7 @@ class SearchFragment : Fragment(), SearchView {
         fragmentManager.beginTransaction().detach(this).attach(this).commit()
     }
 
-    override fun showResult(query: Query?, genreList: ArrayList<Int>?) {
+    override fun showResult(query: Query, genreList: List<Int>) {
         val fragment = SearchRecyclerViewFragment.newInstance(query, genreList)
         replaceListener!!.replaceFragment(fragment, "検索結果", null)
     }

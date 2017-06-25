@@ -137,12 +137,12 @@ class SearchRecyclerViewFragment : Fragment(), SearchRecyclerView {
 
         private val ARG_GENRE_LIST = "genre_list"
 
-        fun newInstance(query: Query?, genreList: ArrayList<Int>?): SearchRecyclerViewFragment {
+        fun newInstance(query: Query?, genreList: List<Int>?): SearchRecyclerViewFragment {
 
             val fragment = SearchRecyclerViewFragment()
             val args = Bundle()
             args.putParcelable(ARG_QUERY, query)
-            args.putIntegerArrayList(ARG_GENRE_LIST, genreList)
+            args.putIntegerArrayList(ARG_GENRE_LIST, ArrayList(genreList))
             fragment.arguments = args
             return fragment
         }
