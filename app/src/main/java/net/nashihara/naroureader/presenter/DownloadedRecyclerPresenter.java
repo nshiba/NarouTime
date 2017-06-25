@@ -1,5 +1,6 @@
 package net.nashihara.naroureader.presenter;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 
 import net.nashihara.naroureader.entities.Novel4Realm;
@@ -29,8 +30,8 @@ public class DownloadedRecyclerPresenter implements Presenter<DownloadedRecycler
         view = null;
     }
 
-    public void fetchDownloadedNovels() {
-        Realm realm = RealmUtils.getRealm(view.getContext());
+    public void fetchDownloadedNovels(Context context) {
+        Realm realm = RealmUtils.getRealm(context);
         RealmResults<Novel4Realm> results = realm.where(Novel4Realm.class).equalTo("isDownload", true).findAll();
 
         ArrayList<Novel4Realm> novels = new ArrayList<>();

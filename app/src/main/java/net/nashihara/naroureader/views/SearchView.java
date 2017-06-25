@@ -4,7 +4,7 @@ import net.nashihara.naroureader.entities.Query;
 
 import java.util.ArrayList;
 
-public interface SearchView extends BaseView {
+public interface SearchView  {
 
     void showResult(Query query, ArrayList<Integer> genreList);
 

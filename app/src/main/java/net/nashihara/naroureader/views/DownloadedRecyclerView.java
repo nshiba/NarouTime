@@ -4,7 +4,7 @@ import net.nashihara.naroureader.entities.Novel4Realm;
 
 import java.util.ArrayList;
 
-public interface DownloadedRecyclerView extends BaseView {
+public interface DownloadedRecyclerView {
 
     void showDownloadedNovels(ArrayList<Novel4Realm> novels);
 }

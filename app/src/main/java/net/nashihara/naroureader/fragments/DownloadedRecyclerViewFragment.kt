@@ -43,7 +43,7 @@ class DownloadedRecyclerViewFragment : Fragment(), DownloadedRecyclerView {
         adapter = SimpleRecyclerViewAdapter(context)
         adapter.setOnItemClickListener { _, position -> replaceFragment(position) }
 
-        controller.fetchDownloadedNovels()
+        controller.fetchDownloadedNovels(context)
     }
 
     private fun replaceFragment(position: Int) {
