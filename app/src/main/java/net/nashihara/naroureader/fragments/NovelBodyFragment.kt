@@ -102,7 +102,7 @@ class NovelBodyFragment : Fragment(), NovelBodyView {
 
         val autoDownload = pref.getBoolean(getString(R.string.auto_download), false)
         val autoSync = pref.getBoolean(getString(R.string.auto_sync), false)
-        controller.setupNovelPage(ncode, title, body, page, autoDownload, autoSync)
+        controller.setupNovelPage(ncode?:"", title?:"", body?:"", page, autoDownload, autoSync)
     }
 
     override fun onAttach(context: Context?) {
