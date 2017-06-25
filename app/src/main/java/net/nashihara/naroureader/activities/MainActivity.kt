@@ -131,6 +131,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 return true
             }
 
+            if (downloadTargetNovel == null) {
+                Toast.makeText(this, "小説目次ページを開いてから押してください", Toast.LENGTH_LONG).show()
+                return true
+            }
+
             val downloadUtils = object : DownloadUtils() {
                 override fun onDownloadSuccess(dialog: NovelDownloadDialogFragment, novel: Novel) {
                     dialog.dismiss()
@@ -147,7 +152,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     dialog.dismiss()
                 }
             }
-            downloadUtils.novelDownlaod(downloadTargetNovel!!.novelDetail, supportFragmentManager, this)
+            downloadUtils.novelDownload(downloadTargetNovel!!.novelDetail, supportFragmentManager, this)
             return true
         }
 

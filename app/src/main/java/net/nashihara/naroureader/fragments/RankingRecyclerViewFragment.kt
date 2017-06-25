@@ -167,7 +167,7 @@ class RankingRecyclerViewFragment : Fragment(), RankingRecyclerView {
                         dialog.dismiss()
                     }
                 }
-                downloadUtils.novelDownlaod(item.novelDetail, fragmentManager, context)
+                downloadUtils.novelDownload(item.novelDetail, fragmentManager, context)
             }
             2 -> {
                 val url = "http://ncode.syosetu.com/" + item.novelDetail.ncode + "/"
