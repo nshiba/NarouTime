@@ -90,7 +90,7 @@ class DownloadedRecyclerViewFragment : Fragment(), DownloadedRecyclerView {
         listener = null
     }
 
-    override fun showDownloadedNovels(novels: ArrayList<Novel4Realm>) {
+    override fun showDownloadedNovels(novels: List<Novel4Realm>) {
         adapter.clearData()
         adapter.addDataOf(novels)
     }
