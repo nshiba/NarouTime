@@ -152,7 +152,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     dialog.dismiss()
                 }
             }
-            downloadUtils.novelDownload(downloadTargetNovel!!.novelDetail, supportFragmentManager, this)
+            downloadTargetNovel?.novelDetail?.let { downloadUtils.novelDownload(it, supportFragmentManager, this) }
+
             return true
         }
 

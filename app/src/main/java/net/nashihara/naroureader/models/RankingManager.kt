@@ -3,21 +3,21 @@ package net.nashihara.naroureader.models
 import narou4j.entities.NovelRank
 import narou4j.enums.RankingType
 
-class RankingManager(private val novelRank: NovelRank, private val prevNovelRank: NovelRank?) {
+class RankingManager(private val novelRank: NovelRank?, private val prevNovelRank: NovelRank?) {
 
     fun hasPrevNovelRank(): Boolean {
         return prevNovelRank != null
     }
 
     fun buildPositionMessage(position: Int): String {
-        if (novelRank.rankingType == null) {
+        if (novelRank?.rankingType == null) {
             return (position + 1).toString() + "位"
         }
         return buildPositionMessage()
     }
 
     fun buildPositionMessage(): String {
-        return novelRank.rank.toString() + "位"
+        return novelRank?.rank.toString() + "位"
     }
 
     fun buildPrevRankingMessage(): String {
@@ -27,7 +27,7 @@ class RankingManager(private val novelRank: NovelRank, private val prevNovelRank
         }
 
         val prev = prevNovelRank.rank.toString() + "位"
-        return when (novelRank.rankingType) {
+        return when (novelRank?.rankingType) {
             RankingType.DAILY -> "前日：" + prev
             RankingType.WEEKLY -> "前週：" + prev
             RankingType.MONTHLY -> "前月：" + prev
@@ -36,9 +36,20 @@ class RankingManager(private val novelRank: NovelRank, private val prevNovelRank
         }
     }
 
-    fun isRankUp(): Boolean = novelRank.rank < prevNovelRank?.rank ?: 300
+    fun isRankUp(): Boolean {
+        if (novelRank == null || prevNovelRank == null) {
+            return true
+        }
 
-    fun isRankDown(): Boolean = novelRank.rank > prevNovelRank?.rank ?: 300
+        return novelRank.rank < prevNovelRank.rank
+    }
 
-    fun isEqual(): Boolean = novelRank.rank == prevNovelRank?.rank ?: -1
+    fun isRankDown(): Boolean {
+        if (novelRank == null || prevNovelRank == null) {
+            return false
+        }
+        return novelRank.rank > prevNovelRank.rank
+    }
+
+    fun isEqual(): Boolean = novelRank?.rank == prevNovelRank?.rank
 }

@@ -75,7 +75,6 @@ class SearchRecyclerPresenter(view: SearchRecyclerView) : Presenter<SearchRecycl
         val novelItemList = ArrayList<NovelItem>()
         for (i in novelList.indices) {
             val novel = novelList[i]
-            val item = NovelItem()
             val rank = NovelRank()
 
             novel.ncode = novel.ncode.toLowerCase()
@@ -83,10 +82,7 @@ class SearchRecyclerPresenter(view: SearchRecyclerView) : Presenter<SearchRecycl
             rank.ncode = novel.ncode
             rank.rank = i
 
-            item.novelDetail = novel
-            item.rank = rank
-
-            novelItemList.add(item)
+            novelItemList.add(NovelItem(novelDetail = novel, rank = rank))
         }
 
         return novelItemList

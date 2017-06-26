@@ -56,8 +56,7 @@ class DownloadedRecyclerViewFragment : Fragment(), DownloadedRecyclerView {
         novelDetail.writer = novel.writer
         novelDetail.allNumberOfNovel = novel.totalPage
 
-        val item = NovelItem()
-        item.novelDetail = novelDetail
+        val item = NovelItem(novelDetail = novelDetail)
         listener?.replaceFragment(NovelTableRecyclerViewFragment.newInstance(novel.ncode ?: ""), novel.title ?: "", item)
     }
 

@@ -26,8 +26,6 @@ import narou4j.enums.RankingType
 import rx.Emitter
 import rx.Observable
 import rx.android.schedulers.AndroidSchedulers
-import rx.functions.Action1
-import rx.functions.Func1
 import rx.schedulers.Schedulers
 
 class RankingRecyclerPresenter(view: RankingRecyclerView) : Presenter<RankingRecyclerView> {
@@ -109,11 +107,9 @@ class RankingRecyclerPresenter(view: RankingRecyclerView) : Presenter<RankingRec
             // ncodeが大文字と小文字が混在しているので小文字に統一
             novel.ncode = novel.ncode.toLowerCase()
 
-            item = NovelItem()
             val rank = NovelRank()
             rank.pt = novel.globalPoint
-            item.novelDetail = novel
-            item.rank = rank
+            item = NovelItem(novelDetail = novel, rank = rank)
             items.add(item)
         }
 
@@ -122,8 +118,8 @@ class RankingRecyclerPresenter(view: RankingRecyclerView) : Presenter<RankingRec
 
     private fun fetchEachRanking(rankingType: RankingType) {
         fetchNovelRank(rankingType)
-                .flatMap { map -> fetchPrevNovelRank(map, rankingType) }
-                .flatMap<List<NovelItem>>({ this.setupNovelRanking(it) })
+                .flatMap { this.setupNovelRanking(it) }
+                .flatMap { novelItems -> fetchPrevNovelRank(novelItems, rankingType) }
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ view?.showRanking(it) }, { this.error(it) })
@@ -151,8 +147,8 @@ class RankingRecyclerPresenter(view: RankingRecyclerView) : Presenter<RankingRec
         return cal
     }
 
-    private fun fetchNovelRank(rankingType: RankingType): Observable<HashMap<String, NovelItem>> {
-        return Observable.fromEmitter<HashMap<String, NovelItem>>({ emitter ->
+    private fun fetchNovelRank(rankingType: RankingType): Observable<HashMap<String, NovelRank>> {
+        return Observable.fromEmitter<HashMap<String, NovelRank>>({ emitter ->
             val ranking = Ranking()
             var ranks: ArrayList<NovelRank>? = null
             try {
@@ -172,20 +168,18 @@ class RankingRecyclerPresenter(view: RankingRecyclerView) : Presenter<RankingRec
         }, Emitter.BackpressureMode.NONE)
     }
 
-    private fun novelRankToNovelMap(rankList: List<NovelRank>, rankingType: RankingType): HashMap<String, NovelItem> {
-        val map = HashMap<String, NovelItem>()
-        for (rank in rankList) {
-            val novelItem = NovelItem()
-            rank.rankingType = rankingType
-            novelItem.rank = rank
-            map.put(rank.ncode, novelItem)
+    private fun novelRankToNovelMap(rankList: List<NovelRank>, rankingType: RankingType): HashMap<String, NovelRank> {
+        val map = HashMap<String, NovelRank>()
+        rankList.forEach {
+            it.rankingType = rankingType
+            map.put(it.ncode, it)
         }
 
         return map
     }
 
-    private fun fetchPrevNovelRank(map: HashMap<String, NovelItem>, rankingType: RankingType): Observable<HashMap<String, NovelItem>> {
-        return Observable.fromEmitter<HashMap<String, NovelItem>>({ emitter ->
+    private fun fetchPrevNovelRank(novelItems: List<NovelItem>, rankingType: RankingType): Observable<List<NovelItem>> {
+        return Observable.fromEmitter<List<NovelItem>>({ emitter ->
             val ranking = Ranking()
             val cal = setupCalendarFromRankingType(rankingType)
 
@@ -202,23 +196,21 @@ class RankingRecyclerPresenter(view: RankingRecyclerView) : Presenter<RankingRec
                 return@fromEmitter
             }
 
-            setupRank(rankList, map)
+            setupPrevRank(rankList, novelItems)
 
-            emitter.onNext(map)
+            emitter.onNext(novelItems)
             emitter.onCompleted()
         }, Emitter.BackpressureMode.NONE)
     }
 
-    private fun setupRank(rankList: List<NovelRank>, map: HashMap<String, NovelItem>) {
-        for (rank in rankList) {
-            val item = map[rank.ncode] ?: continue
-
-            item.prevRank = rank
-            map.put(rank.ncode, item)
+    private fun setupPrevRank(rankList: List<NovelRank>, novelItems: List<NovelItem>) {
+        novelItems.forEach { novelItem ->
+            novelItem.prevRank = rankList.find { rankItem ->
+                rankItem.ncode.toLowerCase() == novelItem.novelDetail.ncode.toLowerCase() }
         }
     }
 
-    private fun setupNovelRanking(map: HashMap<String, NovelItem>): Observable<List<NovelItem>> {
+    private fun setupNovelRanking(map: HashMap<String, NovelRank>): Observable<List<NovelItem>> {
         return Observable.fromEmitter<List<NovelItem>>({ emitter ->
             val pair = fetchNovelFromNcode(map)
 
@@ -227,13 +219,12 @@ class RankingRecyclerPresenter(view: RankingRecyclerView) : Presenter<RankingRec
                 return@fromEmitter
             }
 
-            val items = validateNovels(pair.first, map)
-            emitter.onNext(items)
+            emitter.onNext(pair.first)
             emitter.onCompleted()
         }, Emitter.BackpressureMode.NONE)
     }
 
-    private fun fetchNovelFromNcode(map: HashMap<String, NovelItem>): Pair<MutableList<Novel>, Throwable> {
+    private fun fetchNovelFromNcode(map: HashMap<String, NovelRank>): Pair<MutableList<NovelItem>, Throwable> {
         val narou = Narou()
         val set = map.keys
 
@@ -243,24 +234,25 @@ class RankingRecyclerPresenter(view: RankingRecyclerView) : Presenter<RankingRec
         try {
             novels = narou.novels
         } catch (e: IOException) {
-            return Pair.create<MutableList<Novel>, Throwable>(null, e)
+            return Pair.create<MutableList<NovelItem>, Throwable>(null, e)
         }
 
-        return Pair.create<MutableList<Novel>, Throwable>(novels, null)
+        val novelItems = mutableListOf<NovelItem>()
+        novels.forEach { novelItems.add(NovelItem(novelDetail = it, rank = map[it.ncode])) }
+
+        return Pair.create<MutableList<NovelItem>, Throwable>(validateNovels(novels, map), null)
     }
 
-    private fun validateNovels(novelList: MutableList<Novel>, map: HashMap<String, NovelItem>): List<NovelItem> {
-        novelList.removeAt(0)
+    private fun validateNovels(novelList: List<Novel>, map: HashMap<String, NovelRank>): MutableList<NovelItem> {
+        val novelMutableList = novelList.toMutableList()
+        novelMutableList.removeAt(0)
 
-        val items = ArrayList<NovelItem>()
-        for (novel in novelList) {
-            val item = map[novel.ncode]
-            if (item != null) {
-                // 大文字 → 小文字
+        val items = mutableListOf<NovelItem>()
+        for (novel in novelMutableList) {
+            val rank = map[novel.ncode]
+            rank?.let {
                 novel.ncode = novel.ncode.toLowerCase()
-
-                item.novelDetail = novel
-                items.add(item)
+                items.add(NovelItem(novelDetail = novel, rank = it))
             }
         }
 

@@ -92,7 +92,7 @@ class NovelDetailRecyclerViewAdapter(context: Context, private val isSearch: Boo
         binding.length.text = int2String(novel.numberOfChar) + " 文字"
     }
 
-    private fun setView4Ranking(binding: ItemRankingRecyclerBinding, novel: Novel, rank: NovelRank, prevRank: NovelRank?, position: Int) {
+    private fun setView4Ranking(binding: ItemRankingRecyclerBinding, novel: Novel, rank: NovelRank?, prevRank: NovelRank?, position: Int) {
         val rankingManager = RankingManager(rank, prevRank)
 
         binding.ranking.text = rankingManager.buildPositionMessage(position)
@@ -116,7 +116,8 @@ class NovelDetailRecyclerViewAdapter(context: Context, private val isSearch: Boo
         }
 
         binding.title.text = novel.title
-        binding.rankingPoint.text = int2String(rank.pt) + "pt"
+        rank?.let { binding.rankingPoint.text = int2String(it.pt) + "pt" }
+
         binding.ncode.text = novel.ncode
         binding.writer.text = novel.writer
         binding.genre.text = novel.genre.text
@@ -207,12 +208,14 @@ class NovelDetailRecyclerViewAdapter(context: Context, private val isSearch: Boo
     private class SortedListCallback(private val adapter: NovelDetailRecyclerViewAdapter, private val isSearch: Boolean) : SortedList.Callback<NovelItem>() {
 
         override fun compare(o1: NovelItem, o2: NovelItem): Int {
-            if (o2.rank.rank > o1.rank.rank) {
-                return -1
-            }
-            if (o1.rank.rank == o2.rank.rank) {
-                return 0
-            }
+            o1.rank?.let { o1Rank -> o2.rank?.let { o2Rank ->
+                if (o2Rank.rank > o1Rank.rank) {
+                    return -1
+                }
+                if (o1Rank.rank == o2Rank.rank) {
+                    return 0
+                }
+            } }
             return 1
         }
 
@@ -233,18 +236,15 @@ class NovelDetailRecyclerViewAdapter(context: Context, private val isSearch: Boo
         }
 
         override fun areContentsTheSame(oldItem: NovelItem, newItem: NovelItem): Boolean {
-            return oldItem.rank.rank == newItem.rank.rank
+            return oldItem.rank?.rank == newItem.rank?.rank
         }
 
         override fun areItemsTheSame(item1: NovelItem, item2: NovelItem): Boolean {
             if (item1.novelDetail == null) {
                 return item2.novelDetail == null
             }
-            return item1.novelDetail.ncode === item2.novelDetail.ncode
-        }
-    }
 
-    companion object {
-        private val TAG = NovelDetailRecyclerViewAdapter::class.java.simpleName
+            return item1.novelDetail?.ncode.equals(item2.novelDetail?.ncode)
+        }
     }
 }

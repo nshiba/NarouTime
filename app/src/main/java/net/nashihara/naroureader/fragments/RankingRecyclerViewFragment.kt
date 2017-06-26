@@ -152,9 +152,8 @@ class RankingRecyclerViewFragment : Fragment(), RankingRecyclerView {
                                 , DialogInterface.OnClickListener { dialog1, which1 ->
                                     dialog1.dismiss()
                                     if (OkCancelDialogFragment.OK == which1) {
-                                        val novelItem = NovelItem()
-                                        novelItem.novelDetail = novel
-                                        replaceListener!!.replaceFragment(
+                                        val novelItem = NovelItem(novelDetail = novel)
+                                        replaceListener?.replaceFragment(
                                                 NovelTableRecyclerViewFragment.newInstance(novel.ncode),
                                                 novelItem.novelDetail.title, novelItem)
                                     }
