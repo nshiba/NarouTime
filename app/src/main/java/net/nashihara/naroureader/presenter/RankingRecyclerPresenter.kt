@@ -25,8 +25,6 @@ import narou4j.enums.RankingType
 import net.nashihara.naroureader.addTo
 import net.nashihara.naroureader.async
 import net.nashihara.naroureader.ui
-import rx.android.schedulers.AndroidSchedulers
-import rx.schedulers.Schedulers
 
 class RankingRecyclerPresenter(view: RankingRecyclerView) : Presenter<RankingRecyclerView> {
 
