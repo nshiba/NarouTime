@@ -18,6 +18,7 @@ import narou4j.enums.NovelGenre
 import narou4j.enums.NovelType
 import narou4j.enums.OutputOrder
 import narou4j.enums.SearchWordTarget
+import net.nashihara.naroureader.addTo
 import net.nashihara.naroureader.async
 import net.nashihara.naroureader.ui
 
@@ -60,7 +61,7 @@ class SearchRecyclerPresenter(view: SearchRecyclerView) : Presenter<SearchRecycl
             } catch (e: Exception) {
                 error(e)
             }
-        }
+        }.addTo(jobList)
     }
 
     private fun setupNovelItems(novelList: List<Novel>): List<NovelItem> {
