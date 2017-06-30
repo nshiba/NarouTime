@@ -16,6 +16,7 @@ import kotlinx.coroutines.experimental.Job
 import narou4j.Narou
 import narou4j.entities.Novel
 import narou4j.entities.NovelBody
+import net.nashihara.naroureader.addTo
 import net.nashihara.naroureader.async
 import net.nashihara.naroureader.ui
 
@@ -23,7 +24,7 @@ class NovelTableRecyclerViewPresenter(view: NovelTableRecyclerView, private val 
 
     private var view: NovelTableRecyclerView? = null
 
-    private var job = Job()
+    private val jobList = mutableListOf<Job>()
 
     init {
         attach(view)
@@ -35,7 +36,7 @@ class NovelTableRecyclerViewPresenter(view: NovelTableRecyclerView, private val 
 
     override fun detach() {
         view = null
-        job.cancel()
+        jobList.forEach { it.cancel() }
     }
 
     fun fetchBookmark(ncode: String?) {
@@ -94,8 +95,7 @@ class NovelTableRecyclerViewPresenter(view: NovelTableRecyclerView, private val 
     }
 
     fun fetchNovelFromApi(ncode: String) {
-        job.cancel()
-        job = ui {
+        ui {
             try {
                 val info = fetchNovelBasicInfo(ncode).await()
                 val table = fetchNovelTable(ncode).await()
@@ -104,7 +104,7 @@ class NovelTableRecyclerViewPresenter(view: NovelTableRecyclerView, private val 
             } catch (e: Exception) {
                 showError(e)
             }
-        }
+        }.addTo(jobList)
     }
 
     private fun fetchNovelBasicInfo(ncode: String): Deferred<Novel> {

@@ -11,6 +11,7 @@ import io.realm.RealmResults
 import kotlinx.coroutines.experimental.Job
 import narou4j.Narou
 import narou4j.entities.NovelBody
+import net.nashihara.naroureader.addTo
 import net.nashihara.naroureader.async
 import net.nashihara.naroureader.ui
 
@@ -18,7 +19,7 @@ class NovelBodyPresenter(view: NovelBodyView, private val realm: Realm) : Presen
 
     private var view: NovelBodyView? = null
 
-    private var job = Job()
+    private val jobList = mutableListOf<Job>()
 
     init {
         attach(view)
@@ -30,7 +31,7 @@ class NovelBodyPresenter(view: NovelBodyView, private val realm: Realm) : Presen
 
     override fun detach() {
         view = null
-        job.cancel()
+        jobList.forEach { it.cancel() }
     }
 
     fun setupNovelPage(ncode: String, title: String, body: String, page: Int, autoDownload: Boolean, autoSync: Boolean) {
@@ -69,8 +70,7 @@ class NovelBodyPresenter(view: NovelBodyView, private val realm: Realm) : Presen
     }
 
     private fun fetchBody(ncode: String, page: Int, autoDownload: Boolean) {
-        job.cancel()
-        job = ui {
+        ui {
             try {
                 val narou = Narou()
                 val novelBody = async { narou.getNovelBody(ncode, page) }.await()
@@ -78,7 +78,7 @@ class NovelBodyPresenter(view: NovelBodyView, private val realm: Realm) : Presen
             } catch (e: Exception) {
                 showError(e)
             }
-        }
+        }.addTo(jobList)
     }
 
     private fun disposeNovelBody(body: NovelBody, autoDownload: Boolean) {
