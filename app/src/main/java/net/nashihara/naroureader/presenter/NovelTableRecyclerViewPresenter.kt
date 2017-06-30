@@ -8,24 +8,23 @@ import net.nashihara.naroureader.entities.Novel4Realm
 import net.nashihara.naroureader.entities.NovelTable4Realm
 import net.nashihara.naroureader.views.NovelTableRecyclerView
 
-import java.io.IOException
 import java.util.ArrayList
 
 import io.realm.Realm
-import io.realm.RealmQuery
-import io.realm.RealmResults
+import kotlinx.coroutines.experimental.Deferred
+import kotlinx.coroutines.experimental.Job
 import narou4j.Narou
 import narou4j.entities.Novel
 import narou4j.entities.NovelBody
-import rx.Emitter
-import rx.Observable
-import rx.android.schedulers.AndroidSchedulers
-import rx.functions.Action1
-import rx.schedulers.Schedulers
+import net.nashihara.naroureader.addTo
+import net.nashihara.naroureader.async
+import net.nashihara.naroureader.ui
 
 class NovelTableRecyclerViewPresenter(view: NovelTableRecyclerView, private val realm: Realm) : Presenter<NovelTableRecyclerView> {
 
     private var view: NovelTableRecyclerView? = null
+
+    private val jobList = mutableListOf<Job>()
 
     init {
         attach(view)
@@ -37,6 +36,7 @@ class NovelTableRecyclerViewPresenter(view: NovelTableRecyclerView, private val 
 
     override fun detach() {
         view = null
+        jobList.forEach { it.cancel() }
     }
 
     fun fetchBookmark(ncode: String?) {
@@ -95,36 +95,24 @@ class NovelTableRecyclerViewPresenter(view: NovelTableRecyclerView, private val 
     }
 
     fun fetchNovelFromApi(ncode: String) {
-        Observable.zip(fetchNovelBasicInfo(ncode), fetchNovelTable(ncode)) { info, table ->
-            info.bodies = table
-            info
-        }
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ view?.showNovelTable(it) }, { this.showError(it) })
+        ui {
+            try {
+                val info = fetchNovelBasicInfo(ncode).await()
+                val table = fetchNovelTable(ncode).await()
+                info.bodies = table
+                view?.showNovelTable(info)
+            } catch (e: Exception) {
+                showError(e)
+            }
+        }.addTo(jobList)
     }
 
-    private fun fetchNovelBasicInfo(ncode: String): Observable<Novel> {
-        return Observable.fromEmitter<Novel>({ emitter ->
-            val narou = Narou()
-            try {
-                emitter.onNext(narou.getNovel(ncode))
-            } catch (e: IOException) {
-                emitter.onError(e)
-            }
-        }, Emitter.BackpressureMode.NONE)
+    private fun fetchNovelBasicInfo(ncode: String): Deferred<Novel> {
+        return async { Narou().getNovel(ncode) }
     }
 
-    private fun fetchNovelTable(ncode: String): Observable<List<NovelBody>> {
-        return Observable.fromEmitter<List<NovelBody>>({ emitter ->
-            val narou = Narou()
-
-            try {
-                emitter.onNext(narou.getNovelTable(ncode))
-            } catch (e: IOException) {
-                emitter.onError(e)
-            }
-        }, Emitter.BackpressureMode.NONE)
+    private fun fetchNovelTable(ncode: String): Deferred<MutableList<NovelBody>> {
+        return async { Narou().getNovelTable(ncode) }
     }
 
     private fun showError(throwable: Throwable) {

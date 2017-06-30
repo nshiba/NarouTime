@@ -6,22 +6,20 @@ import net.nashihara.naroureader.entities.Novel4Realm
 import net.nashihara.naroureader.entities.NovelBody4Realm
 import net.nashihara.naroureader.views.NovelBodyView
 
-import java.io.IOException
-
 import io.realm.Realm
-import io.realm.RealmQuery
 import io.realm.RealmResults
+import kotlinx.coroutines.experimental.Job
 import narou4j.Narou
 import narou4j.entities.NovelBody
-import rx.Emitter
-import rx.Observable
-import rx.android.schedulers.AndroidSchedulers
-import rx.functions.Action1
-import rx.schedulers.Schedulers
+import net.nashihara.naroureader.addTo
+import net.nashihara.naroureader.async
+import net.nashihara.naroureader.ui
 
 class NovelBodyPresenter(view: NovelBodyView, private val realm: Realm) : Presenter<NovelBodyView> {
 
     private var view: NovelBodyView? = null
+
+    private val jobList = mutableListOf<Job>()
 
     init {
         attach(view)
@@ -33,6 +31,7 @@ class NovelBodyPresenter(view: NovelBodyView, private val realm: Realm) : Presen
 
     override fun detach() {
         view = null
+        jobList.forEach { it.cancel() }
     }
 
     fun setupNovelPage(ncode: String, title: String, body: String, page: Int, autoDownload: Boolean, autoSync: Boolean) {
@@ -71,17 +70,15 @@ class NovelBodyPresenter(view: NovelBodyView, private val realm: Realm) : Presen
     }
 
     private fun fetchBody(ncode: String, page: Int, autoDownload: Boolean) {
-        Observable.fromEmitter<NovelBody>({
-            val narou = Narou()
+        ui {
             try {
-                it.onNext(narou.getNovelBody(ncode, page))
-            } catch (e: IOException) {
-                it.onError(e)
+                val narou = Narou()
+                val novelBody = async { narou.getNovelBody(ncode, page) }.await()
+                disposeNovelBody(novelBody, autoDownload)
+            } catch (e: Exception) {
+                showError(e)
             }
-        }, Emitter.BackpressureMode.NONE)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ disposeNovelBody(it, autoDownload) }, { this.showError(it) })
+        }.addTo(jobList)
     }
 
     private fun disposeNovelBody(body: NovelBody, autoDownload: Boolean) {

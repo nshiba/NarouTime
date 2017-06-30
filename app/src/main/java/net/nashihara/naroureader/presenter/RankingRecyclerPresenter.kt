@@ -1,15 +1,14 @@
 package net.nashihara.naroureader.presenter
 
-import android.support.v4.util.Pair
-import android.text.TextUtils
 import android.util.Log
 
 import com.google.firebase.crash.FirebaseCrash
+import kotlinx.coroutines.experimental.Deferred
+import kotlinx.coroutines.experimental.Job
 
 import net.nashihara.naroureader.entities.NovelItem
 import net.nashihara.naroureader.views.RankingRecyclerView
 
-import java.io.IOException
 import java.util.ArrayList
 import java.util.Calendar
 import java.util.Date
@@ -23,14 +22,15 @@ import narou4j.entities.NovelRank
 import narou4j.enums.NovelGenre
 import narou4j.enums.OutputOrder
 import narou4j.enums.RankingType
-import rx.Emitter
-import rx.Observable
-import rx.android.schedulers.AndroidSchedulers
-import rx.schedulers.Schedulers
+import net.nashihara.naroureader.addTo
+import net.nashihara.naroureader.async
+import net.nashihara.naroureader.ui
 
 class RankingRecyclerPresenter(view: RankingRecyclerView) : Presenter<RankingRecyclerView> {
 
     private var view: RankingRecyclerView? = null
+
+    private val jobList = mutableListOf<Job>()
 
     init {
         attach(view)
@@ -42,6 +42,7 @@ class RankingRecyclerPresenter(view: RankingRecyclerView) : Presenter<RankingRec
 
     override fun detach() {
         view = null
+        jobList.forEach { it.cancel() }
     }
 
     private fun error(throwable: Throwable?) {
@@ -56,7 +57,7 @@ class RankingRecyclerPresenter(view: RankingRecyclerView) : Presenter<RankingRec
     }
 
     fun fetchRanking(rankingType: String) {
-        if (TextUtils.isEmpty(rankingType)) {
+        if (rankingType.isNullOrEmpty()) {
             return
         }
 
@@ -68,34 +69,24 @@ class RankingRecyclerPresenter(view: RankingRecyclerView) : Presenter<RankingRec
     }
 
     private fun fetchTotalRanking() {
-        fetchNovelsFromTotalRanking()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ view?.showRanking(it) }, { this.error(it) })
+        ui {
+            try {
+                val novelList = fetchNovelsFromTotalRanking()
+                val novelItemList = novelToNovelItem(novelList.await())
+                view?.showRanking(novelItemList)
+            } catch (e: Exception) {
+                error(e)
+            }
+        }.addTo(jobList)
     }
 
-    private fun fetchNovelsFromTotalRanking(): Observable<List<NovelItem>> {
-        return Observable.fromEmitter<List<NovelItem>>({ emitter ->
+    private fun fetchNovelsFromTotalRanking(): Deferred<MutableList<Novel>> {
+        return async {
             val narou = Narou()
             narou.setOrder(OutputOrder.TOTAL_POINT)
             narou.setLim(301)
-
-            var novels: MutableList<Novel>? = null
-            try {
-                novels = narou.novels
-            } catch (e: IOException) {
-                emitter.onError(e)
-            }
-
-            if (novels == null) {
-                emitter.onError(null)
-                emitter.onCompleted()
-                return@fromEmitter
-            }
-
-            emitter.onNext(novelToNovelItem(novels))
-            emitter.onCompleted()
-        }, Emitter.BackpressureMode.NONE)
+            return@async narou.novels
+        }
     }
 
     private fun novelToNovelItem(novels: MutableList<Novel>): List<NovelItem> {
@@ -117,12 +108,16 @@ class RankingRecyclerPresenter(view: RankingRecyclerView) : Presenter<RankingRec
     }
 
     private fun fetchEachRanking(rankingType: RankingType) {
-        fetchNovelRank(rankingType)
-                .flatMap { this.setupNovelRanking(it) }
-                .flatMap { novelItems -> fetchPrevNovelRank(novelItems, rankingType) }
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ view?.showRanking(it) }, { this.error(it) })
+        ui {
+            try {
+                val ranking = async { fetchNovelRank(rankingType) }
+                val rankingWithNovelInfo = async { fetchRankingNovelItem(ranking.await()) }
+                val setupedNovelRanking = async { setupPrevNovelRank(rankingWithNovelInfo.await(), rankingType) }.await()
+                view?.showRanking(setupedNovelRanking)
+            } catch (e: Exception) {
+                error(e)
+            }
+        }.addTo(jobList)
     }
 
     private fun setupCalendarFromRankingType(rankingType: RankingType): Calendar {
@@ -147,25 +142,9 @@ class RankingRecyclerPresenter(view: RankingRecyclerView) : Presenter<RankingRec
         return cal
     }
 
-    private fun fetchNovelRank(rankingType: RankingType): Observable<HashMap<String, NovelRank>> {
-        return Observable.fromEmitter<HashMap<String, NovelRank>>({ emitter ->
-            val ranking = Ranking()
-            var ranks: ArrayList<NovelRank>? = null
-            try {
-                ranks = ranking.getRanking(rankingType) as ArrayList<NovelRank>
-            } catch (e: IOException) {
-                emitter.onError(e)
-            }
-
-            if (ranks == null) {
-                emitter.onError(Throwable("error: ranks is null"))
-                emitter.onCompleted()
-                return@fromEmitter
-            }
-
-            emitter.onNext(novelRankToNovelMap(ranks, rankingType))
-            emitter.onCompleted()
-        }, Emitter.BackpressureMode.NONE)
+    private fun fetchNovelRank(rankingType: RankingType): HashMap<String, NovelRank> {
+        val ranks = Ranking().getRanking(rankingType)
+        return novelRankToNovelMap(ranks, rankingType)
     }
 
     private fun novelRankToNovelMap(rankList: List<NovelRank>, rankingType: RankingType): HashMap<String, NovelRank> {
@@ -178,72 +157,32 @@ class RankingRecyclerPresenter(view: RankingRecyclerView) : Presenter<RankingRec
         return map
     }
 
-    private fun fetchPrevNovelRank(novelItems: List<NovelItem>, rankingType: RankingType): Observable<List<NovelItem>> {
-        return Observable.fromEmitter<List<NovelItem>>({ emitter ->
-            val ranking = Ranking()
-            val cal = setupCalendarFromRankingType(rankingType)
-
-            val rankList: List<NovelRank>
-            try {
-                rankList = ranking.getRanking(rankingType, cal.time)
-            } catch (e: IOException) {
-                emitter.onError(e)
-                return@fromEmitter
-            }
-
-            if (rankList == null) {
-                emitter.onError(null)
-                return@fromEmitter
-            }
-
-            setupPrevRank(rankList, novelItems)
-
-            emitter.onNext(novelItems)
-            emitter.onCompleted()
-        }, Emitter.BackpressureMode.NONE)
+    private fun setupPrevNovelRank(novelItems: List<NovelItem>, rankingType: RankingType): List<NovelItem> {
+        val cal = setupCalendarFromRankingType(rankingType)
+        val rankList: List<NovelRank> = Ranking().getRanking(rankingType, cal.time)
+        return setupPrevRank(rankList, novelItems)
     }
 
-    private fun setupPrevRank(rankList: List<NovelRank>, novelItems: List<NovelItem>) {
-        novelItems.forEach { novelItem ->
+    private fun setupPrevRank(rankList: List<NovelRank>, novelItems: List<NovelItem>): List<NovelItem> {
+        novelItems.map { novelItem ->
             novelItem.prevRank = rankList.find { rankItem ->
                 rankItem.ncode.toLowerCase() == novelItem.novelDetail.ncode.toLowerCase() }
         }
+        return novelItems
     }
 
-    private fun setupNovelRanking(map: HashMap<String, NovelRank>): Observable<List<NovelItem>> {
-        return Observable.fromEmitter<List<NovelItem>>({ emitter ->
-            val pair = fetchNovelFromNcode(map)
-
-            if (pair.first == null) {
-                error(pair.second)
-                return@fromEmitter
-            }
-
-            emitter.onNext(pair.first)
-            emitter.onCompleted()
-        }, Emitter.BackpressureMode.NONE)
-    }
-
-    private fun fetchNovelFromNcode(map: HashMap<String, NovelRank>): Pair<MutableList<NovelItem>, Throwable> {
+    private fun fetchRankingNovelItem(map: HashMap<String, NovelRank>): List<NovelItem> {
         val narou = Narou()
-        val set = map.keys
-
-        narou.setNCode(set.toTypedArray())
+        narou.setNCode(map.keys.toTypedArray())
         narou.setLim(300)
-        val novels: List<Novel>
-        try {
-            novels = narou.novels
-        } catch (e: IOException) {
-            return Pair.create<MutableList<NovelItem>, Throwable>(null, e)
-        }
 
+        val novels = narou.novels
         val novelItems = mutableListOf<NovelItem>()
-        novels.forEach { novelItems.add(NovelItem(novelDetail = it, rank = map[it.ncode])) }
+        novels.map { novelItems.add(NovelItem(novelDetail = it, rank = map[it.ncode])) }
 
-        return Pair.create<MutableList<NovelItem>, Throwable>(validateNovels(novels, map), null)
+        return validateNovels(novels, map)
     }
-
-    private fun validateNovels(novelList: List<Novel>, map: HashMap<String, NovelRank>): MutableList<NovelItem> {
+    private fun validateNovels(novelList: List<Novel>, map: HashMap<String, NovelRank>): List<NovelItem> {
         val novelMutableList = novelList.toMutableList()
         novelMutableList.removeAt(0)
 
@@ -263,7 +202,6 @@ class RankingRecyclerPresenter(view: RankingRecyclerView) : Presenter<RankingRec
                            itemChecked: BooleanArray, min: String, max: String) {
         val trueSet = HashSet<NovelGenre>()
         val filterList = ArrayList<NovelItem>()
-        val resultList = ArrayList<NovelItem>()
 
         val maxLength = validateCharLength(min)
         val minLength = validateCharLength(max)
@@ -272,21 +210,18 @@ class RankingRecyclerPresenter(view: RankingRecyclerView) : Presenter<RankingRec
             genreAndEndCheck(i, filterIds, itemChecked, novelItemList, trueSet, filterList)
         }
 
-        for (i in filterList.indices) {
-            val target = filterList[i]
-
-            if (!charLengthCheck(target, trueSet, maxLength, minLength)) {
-                continue
-            }
-
-            resultList.add(target)
-        }
+        val resultList = filterList.indices
+                .map { filterList[it] }
+                .filter { charLengthCheck(it, trueSet, maxLength, minLength) }
 
         view?.showRanking(resultList)
     }
 
     private fun validateCharLength(length: String): Int {
-        return if (length == "") 0 else Integer.parseInt(length)
+        return when (length) {
+            "" -> 0
+            else -> Integer.parseInt(length)
+        }
     }
 
     private fun genreAndEndCheck(itemIndex: Int, filterIds: Array<NovelGenre>, itemChecked: BooleanArray,

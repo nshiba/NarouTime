@@ -59,16 +59,6 @@
   copyrightHolder: Copyright 2015 - 2016 KeepSafe Software Inc.
   license: The Apache Software License, Version 2.0
   url: https://github.com/KeepSafe/ReLinker
-- artifact: io.reactivex:rxandroid:+
-  name: RxAndroid
-  copyrightHolder: Copyright 2015 The RxAndroid authors
-  license: The Apache Software License, Version 2.0
-  url: https://github.com/ReactiveX/RxAndroid
-- artifact: io.reactivex:rxjava:+
-  name: rxjava
-  copyrightHolder: Copyright 2013 Netflix, Inc.
-  license: The Apache Software License, Version 2.0
-  url: https://github.com/ReactiveX/RxJava
 - artifact: net.nashihara:narou4j:+
   name: narou4j
   copyrightHolder: Copyright 2016 Naoya Shibahara
@@ -78,3 +68,52 @@
   name: vintage-chroma
   copyrightHolder: Copyright 2016 Pavel Sikun.
   license: The Apache Software License, Version 2.0
+- artifact: com.google.android.gms:play-services-basement:+
+  name: play-services-basement
+  skip: true
+- artifact: com.google.android.gms:play-services-tasks:+
+  name: play-services-tasks
+  skip: true
+- artifact: com.google.code.gson:gson:+
+  name: Gson
+  copyrightHolder: Copyright 2008 Google Inc.
+  license: The Apache Software License, Version 2.0
+- artifact: com.google.firebase:firebase-analytics-impl:+
+  name: firebase-analytics-impl
+  skip: true
+- artifact: com.google.firebase:firebase-analytics:+
+  name: firebase-analytics
+  skip: true
+- artifact: com.google.firebase:firebase-common:+
+  name: firebase-common
+  skip: true
+- artifact: com.google.firebase:firebase-core:+
+  name: firebase-core
+  skip: true
+- artifact: com.google.firebase:firebase-crash:+
+  name: firebase-crash
+  skip: true
+- artifact: com.google.firebase:firebase-iid:+
+  name: firebase-iid
+  skip: true
+- artifact: com.nineoldandroids:library:+
+  name: Nine Old Androids
+  skip: true
+- artifact: org.jetbrains.kotlin:kotlin-stdlib-jre7:+
+  name: kotlin-stdlib-jre7
+  skip: true
+- artifact: org.jetbrains.kotlin:kotlin-stdlib:+
+  name: kotlin-stdlib
+  skip: true
+- artifact: org.jetbrains.kotlinx:kotlinx-coroutines-android:+
+  name: kotlinx-coroutines-android
+  skip: true
+- artifact: org.jetbrains.kotlinx:kotlinx-coroutines-core:+
+  name: kotlinx-coroutines-core
+  skip: true
+- artifact: org.jetbrains:annotations:+
+  name: IntelliJ IDEA Annotations
+  copyrightHolder: Copyright 2016 JetBrains Inc.
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: http://www.jetbrains.org

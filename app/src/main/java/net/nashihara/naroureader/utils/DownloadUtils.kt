@@ -13,25 +13,22 @@ import net.nashihara.naroureader.entities.Novel4Realm
 import net.nashihara.naroureader.entities.NovelBody4Realm
 import net.nashihara.naroureader.entities.NovelTable4Realm
 
-import java.io.IOException
-
 import io.realm.Realm
 import narou4j.Narou
 import narou4j.entities.Novel
 import narou4j.entities.NovelBody
-import rx.Observable
-import rx.Subscriber
-import rx.schedulers.Schedulers
+import net.nashihara.naroureader.async
+import net.nashihara.naroureader.ui
 
 abstract class DownloadUtils {
     private var downloadDialog: NovelDownloadDialogFragment? = null
     private lateinit var manager: FragmentManager
     private var realm: Realm? = null
-    private lateinit var context: Context
+    private lateinit var downloadContext: Context
     private var novel: Novel? = null
 
     fun novelDownload(novel: Novel, manager: FragmentManager, context: Context) {
-        this.context = context
+        this.downloadContext = context
         this.novel = novel
         this.manager = manager
 
@@ -47,7 +44,7 @@ abstract class DownloadUtils {
     }
 
     private fun checkNovel() {
-        realm = RealmUtils.getRealm(context)
+        realm = RealmUtils.getRealm(downloadContext)
         val novel4Realm = realm!!.where(Novel4Realm::class.java).equalTo("ncode", novel!!.ncode.toLowerCase()).findFirst()
         if (novel4Realm != null) {
             if (novel4Realm.isDownload) {
@@ -80,78 +77,59 @@ abstract class DownloadUtils {
     }
 
     private fun downloadTable() {
-        Observable.create(Observable.OnSubscribe<List<NovelBody>> { subscriber ->
-            val narou = Narou()
+        ui {
             try {
-                subscriber.onNext(narou.getNovelTable(novel!!.ncode.toLowerCase()))
-            } catch (e: IOException) {
-                subscriber.onError(e)
-            }
-
-            subscriber.onCompleted()
-        }).subscribeOn(Schedulers.io()).subscribe(object : Subscriber<List<NovelBody>>() {
-            override fun onCompleted() {
+                val narou = Narou()
+                val novelBodies = async { narou.getNovelTable(novel?.ncode?.toLowerCase()) }.await()
+                storeTable(novelBodies)
+                downloadDialog?.progress = 1
                 novel?.let { downloadBody(it.allNumberOfNovel) }
-            }
-
-            override fun onError(e: Throwable) {
+            } catch (e: Exception) {
                 Log.e(TAG, "onError: ", e.fillInStackTrace())
                 FirebaseCrash.report(e)
                 downloadDialog?.let { onDownloadError(it) }
             }
+        }
+    }
 
-            override fun onNext(novelBodies: List<NovelBody>) {
-                storeTable(novelBodies)
-                downloadDialog?.progress = 1
-            }
-        })
+    private fun storeBody(novelBody: NovelBody) {
+        realm!!.beginTransaction()
+        val body4Realm = realm!!.createObject(NovelBody4Realm::class.java)
+        body4Realm.ncode = novelBody.ncode
+        body4Realm.page = novelBody.page
+        body4Realm.title = novelBody.title
+        body4Realm.body = novelBody.body
+        realm!!.commitTransaction()
+        downloadDialog!!.progress = novelBody.page + 1
     }
 
     private fun downloadBody(totalPage: Int) {
-        Observable.create(Observable.OnSubscribe<NovelBody> { subscriber ->
-            val narou = Narou()
-
+        ui {
             try {
-                realm = RealmUtils.getRealm(context)
-                for (i in 1..totalPage) {
-                    subscriber.onNext(narou.getNovelBody(novel!!.ncode.toLowerCase(), i))
-                }
-                realm?.close()
-            } catch (e: IOException) {
-                subscriber.onError(e)
-            }
+                val narou = Narou()
+                async {
+                    realm = RealmUtils.getRealm(downloadContext)
+                    for (i in 1..totalPage) {
+                        storeBody(narou.getNovelBody(novel!!.ncode.toLowerCase(), i))
+                    }
+                    realm?.close()
+                }.await()
 
-            subscriber.onCompleted()
-        }).subscribe(object : Subscriber<NovelBody>() {
-            override fun onCompleted() {
                 updateIsDownload()
                 downloadDialog?.let { dialog -> novel?.let { novel ->
                     onDownloadSuccess(dialog, novel)
                 }}
-            }
-
-            override fun onError(e: Throwable) {
+            } catch (e: Exception) {
                 Log.e(TAG, "onError: ", e.fillInStackTrace())
                 FirebaseCrash.report(e)
                 downloadDialog?.let { onDownloadError(it) }
                 realm!!.close()
             }
-
-            override fun onNext(novelBody: NovelBody) {
-                realm!!.beginTransaction()
-                val body4Realm = realm!!.createObject(NovelBody4Realm::class.java)
-                body4Realm.ncode = novelBody.ncode
-                body4Realm.page = novelBody.page
-                body4Realm.title = novelBody.title
-                body4Realm.body = novelBody.body
-                realm!!.commitTransaction()
-                downloadDialog!!.progress = novelBody.page + 1
-            }
-        })
+        }
     }
 
     private fun updateIsDownload() {
-        realm = RealmUtils.getRealm(context)
+        realm = RealmUtils.getRealm(downloadContext)
         val novel4Realm = realm!!.where(Novel4Realm::class.java).equalTo("ncode", novel!!.ncode.toLowerCase()).findFirst()
         realm!!.beginTransaction()
         novel4Realm.isDownload = true
@@ -160,7 +138,7 @@ abstract class DownloadUtils {
     }
 
     private fun storeTable(novelBodies: List<NovelBody>) {
-        realm = RealmUtils.getRealm(context)
+        realm = RealmUtils.getRealm(downloadContext)
         realm!!.beginTransaction()
         for (i in novelBodies.indices) {
             val targetTable = novelBodies[i]

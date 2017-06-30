@@ -8,4 +8,4 @@
 /keystore
 *.apk
 fabfile.py
-license.html
+app/src/main/assets/licenses.html
