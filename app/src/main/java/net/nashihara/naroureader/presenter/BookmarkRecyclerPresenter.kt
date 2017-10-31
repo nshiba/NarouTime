@@ -22,7 +22,7 @@ class BookmarkRecyclerPresenter(view: BookmarkRecyclerView) : Presenter<Bookmark
     }
 
     fun fetchBookmarkNovels(context: Context) {
-        val realm = RealmUtils.getRealm(context)
+        val realm = RealmUtils.getRealm()
         val results = realm.where(Novel4Realm::class.java).notEqualTo("bookmark", 0).findAll()
         results?.let { view?.showBookmarks(it.toList()) }
     }

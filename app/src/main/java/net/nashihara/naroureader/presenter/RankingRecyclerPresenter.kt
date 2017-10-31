@@ -26,15 +26,9 @@ import net.nashihara.naroureader.addTo
 import net.nashihara.naroureader.async
 import net.nashihara.naroureader.ui
 
-class RankingRecyclerPresenter(view: RankingRecyclerView) : Presenter<RankingRecyclerView> {
-
-    private var view: RankingRecyclerView? = null
+class RankingRecyclerPresenter(private var view: RankingRecyclerView?) : Presenter<RankingRecyclerView> {
 
     private val jobList = mutableListOf<Job>()
-
-    init {
-        attach(view)
-    }
 
     override fun attach(view: RankingRecyclerView) {
         this.view = view

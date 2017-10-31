@@ -29,7 +29,7 @@ class DownloadedRecyclerPresenter(view: DownloadedRecyclerView) : Presenter<Down
     }
 
     fun fetchDownloadedNovels(context: Context) {
-        val realm = RealmUtils.getRealm(context)
+        val realm = RealmUtils.getRealm()
         val results = realm.where(Novel4Realm::class.java).equalTo("isDownload", true).findAll()
         view?.showDownloadedNovels(results.toList())
     }

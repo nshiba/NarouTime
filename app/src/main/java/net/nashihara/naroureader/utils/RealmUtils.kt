@@ -12,9 +12,12 @@ object RealmUtils {
 
     private val VERSION = 3
 
-    fun getRealm(context: Context): Realm {
+    fun init(context: Context) {
+        Realm.init(context)
+    }
+
+    fun getRealm(): Realm {
         if (defaultConfig == null) {
-            Realm.init(context)
             defaultConfig = buildConfig()
         }
 

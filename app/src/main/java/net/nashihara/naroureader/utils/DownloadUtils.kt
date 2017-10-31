@@ -44,7 +44,7 @@ abstract class DownloadUtils {
     }
 
     private fun checkNovel() {
-        realm = RealmUtils.getRealm(downloadContext)
+        realm = RealmUtils.getRealm()
         val novel4Realm = realm!!.where(Novel4Realm::class.java).equalTo("ncode", novel!!.ncode.toLowerCase()).findFirst()
         if (novel4Realm != null) {
             if (novel4Realm.isDownload) {
@@ -108,7 +108,7 @@ abstract class DownloadUtils {
             try {
                 val narou = Narou()
                 async {
-                    realm = RealmUtils.getRealm(downloadContext)
+                    realm = RealmUtils.getRealm()
                     for (i in 1..totalPage) {
                         storeBody(narou.getNovelBody(novel!!.ncode.toLowerCase(), i))
                     }
@@ -129,7 +129,7 @@ abstract class DownloadUtils {
     }
 
     private fun updateIsDownload() {
-        realm = RealmUtils.getRealm(downloadContext)
+        realm = RealmUtils.getRealm()
         val novel4Realm = realm!!.where(Novel4Realm::class.java).equalTo("ncode", novel!!.ncode.toLowerCase()).findFirst()
         realm!!.beginTransaction()
         novel4Realm.isDownload = true
@@ -138,7 +138,7 @@ abstract class DownloadUtils {
     }
 
     private fun storeTable(novelBodies: List<NovelBody>) {
-        realm = RealmUtils.getRealm(downloadContext)
+        realm = RealmUtils.getRealm()
         realm!!.beginTransaction()
         for (i in novelBodies.indices) {
             val targetTable = novelBodies[i]

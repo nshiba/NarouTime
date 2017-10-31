@@ -60,7 +60,7 @@ class NovelTableRecyclerViewFragment : Fragment(), NovelTableRecyclerView {
         if (arguments != null) {
             ncode = arguments.getString(PARAM_NCODE)
         }
-        realm = RealmUtils.getRealm(context)
+        realm = RealmUtils.getRealm()
         controller = NovelTableRecyclerViewPresenter(this, realm)
     }
 

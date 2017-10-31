@@ -25,7 +25,7 @@ class NovelBodyFragment : Fragment(), NovelBodyView {
     private val pref: SharedPreferences
             by lazy { PreferenceManager.getDefaultSharedPreferences(context) }
 
-    private val realm: Realm by lazy { RealmUtils.getRealm(context) }
+    private val realm: Realm = RealmUtils.getRealm()
 
     private var page: Int = 0
 

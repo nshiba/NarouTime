@@ -47,7 +47,7 @@ class NovelViewActivity : AppCompatActivity(), NovelBodyFragment.OnNovelBodyInte
         binding = DataBindingUtil.setContentView<ActivityNovelViewBinding>(this, R.layout.activity_novel_view)
         manager = supportFragmentManager
         pref = PreferenceManager.getDefaultSharedPreferences(this)
-        realm = RealmUtils.getRealm(this)
+        realm = RealmUtils.getRealm()
 
         val intent = intent
         ncode = intent.getStringExtra("ncode")
@@ -147,7 +147,7 @@ class NovelViewActivity : AppCompatActivity(), NovelBodyFragment.OnNovelBodyInte
 
     override fun getNovel4RealmInstance(): Novel4Realm {
         if (realm?.isClosed ?: false) {
-            realm = RealmUtils.getRealm(this)
+            realm = RealmUtils.getRealm()
         }
 
         val novel4Realm = Novel4Realm()
@@ -176,7 +176,7 @@ class NovelViewActivity : AppCompatActivity(), NovelBodyFragment.OnNovelBodyInte
     private val realmResult: RealmResults<Novel4Realm>
         get() {
             if (realm!!.isClosed) {
-                realm = RealmUtils.getRealm(this)
+                realm = RealmUtils.getRealm()
             }
 
             val query = realm!!.where(Novel4Realm::class.java)
